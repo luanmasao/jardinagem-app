@@ -1,0 +1,226 @@
+@startuml
+
+skinparam classAttributeIconSize 0
+
+class Usuario {
+    - id: Long
+    - nome: String
+    - email: String
+    - senha: String
+    - telefone: String
+    - dataCadastro: Date
+    - ativo: Boolean
+}
+
+class Cliente {
+    - id: Long
+    - nome: String
+    - telefone: String
+    - email: String
+    - documento: String
+    - observacoes: String
+    - ativo: Boolean
+}
+
+class Endereco {
+    - id: Long
+    - cep: String
+    - logradouro: String
+    - numero: String
+    - complemento: String
+    - bairro: String
+    - cidade: String
+    - estado: String
+    - latitude: Double
+    - longitude: Double
+}
+
+class Servico {
+    - id: Long
+    - nome: String
+    - descricao: String
+    - unidade: String
+    - precoBase: Decimal
+    - usaMedicaoArea: Boolean
+    - ativo: Boolean
+}
+
+class Produto {
+    - id: Long
+    - nome: String
+    - descricao: String
+    - unidade: String
+    - precoBase: Decimal
+    - ativo: Boolean
+}
+
+class Orcamento {
+    - id: Long
+    - numero: String
+    - dataCriacao: Date
+    - dataValidade: Date
+    - status: StatusOrcamento
+    - subtotal: Decimal
+    - tipoDesconto: TipoDesconto
+    - valorDesconto: Decimal
+    - total: Decimal
+    - observacoes: String
+    - condicoesPagamento: String
+
+    + calcularSubtotal(): Decimal
+    + calcularDesconto(): Decimal
+    + calcularTotal(): Decimal
+    + validarParaEnvio(): Boolean
+    + alterarStatus(novoStatus: StatusOrcamento): Boolean
+    + duplicar(): Orcamento
+}
+
+class ItemOrcamento {
+    - id: Long
+    - tipo: TipoItem
+    - descricao: String
+    - quantidade: Decimal
+    - unidade: String
+    - valorUnitario: Decimal
+    - valorTotal: Decimal
+
+    + calcularTotal(): Decimal
+    + atualizarQuantidadePelasAreas(): Decimal
+    + editarSnapshot(descricao: String, valorUnitario: Decimal)
+}
+
+class Area {
+    - id: Long
+    - nome: String
+    - geometria: String
+    - areaCalculada: Decimal
+    - unidade: String
+    - observacoes: String
+
+    + calcularArea(): Decimal
+    + atualizarGeometria(geometria: String): Decimal
+}
+
+enum StatusOrcamento {
+    RASCUNHO
+    ENVIADO
+    EM_ANALISE
+    APROVADO
+    RECUSADO
+    EXPIRADO
+    CANCELADO
+    CONCLUIDO
+}
+
+enum TipoDesconto {
+    PERCENTUAL
+    VALOR_FIXO
+}
+
+enum TipoItem {
+    SERVICO
+    PRODUTO
+}
+
+
+Usuario "1" -- "0..*" Cliente : cadastra
+Usuario "1" -- "0..*" Servico : cadastra
+Usuario "1" -- "0..*" Produto : cadastra
+Usuario "1" -- "0..*" Orcamento : cria
+
+Cliente "1" -- "0..1" Endereco : possui
+Cliente "1" -- "0..*" Orcamento : recebe
+
+Orcamento "1" *-- "0..*" ItemOrcamento : possui
+
+ItemOrcamento "0..*" --> "0..1" Servico : referencia
+ItemOrcamento "0..*" --> "0..1" Produto : referencia
+
+ItemOrcamento "1" *-- "0..*" Area : possui
+
+
+note right of ItemOrcamento
+Cada ItemOrcamento representa
+exatamente um Serviço OU um Produto.
+
+Se tipo = SERVICO:
+- referencia um Serviço;
+- pode possuir Áreas quando
+  o serviço utiliza medição.
+
+Se tipo = PRODUTO:
+- referencia um Produto;
+- não pode possuir Áreas.
+
+O item mantém um snapshot
+independente do cadastro original.
+
+A descrição e o valor unitário
+podem ser personalizados no orçamento.
+end note
+
+
+note right of Area
+Uma Área pertence a um
+ItemOrcamento de serviço.
+
+A geometria é delimitada
+manualmente no mapa.
+
+A área é calculada automaticamente
+em metros quadrados (m²).
+
+Quando a geometria é alterada,
+a área deve ser recalculada.
+
+Para serviços medidos em m²,
+a soma das áreas determina
+a quantidade do ItemOrcamento.
+end note
+
+
+note bottom of Orcamento
+Um orçamento inicia como RASCUNHO.
+
+RASCUNHO pode estar incompleto
+e permanecer editável.
+
+Para passar a ENVIADO, deve possuir:
+- cliente;
+- pelo menos um item válido;
+- validade definida;
+- valores consistentes;
+- medições necessárias concluídas.
+
+Após sair de RASCUNHO,
+o orçamento não é editado diretamente.
+Alterações posteriores devem ser
+realizadas por duplicação.
+end note
+
+
+note bottom of Servico
+Quando usaMedicaoArea = true,
+a unidade comercial deve ser m².
+end note
+
+
+note bottom of Orcamento
+Transições permitidas:
+
+RASCUNHO -> ENVIADO
+RASCUNHO -> CANCELADO
+
+ENVIADO -> EM_ANALISE
+ENVIADO -> EXPIRADO
+ENVIADO -> CANCELADO
+
+EM_ANALISE -> APROVADO
+EM_ANALISE -> RECUSADO
+EM_ANALISE -> EXPIRADO
+EM_ANALISE -> CANCELADO
+
+APROVADO -> CONCLUIDO
+end note
+
+@enduml

@@ -1,0 +1,90 @@
+@startuml
+
+[*] --> RASCUNHO : Criar orçamento
+
+state RASCUNHO
+state ENVIADO
+state EM_ANALISE
+state APROVADO
+state RECUSADO
+state EXPIRADO
+state CANCELADO
+state CONCLUIDO
+
+RASCUNHO --> ENVIADO : Enviar orçamento\n[validado]
+RASCUNHO --> CANCELADO : Cancelar orçamento
+
+ENVIADO --> EM_ANALISE : Iniciar análise
+ENVIADO --> EXPIRADO : Validade ultrapassada
+ENVIADO --> CANCELADO : Cancelar orçamento
+
+EM_ANALISE --> APROVADO : Registrar aprovação
+EM_ANALISE --> RECUSADO : Registrar recusa
+EM_ANALISE --> EXPIRADO : Validade ultrapassada
+EM_ANALISE --> CANCELADO : Cancelar orçamento
+
+APROVADO --> CONCLUIDO : Concluir execução
+
+RECUSADO --> [*]
+EXPIRADO --> [*]
+CANCELADO --> [*]
+CONCLUIDO --> [*]
+
+note right of RASCUNHO
+Pode estar incompleto
+e permanecer editável.
+
+Pode ser salvo sem itens.
+
+Não expira automaticamente.
+end note
+
+note right of ENVIADO
+Não pode ser editado diretamente.
+
+A validade pode provocar
+a transição para EXPIRADO.
+end note
+
+note right of EM_ANALISE
+Não pode ser editado diretamente.
+
+Pode resultar em:
+APROVADO, RECUSADO,
+EXPIRADO ou CANCELADO.
+end note
+
+note right of APROVADO
+Representa a aceitação
+da proposta pelo cliente.
+
+Não pode ser editado diretamente.
+end note
+
+note bottom of RECUSADO
+Não pode ser reaberto.
+
+Uma nova proposta deve ser
+criada por duplicação.
+end note
+
+note bottom of EXPIRADO
+Não pode ser reaberto.
+
+Uma nova proposta deve ser
+criada por duplicação.
+end note
+
+note bottom of CANCELADO
+Não pode ser reaberto.
+end note
+
+note bottom of CONCLUIDO
+Representa a conclusão
+da execução relacionada
+ao orçamento.
+
+Não pode ser reaberto.
+end note
+
+@enduml

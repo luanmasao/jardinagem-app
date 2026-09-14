@@ -1,0 +1,131 @@
+@startuml
+
+start
+
+:Selecionar cliente;
+:Criar orçamento;
+:Definir status como "RASCUNHO";
+
+repeat
+
+    :Selecionar tipo de item;
+
+    if (É um serviço?) then (Sim)
+
+        :Selecionar serviço;
+        :Criar snapshot do serviço;
+
+        if (Serviço utiliza medição de área?) then (Sim)
+
+            :Abrir mapa;
+
+            if (Localização do cliente disponível?) then (Sim)
+                :Posicionar mapa na localização do cliente;
+            else (Não)
+                :Localizar manualmente o local no mapa;
+            endif
+
+            repeat
+
+                :Delimitar polígono;
+                :Calcular área automaticamente;
+                :Criar/associar área ao item;
+
+            repeat while (Adicionar outra área?) is (Sim)
+
+            :Somar áreas;
+            :Atualizar quantidade do item;
+            :Calcular valor total do item;
+
+            repeat
+
+                if (Editar área?) then (Sim)
+                    :Editar geometria ou dados da área;
+                    :Recalcular área;
+                    :Atualizar quantidade do item;
+                    :Recalcular valor total do item;
+                endif
+
+            repeat while (Continuar editando áreas?) is (Sim)
+
+        else (Não)
+
+            :Informar quantidade;
+            :Calcular valor total do item;
+
+        endif
+
+        if (Editar item?) then (Sim)
+            :Editar descrição ou valor unitário;
+            :Recalcular valor total do item;
+        endif
+
+    else (Produto)
+
+        :Selecionar produto;
+        :Criar snapshot do produto;
+        :Informar quantidade;
+
+        if (Editar item?) then (Sim)
+            :Editar descrição ou valor unitário;
+        endif
+
+        :Calcular valor total do item;
+
+    endif
+
+    if (Remover item?) then (Sim)
+        :Remover item do orçamento;
+    endif
+
+repeat while (Adicionar outro item?) is (Sim)
+
+
+if (Aplicar desconto?) then (Sim)
+    :Selecionar tipo de desconto;
+    :Informar valor do desconto;
+    :Validar desconto;
+endif
+
+if (Definir validade?) then (Sim)
+    :Informar data de validade;
+endif
+
+if (Adicionar observações?) then (Sim)
+    :Informar observações;
+endif
+
+if (Informar condições de pagamento?) then (Sim)
+    :Informar condições de pagamento;
+endif
+
+
+:Calcular subtotal;
+:Calcular desconto;
+:Calcular total;
+
+:Salvar orçamento;
+
+if (Enviar orçamento?) then (Sim)
+
+    :Validar orçamento para envio;
+
+    if (Orçamento atende às condições de envio?) then (Sim)
+        :Alterar status para "ENVIADO";
+        :Confirmar envio;
+    else (Não)
+        :Exibir erros de validação;
+        :Manter status como "RASCUNHO";
+    endif
+
+else (Não)
+
+    :Manter status como "RASCUNHO";
+
+endif
+
+:Exibir resumo do orçamento;
+
+stop
+
+@enduml

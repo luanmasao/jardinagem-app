@@ -1,0 +1,140 @@
+@startuml
+left to right direction
+
+actor "Jardineiro" as Jardineiro
+
+rectangle "Sistema de Orçamentos de Jardinagem" {
+
+    package "Autenticação" {
+        usecase "Realizar login" as UC_Login
+        usecase "Encerrar sessão" as UC_Logout
+    }
+
+    package "Cadastros" {
+        usecase "Gerenciar clientes" as UC_Clientes
+        usecase "Gerenciar serviços" as UC_Servicos
+        usecase "Gerenciar produtos" as UC_Produtos
+        usecase "Gerenciar endereço do cliente" as UC_Endereco
+    }
+
+    package "Orçamentos" {
+        usecase "Criar orçamento" as UC_Criar
+        usecase "Consultar orçamentos" as UC_Consultar
+        usecase "Visualizar orçamento" as UC_Visualizar
+        usecase "Duplicar orçamento" as UC_Duplicar
+
+        usecase "Adicionar serviço" as UC_AddServico
+        usecase "Adicionar produto" as UC_AddProduto
+        usecase "Editar item do orçamento" as UC_EditarItem
+        usecase "Remover item do orçamento" as UC_RemoverItem
+
+        usecase "Delimitar área no mapa" as UC_DelimitarArea
+        usecase "Editar área" as UC_EditarArea
+        usecase "Remover área" as UC_RemoverArea
+
+        usecase "Aplicar desconto" as UC_Desconto
+        usecase "Definir validade" as UC_Validade
+        usecase "Adicionar observações" as UC_Observacoes
+        usecase "Informar condições de pagamento" as UC_Pagamento
+
+        usecase "Enviar orçamento" as UC_Enviar
+        usecase "Gerenciar status do orçamento" as UC_Status
+
+        usecase "Gerar PDF" as UC_PDF
+        usecase "Compartilhar PDF" as UC_Compartilhar
+    }
+
+    package "Localização e Mapa" {
+        usecase "Localizar endereço" as UC_LocalizarEndereco
+        usecase "Posicionar mapa" as UC_PosicionarMapa
+    }
+}
+
+' Autenticação
+Jardineiro --> UC_Login
+Jardineiro --> UC_Logout
+
+' Cadastros
+Jardineiro --> UC_Clientes
+Jardineiro --> UC_Servicos
+Jardineiro --> UC_Produtos
+Jardineiro --> UC_Endereco
+
+' Orçamentos
+Jardineiro --> UC_Criar
+Jardineiro --> UC_Consultar
+Jardineiro --> UC_Visualizar
+Jardineiro --> UC_Duplicar
+
+Jardineiro --> UC_AddServico
+Jardineiro --> UC_AddProduto
+Jardineiro --> UC_EditarItem
+Jardineiro --> UC_RemoverItem
+
+Jardineiro --> UC_DelimitarArea
+Jardineiro --> UC_EditarArea
+Jardineiro --> UC_RemoverArea
+
+Jardineiro --> UC_Desconto
+Jardineiro --> UC_Validade
+Jardineiro --> UC_Observacoes
+Jardineiro --> UC_Pagamento
+
+Jardineiro --> UC_Enviar
+Jardineiro --> UC_Status
+
+Jardineiro --> UC_PDF
+Jardineiro --> UC_Compartilhar
+
+' Localização
+Jardineiro --> UC_LocalizarEndereco
+Jardineiro --> UC_PosicionarMapa
+
+' Relações entre casos de uso
+
+UC_DelimitarArea ..> UC_AddServico : <<extend>>\n[serviço exige medição]
+UC_EditarArea ..> UC_DelimitarArea : <<extend>>\n[área já existente]
+UC_RemoverArea ..> UC_DelimitarArea : <<extend>>\n[área já existente]
+
+UC_EditarItem ..> UC_AddServico : <<extend>>\n[item de serviço]
+UC_EditarItem ..> UC_AddProduto : <<extend>>\n[item de produto]
+
+UC_Enviar ..> UC_Criar : <<extend>>\n[orçamento em RASCUNHO]
+
+UC_LocalizarEndereco ..> UC_Endereco : <<extend>>\n[endereço informado]
+
+UC_PosicionarMapa ..> UC_DelimitarArea : <<extend>>\n[localização disponível]
+
+note right of UC_Enviar
+Antes do envio, o sistema deve validar:
+- cliente definido;
+- pelo menos um item válido;
+- validade definida;
+- valores consistentes;
+- medições necessárias concluídas.
+end note
+
+note right of UC_Status
+As alterações de status devem respeitar
+as transições permitidas no ciclo de vida
+do orçamento.
+end note
+
+note bottom of UC_EditarItem
+O item é um snapshot independente
+do cadastro original.
+
+A edição do item não altera
+o Serviço ou Produto cadastrado.
+end note
+
+note bottom of UC_DelimitarArea
+Áreas são delimitadas como polígonos
+no mapa.
+
+Para serviços medidos em m²,
+a soma das áreas determina
+a quantidade do item.
+end note
+
+@enduml

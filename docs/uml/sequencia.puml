@@ -1,0 +1,191 @@
+@startuml
+
+actor "Jardineiro" as Jardineiro
+
+boundary "Aplicativo" as App
+control "OrcamentoController" as Controller
+
+entity "Cliente" as Cliente
+entity "Servico" as Servico
+entity "Produto" as Produto
+entity "Orcamento" as Orcamento
+entity "ItemOrcamento" as Item
+entity "Area" as Area
+
+
+== Criação do orçamento ==
+
+Jardineiro -> App : Solicitar criação de orçamento
+App -> Controller : iniciarOrcamento(clienteId)
+
+Controller -> Cliente : consultar(clienteId)
+Cliente --> Controller : dados do cliente
+
+Controller -> Orcamento : criar(cliente)
+Orcamento --> Controller : novo orçamento\nstatus = RASCUNHO
+
+
+== Inclusão de itens ==
+
+loop Para cada item
+
+    Jardineiro -> App : Selecionar serviço ou produto
+
+    alt Serviço
+
+        App -> Controller : adicionarServico(servicoId)
+
+        Controller -> Servico : consultar(servicoId)
+        Servico --> Controller : dados do serviço
+
+        Controller -> Item : criarSnapshot(servico)
+        Item --> Controller : item criado
+
+        alt Serviço utiliza medição de área
+
+            Controller --> App : solicitar medição
+
+            Jardineiro -> App : Abrir mapa
+
+            opt Localização do cliente disponível
+                App -> Controller : obter localização do cliente
+                Controller --> App : latitude e longitude
+                App -> App : Posicionar mapa na localização
+            end
+
+            loop Para cada área
+
+                Jardineiro -> App : Delimitar polígono
+
+                App -> Area : criar(geometria)
+                Area -> Area : calcularArea()
+                Area --> App : área calculada
+
+                App -> Controller : adicionarArea(itemId, area)
+
+                Controller -> Item : associar área
+                Controller -> Item : atualizarQuantidadePelasAreas()
+
+            end
+
+        else Serviço não utiliza medição
+
+            Jardineiro -> App : Informar quantidade
+            App -> Controller : definirQuantidade(itemId, quantidade)
+            Controller -> Item : atualizar quantidade
+
+        end
+
+        opt Editar item
+            Jardineiro -> App : Editar descrição ou valor unitário
+            App -> Controller : editarItem(descricao, valorUnitario)
+            Controller -> Item : editarSnapshot()
+        end
+
+        Controller -> Item : calcularTotal()
+        Item --> Controller : valor total
+
+        Controller -> Orcamento : adicionarItem(item)
+
+    else Produto
+
+        App -> Controller : adicionarProduto(produtoId)
+
+        Controller -> Produto : consultar(produtoId)
+        Produto --> Controller : dados do produto
+
+        Controller -> Item : criarSnapshot(produto)
+        Item --> Controller : item criado
+
+        Jardineiro -> App : Informar quantidade
+        App -> Controller : definirQuantidade(itemId, quantidade)
+
+        opt Editar item
+            Jardineiro -> App : Editar descrição ou valor unitário
+            App -> Controller : editarItem(descricao, valorUnitario)
+            Controller -> Item : editarSnapshot()
+        end
+
+        Controller -> Item : calcularTotal()
+        Item --> Controller : valor total
+
+        Controller -> Orcamento : adicionarItem(item)
+
+    end
+
+end
+
+
+== Dados comerciais ==
+
+opt Informar desconto
+    Jardineiro -> App : Informar tipo e valor do desconto
+    App -> Controller : aplicarDesconto(tipo, valor)
+    Controller -> Orcamento : definir desconto
+end
+
+opt Informar validade
+    Jardineiro -> App : Informar validade
+    App -> Controller : definirValidade(data)
+    Controller -> Orcamento : definir validade
+end
+
+opt Adicionar observações
+    Jardineiro -> App : Informar observações
+    App -> Controller : definirObservacoes(texto)
+    Controller -> Orcamento : definir observações
+end
+
+opt Informar condições de pagamento
+    Jardineiro -> App : Informar condições
+    App -> Controller : definirCondicoesPagamento(texto)
+    Controller -> Orcamento : definir condições
+end
+
+
+== Cálculo ==
+
+Controller -> Orcamento : calcularSubtotal()
+Orcamento --> Controller : subtotal
+
+Controller -> Orcamento : calcularDesconto()
+Orcamento --> Controller : valor do desconto
+
+Controller -> Orcamento : calcularTotal()
+Orcamento --> Controller : total
+
+
+== Salvamento ==
+
+Jardineiro -> App : Salvar orçamento
+App -> Controller : salvarOrcamento()
+Controller -> Orcamento : manter status RASCUNHO
+Controller --> App : orçamento salvo
+
+App --> Jardineiro : Exibir resumo do orçamento
+
+
+== Envio ==
+
+Jardineiro -> App : Solicitar envio do orçamento
+App -> Controller : enviarOrcamento()
+
+Controller -> Orcamento : validarParaEnvio()
+Orcamento --> Controller : resultado da validação
+
+alt Orçamento inválido
+
+    Controller --> App : Retornar erros de validação
+    App --> Jardineiro : Exibir dados que precisam ser corrigidos
+
+else Orçamento válido
+
+    Controller -> Orcamento : alterarStatus(ENVIADO)
+    Orcamento --> Controller : status atualizado
+
+    Controller --> App : orçamento enviado
+    App --> Jardineiro : Confirmar envio
+
+end
+
+@enduml

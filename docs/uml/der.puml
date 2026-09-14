@@ -1,0 +1,296 @@
+@startuml
+
+hide methods
+hide stereotypes
+
+entity USUARIO {
+    * id : BIGINT <<PK>>
+    --
+    nome : VARCHAR(100)
+    email : VARCHAR(150)
+    senha : VARCHAR(255)
+    telefone : VARCHAR(20)
+    data_cadastro : DATETIME
+    ativo : BOOLEAN
+}
+
+entity CLIENTE {
+    * id : BIGINT <<PK>>
+    --
+    usuario_id : BIGINT <<FK>>
+    nome : VARCHAR(150)
+    telefone : VARCHAR(20)
+    email : VARCHAR(150)
+    documento : VARCHAR(30)
+    observacoes : TEXT
+    ativo : BOOLEAN
+}
+
+entity ENDERECO {
+    * id : BIGINT <<PK>>
+    --
+    cliente_id : BIGINT <<FK>>
+    cep : VARCHAR(10)
+    logradouro : VARCHAR(150)
+    numero : VARCHAR(20)
+    complemento : VARCHAR(100)
+    bairro : VARCHAR(100)
+    cidade : VARCHAR(100)
+    estado : VARCHAR(2)
+    latitude : DECIMAL(10,8)
+    longitude : DECIMAL(11,8)
+}
+
+entity SERVICO {
+    * id : BIGINT <<PK>>
+    --
+    usuario_id : BIGINT <<FK>>
+    nome : VARCHAR(150)
+    descricao : TEXT
+    unidade : VARCHAR(30)
+    preco_base : DECIMAL(10,2)
+    usa_medicao_area : BOOLEAN
+    ativo : BOOLEAN
+}
+
+entity PRODUTO {
+    * id : BIGINT <<PK>>
+    --
+    usuario_id : BIGINT <<FK>>
+    nome : VARCHAR(150)
+    descricao : TEXT
+    unidade : VARCHAR(30)
+    preco_base : DECIMAL(10,2)
+    ativo : BOOLEAN
+}
+
+entity ORCAMENTO {
+    * id : BIGINT <<PK>>
+    --
+    usuario_id : BIGINT <<FK>>
+    cliente_id : BIGINT <<FK>>
+    numero : VARCHAR(30)
+    data_criacao : DATETIME
+    data_validade : DATE
+    status : VARCHAR(20)
+    subtotal : DECIMAL(10,2)
+    tipo_desconto : VARCHAR(20)
+    valor_desconto : DECIMAL(10,2)
+    total : DECIMAL(10,2)
+    observacoes : TEXT
+    condicoes_pagamento : TEXT
+    --
+    UK(usuario_id, numero)
+}
+
+entity ITEM_ORCAMENTO {
+    * id : BIGINT <<PK>>
+    --
+    orcamento_id : BIGINT <<FK>>
+    servico_id : BIGINT <<FK, NULL>>
+    produto_id : BIGINT <<FK, NULL>>
+    tipo : VARCHAR(20)
+    descricao : VARCHAR(200)
+    quantidade : DECIMAL(10,3)
+    unidade : VARCHAR(30)
+    valor_unitario : DECIMAL(10,2)
+    valor_total : DECIMAL(10,2)
+}
+
+entity AREA {
+    * id : BIGINT <<PK>>
+    --
+    item_orcamento_id : BIGINT <<FK>>
+    nome : VARCHAR(100)
+    geometria : TEXT
+    area_calculada : DECIMAL(12,2)
+    unidade : VARCHAR(10)
+    observacoes : TEXT
+}
+
+
+USUARIO ||--o{ CLIENTE : cadastra
+USUARIO ||--o{ SERVICO : cadastra
+USUARIO ||--o{ PRODUTO : cadastra
+USUARIO ||--o{ ORCAMENTO : cria
+
+CLIENTE ||--o| ENDERECO : possui
+CLIENTE ||--o{ ORCAMENTO : recebe
+
+ORCAMENTO ||--o{ ITEM_ORCAMENTO : possui
+
+SERVICO ||--o{ ITEM_ORCAMENTO : referencia
+PRODUTO ||--o{ ITEM_ORCAMENTO : referencia
+
+ITEM_ORCAMENTO ||--o{ AREA : possui
+
+
+note right of CLIENTE
+O endereço é opcional.
+
+Um cliente pode possuir no máximo
+um endereço cadastrado.
+
+A localização geográfica do endereço
+é auxiliar e não representa uma
+área de trabalho.
+end note
+
+
+note right of ITEM_ORCAMENTO
+RESTRIÇÃO Serviço OU Produto:
+
+Cada item representa exatamente
+um Serviço OU um Produto.
+
+Se tipo = SERVICO:
+- servico_id deve ser preenchido;
+- produto_id deve ser NULL.
+
+Se tipo = PRODUTO:
+- produto_id deve ser preenchido;
+- servico_id deve ser NULL.
+
+O item é um snapshot independente
+do cadastro original.
+
+A descrição, unidade, quantidade,
+valor unitário e valor total pertencem
+ao histórico do orçamento.
+
+A descrição e o valor unitário podem
+ser personalizados no orçamento.
+end note
+
+
+note right of AREA
+Uma Área pertence a um
+ItemOrcamento de serviço.
+
+Um item pode possuir várias áreas.
+
+As áreas podem ser não contíguas.
+
+A geometria é delimitada no mapa
+e a área é calculada automaticamente
+em m².
+
+Se a geometria for alterada,
+a área deve ser recalculada.
+
+A área somente é válida quando:
+- tipo do item = SERVICO;
+- o serviço utiliza medição de área.
+end note
+
+
+note bottom of SERVICO
+Quando usa_medicao_area = TRUE,
+a unidade comercial deve ser m².
+
+Alterações posteriores no cadastro
+não modificam itens de orçamentos
+existentes.
+
+Serviços já utilizados em orçamento
+devem ser desativados, não excluídos
+fisicamente.
+end note
+
+
+note bottom of PRODUTO
+Alterações posteriores no cadastro
+não modificam itens de orçamentos
+existentes.
+
+Produtos já utilizados em orçamento
+devem ser desativados, não excluídos
+fisicamente.
+end note
+
+
+note bottom of ORCAMENTO
+Um orçamento pode existir sem itens
+enquanto estiver em RASCUNHO.
+
+Todo novo orçamento inicia como
+RASCUNHO.
+
+Para ser ENVIADO, deve possuir:
+- cliente;
+- pelo menos um item válido;
+- validade definida;
+- valores consistentes;
+- medições necessárias concluídas.
+
+Após sair de RASCUNHO, não deve ser
+editado diretamente.
+
+Alterações posteriores devem ocorrer
+por duplicação.
+
+Os valores subtotal, desconto e total
+são armazenados no orçamento.
+end note
+
+
+note bottom of ORCAMENTO
+Estados possíveis:
+
+RASCUNHO
+ENVIADO
+EM_ANALISE
+APROVADO
+RECUSADO
+EXPIRADO
+CANCELADO
+CONCLUIDO
+
+Transições permitidas:
+
+RASCUNHO -> ENVIADO
+RASCUNHO -> CANCELADO
+
+ENVIADO -> EM_ANALISE
+ENVIADO -> EXPIRADO
+ENVIADO -> CANCELADO
+
+EM_ANALISE -> APROVADO
+EM_ANALISE -> RECUSADO
+EM_ANALISE -> EXPIRADO
+EM_ANALISE -> CANCELADO
+
+APROVADO -> CONCLUIDO
+end note
+
+
+note bottom of ORCAMENTO
+Desconto:
+
+PERCENTUAL: 0% a 100%
+VALOR_FIXO: 0 até o subtotal
+
+Total = subtotal - desconto
+
+O total nunca pode ser negativo.
+end note
+
+
+note bottom of ITEM_ORCAMENTO
+Para serviço com medição em m²:
+
+quantidade =
+soma das áreas associadas.
+
+A quantidade é calculada
+automaticamente e não deve ser
+alterada manualmente.
+
+Para produto ou serviço sem medição,
+a quantidade é informada pelo usuário.
+
+valor_total =
+quantidade x valor_unitario
+end note
+
+@enduml
