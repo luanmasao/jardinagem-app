@@ -1,0 +1,39 @@
+{
+  "name": "jardinagem-app",
+  "version": "1.0.0",
+  "main": "expo-router/entry",
+  "scripts": {
+    "start": "expo start",
+    "android": "expo start --android",
+    "ios": "expo start --ios",
+    "web": "expo start --web",
+    "typecheck": "tsc --noEmit",
+    "test:typecheck": "tsc --project tsconfig.test.json --noEmit",
+    "test": "tsx --test tests/domain/*.test.ts",
+    "test:auth": "tsx --env-file=.env.local --test tests/auth/*.test.ts"
+  },
+  "dependencies": {
+    "@react-native-async-storage/async-storage": "2.2.0",
+    "@supabase/supabase-js": "^2.116.0",
+    "aes-js": "^3.1.2",
+    "expo": "~57.0.23",
+    "expo-constants": "~57.0.18",
+    "expo-linking": "~57.0.10",
+    "expo-router": "~57.0.21",
+    "expo-secure-store": "~57.0.4",
+    "expo-status-bar": "~57.0.1",
+    "react": "19.2.3",
+    "react-native": "0.86.3",
+    "react-native-get-random-values": "~1.11.0",
+    "react-native-safe-area-context": "~5.7.0",
+    "react-native-screens": "~4.26.0"
+  },
+  "devDependencies": {
+    "@types/aes-js": "^3.1.4",
+    "@types/node": "^22.20.3",
+    "@types/react": "~19.2.2",
+    "tsx": "^4.23.13",
+    "typescript": "~6.0.3"
+  },
+  "private": true
+}

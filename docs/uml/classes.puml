@@ -1,104 +1,125 @@
 @startuml
 
+title Diagrama de Classes - Sistema de Orçamentos para Jardinagem
+' Versão UML v3.1
+
 skinparam classAttributeIconSize 0
 
 class Usuario {
-    - id: Long
-    - nome: String
-    - email: String
-    - senha: String
-    - telefone: String
-    - dataCadastro: Date
-    - ativo: Boolean
+    - id : UUID
+    - nome : String
+    - telefone : String
+    - dataCadastro : DateTime
+    - ativo : Boolean
+
+    + ativar() : void
+    + desativar() : void
 }
 
 class Cliente {
-    - id: Long
-    - nome: String
-    - telefone: String
-    - email: String
-    - documento: String
-    - observacoes: String
-    - ativo: Boolean
+    - id : UUID
+    - nome : String
+    - telefone : String
+    - email : String
+    - documento : String
+    - observacoes : String
+    - ativo : Boolean
+
+    + atualizarDados() : void
+    + ativar() : void
+    + desativar() : void
 }
 
 class Endereco {
-    - id: Long
-    - cep: String
-    - logradouro: String
-    - numero: String
-    - complemento: String
-    - bairro: String
-    - cidade: String
-    - estado: String
-    - latitude: Double
-    - longitude: Double
+    - id : UUID
+    - cep : String
+    - logradouro : String
+    - numero : String
+    - complemento : String
+    - bairro : String
+    - cidade : String
+    - estado : String
+    - latitude : Decimal
+    - longitude : Decimal
+
+    + atualizar() : void
 }
 
 class Servico {
-    - id: Long
-    - nome: String
-    - descricao: String
-    - unidade: String
-    - precoBase: Decimal
-    - usaMedicaoArea: Boolean
-    - ativo: Boolean
+    - id : UUID
+    - nome : String
+    - descricao : String
+    - unidade : String
+    - precoBase : Decimal
+    - usaMedicaoArea : Boolean
+    - ativo : Boolean
+
+    + atualizar() : void
+    + ativar() : void
+    + desativar() : void
 }
 
 class Produto {
-    - id: Long
-    - nome: String
-    - descricao: String
-    - unidade: String
-    - precoBase: Decimal
-    - ativo: Boolean
+    - id : UUID
+    - nome : String
+    - descricao : String
+    - unidade : String
+    - precoBase : Decimal
+    - ativo : Boolean
+
+    + atualizar() : void
+    + ativar() : void
+    + desativar() : void
 }
 
 class Orcamento {
-    - id: Long
-    - numero: String
-    - dataCriacao: Date
-    - dataValidade: Date
-    - status: StatusOrcamento
-    - subtotal: Decimal
-    - tipoDesconto: TipoDesconto
-    - valorDesconto: Decimal
-    - total: Decimal
-    - observacoes: String
-    - condicoesPagamento: String
+    - id : UUID
+    - numero : String
+    - dataCriacao : DateTime
+    - dataValidade : Date
+    - status : StatusOrcamento
+    - subtotal : Decimal
+    - tipoDesconto : TipoDesconto
+    - valorDesconto : Decimal
+    - total : Decimal
+    - observacoes : String
+    - condicoesPagamento : String
 
-    + calcularSubtotal(): Decimal
-    + calcularDesconto(): Decimal
-    + calcularTotal(): Decimal
-    + validarParaEnvio(): Boolean
-    + alterarStatus(novoStatus: StatusOrcamento): Boolean
-    + duplicar(): Orcamento
+    + calcularSubtotal() : Decimal
+    + calcularDesconto() : Decimal
+    + calcularTotal() : Decimal
+    + duplicar() : Orcamento
+    + validarEnvio() : Boolean
+    + enviar() : void
+    + alterarStatus() : void
 }
 
 class ItemOrcamento {
-    - id: Long
-    - tipo: TipoItem
-    - descricao: String
-    - quantidade: Decimal
-    - unidade: String
-    - valorUnitario: Decimal
-    - valorTotal: Decimal
+    - id : UUID
+    - tipo : TipoItem
+    - descricao : String
+    - quantidade : Decimal
+    - unidade : String
+    - valorUnitario : Decimal
+    - valorTotal : Decimal
+    - usaMedicaoArea : Boolean
 
-    + calcularTotal(): Decimal
-    + atualizarQuantidadePelasAreas(): Decimal
-    + editarSnapshot(descricao: String, valorUnitario: Decimal)
+    + calcularTotal() : Decimal
+    + atualizarQuantidade() : void
+    + recalcularQuantidadePelasAreas() : Decimal
 }
 
 class Area {
-    - id: Long
-    - nome: String
-    - geometria: String
-    - areaCalculada: Decimal
-    - unidade: String
-    - observacoes: String
+    - id : UUID
+    - nome : String
+    - geometria : Polygon
+    - areaCalculada : Decimal
+    - unidade : String
+    - observacoes : String
 
-    + calcularArea(): Decimal
-    + atualizarGeometria(geometria: String): Decimal
+    + calcularArea() : Decimal
+    + atualizarGeometria() : void
+    + atualizarArea() : void
 }
 
 enum StatusOrcamento {
@@ -114,7 +135,7 @@ enum StatusOrcamento {
 
 enum TipoDesconto {
     PERCENTUAL
-    VALOR_FIXO
+    FIXO
 }
 
 enum TipoItem {
@@ -122,105 +143,64 @@ enum TipoItem {
     PRODUTO
 }
 
+Usuario "1" -- "0..*" Cliente : possui >
+Usuario "1" -- "0..*" Servico : cadastra >
+Usuario "1" -- "0..*" Produto : cadastra >
+Usuario "1" -- "0..*" Orcamento : cria >
 
-Usuario "1" -- "0..*" Cliente : cadastra
-Usuario "1" -- "0..*" Servico : cadastra
-Usuario "1" -- "0..*" Produto : cadastra
-Usuario "1" -- "0..*" Orcamento : cria
+Cliente "1" -- "0..1" Endereco : possui >
+Cliente "1" -- "0..*" Orcamento : recebe >
 
-Cliente "1" -- "0..1" Endereco : possui
-Cliente "1" -- "0..*" Orcamento : recebe
+Orcamento "1" *-- "0..*" ItemOrcamento : contém >
 
-Orcamento "1" *-- "0..*" ItemOrcamento : possui
+ItemOrcamento "0..1" --> "1" Servico : referencia >
+ItemOrcamento "0..1" --> "1" Produto : referencia >
 
-ItemOrcamento "0..*" --> "0..1" Servico : referencia
-ItemOrcamento "0..*" --> "0..1" Produto : referencia
+ItemOrcamento "1" *-- "0..*" Area : possui >
 
-ItemOrcamento "1" *-- "0..*" Area : possui
-
+Orcamento --> StatusOrcamento
+Orcamento --> TipoDesconto
+ItemOrcamento --> TipoItem
 
 note right of ItemOrcamento
-Cada ItemOrcamento representa
-exatamente um Serviço OU um Produto.
+    Cada item referencia exatamente
+    um Serviço OU um Produto.
 
-Se tipo = SERVICO:
-- referencia um Serviço;
-- pode possuir Áreas quando
-  o serviço utiliza medição.
+    SERVICO XOR PRODUTO
 
-Se tipo = PRODUTO:
-- referencia um Produto;
-- não pode possuir Áreas.
+    usaMedicaoArea é um snapshot
+    da característica do Serviço no
+    momento em que o item foi criado.
 
-O item mantém um snapshot
-independente do cadastro original.
-
-A descrição e o valor unitário
-podem ser personalizados no orçamento.
+    Se usaMedicaoArea = true:
+    quantidade = soma das áreas.
 end note
-
 
 note right of Area
-Uma Área pertence a um
-ItemOrcamento de serviço.
+    Áreas somente podem existir
+    para itens de Serviço com
+    usaMedicaoArea = true.
 
-A geometria é delimitada
-manualmente no mapa.
+    geometria = POLYGON
 
-A área é calculada automaticamente
-em metros quadrados (m²).
-
-Quando a geometria é alterada,
-a área deve ser recalculada.
-
-Para serviços medidos em m²,
-a soma das áreas determina
-a quantidade do ItemOrcamento.
+    areaCalculada representa a
+    área da geometria em m².
 end note
-
 
 note bottom of Orcamento
-Um orçamento inicia como RASCUNHO.
+    RASCUNHO pode ser salvo incompleto.
+    Ao sair de RASCUNHO, o orçamento
+    deve atender às validações de envio.
 
-RASCUNHO pode estar incompleto
-e permanecer editável.
-
-Para passar a ENVIADO, deve possuir:
-- cliente;
-- pelo menos um item válido;
-- validade definida;
-- valores consistentes;
-- medições necessárias concluídas.
-
-Após sair de RASCUNHO,
-o orçamento não é editado diretamente.
-Alterações posteriores devem ser
-realizadas por duplicação.
+    Alterações em orçamento que já
+    saiu de RASCUNHO ocorrem por
+    duplicação.
 end note
-
 
 note bottom of Servico
-Quando usaMedicaoArea = true,
-a unidade comercial deve ser m².
-end note
-
-
-note bottom of Orcamento
-Transições permitidas:
-
-RASCUNHO -> ENVIADO
-RASCUNHO -> CANCELADO
-
-ENVIADO -> EM_ANALISE
-ENVIADO -> EXPIRADO
-ENVIADO -> CANCELADO
-
-EM_ANALISE -> APROVADO
-EM_ANALISE -> RECUSADO
-EM_ANALISE -> EXPIRADO
-EM_ANALISE -> CANCELADO
-
-APROVADO -> CONCLUIDO
+    usaMedicaoArea representa o
+    comportamento atual do serviço
+    no catálogo.
 end note
 
 @enduml
