@@ -6,7 +6,9 @@ O sistema permite cadastrar clientes, serviços e produtos, criar e reutilizar o
 
 ## Status
 
-🚧 Em desenvolvimento — fase de validação técnica e POC.
+✅ Autenticação implementada e homologada
+
+🚧 Em desenvolvimento — CRUD de clientes.
 
 ## Stack em avaliação
 
