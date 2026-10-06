@@ -2,7 +2,12 @@
   "extends": "./tsconfig.json",
   "compilerOptions": {
     "noEmit": true,
-    "types": ["node"]
+    "types": ["node"],
+    "paths": {
+      "expo-crypto": ["./tests/mocks/expo-crypto.ts"],
+      "expo-sharing": ["./tests/mocks/expo-sharing.ts"],
+      "expo-file-system/legacy": ["./tests/mocks/expo-file-system-legacy.ts"]
+    }
   },
   "include": [
     "src/**/*.ts",

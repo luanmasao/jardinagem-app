@@ -1,0 +1,456 @@
+import React from 'react';
+import {
+  View,
+  Text,
+  StyleSheet,
+  FlatList,
+  TextInput,
+  TouchableOpacity,
+  ActivityIndicator,
+  RefreshControl,
+  ScrollView,
+} from 'react-native';
+import { useRouter } from 'expo-router';
+import { useOrcamentos } from '../../../src/presentation/hooks/use-orcamentos';
+import { OrcamentoResumo } from '../../../src/domain/repositories/orcamento.repository.interface';
+import { StatusOrcamento } from '../../../src/domain/enums/status-orcamento';
+
+const STATUS_FILTROS: Array<{ label: string; valor: StatusOrcamento | 'TODOS' }> = [
+  { label: 'Todos', valor: 'TODOS' },
+  { label: 'Rascunho', valor: StatusOrcamento.RASCUNHO },
+  { label: 'Enviado', valor: StatusOrcamento.ENVIADO },
+  { label: 'Em Análise', valor: StatusOrcamento.EM_ANALISE },
+  { label: 'Aprovado', valor: StatusOrcamento.APROVADO },
+  { label: 'Concluído', valor: StatusOrcamento.CONCLUIDO },
+  { label: 'Recusado', valor: StatusOrcamento.RECUSADO },
+  { label: 'Cancelado', valor: StatusOrcamento.CANCELADO },
+  { label: 'Expirado', valor: StatusOrcamento.EXPIRADO },
+];
+
+function getStatusStyle(status: StatusOrcamento) {
+  switch (status) {
+    case StatusOrcamento.RASCUNHO:
+      return { bg: '#FFF3E0', text: '#E65100', border: '#FFE0B2' };
+    case StatusOrcamento.ENVIADO:
+      return { bg: '#E3F2FD', text: '#1565C0', border: '#BBDEFB' };
+    case StatusOrcamento.EM_ANALISE:
+      return { bg: '#EDE7F6', text: '#512DA8', border: '#D1C4E9' };
+    case StatusOrcamento.APROVADO:
+      return { bg: '#E8F5E9', text: '#2E7D32', border: '#C8E6C9' };
+    case StatusOrcamento.CONCLUIDO:
+      return { bg: '#E0F2F1', text: '#004D40', border: '#B2DFDB' };
+    case StatusOrcamento.RECUSADO:
+      return { bg: '#FFEBEE', text: '#C62828', border: '#FFCDD2' };
+    case StatusOrcamento.EXPIRADO:
+      return { bg: '#FFF8E1', text: '#F57F17', border: '#FFECB3' };
+    case StatusOrcamento.CANCELADO:
+      return { bg: '#ECEFF1', text: '#455A64', border: '#CFD8DC' };
+    default:
+      return { bg: '#F5F5F5', text: '#616161', border: '#E0E0E0' };
+  }
+}
+
+function getStatusLabel(status: StatusOrcamento) {
+  switch (status) {
+    case StatusOrcamento.RASCUNHO:
+      return 'Rascunho';
+    case StatusOrcamento.ENVIADO:
+      return 'Enviado';
+    case StatusOrcamento.EM_ANALISE:
+      return 'Em Análise';
+    case StatusOrcamento.APROVADO:
+      return 'Aprovado';
+    case StatusOrcamento.CONCLUIDO:
+      return 'Concluído';
+    case StatusOrcamento.RECUSADO:
+      return 'Recusado';
+    case StatusOrcamento.EXPIRADO:
+      return 'Expirado';
+    case StatusOrcamento.CANCELADO:
+      return 'Cancelado';
+    default:
+      return status;
+  }
+}
+
+export default function OrcamentosListScreen() {
+  const router = useRouter();
+  const {
+    filteredOrcamentos,
+    isLoading,
+    error,
+    searchQuery,
+    setSearchQuery,
+    filtroStatus,
+    setFiltroStatus,
+    reload,
+  } = useOrcamentos();
+
+  const formatarMoeda = (valor: number): string => {
+    return `R$ ${valor.toFixed(2).replace('.', ',')}`;
+  };
+
+  const formatarData = (data: Date): string => {
+    return new Intl.DateTimeFormat('pt-BR').format(data);
+  };
+
+  const renderOrcamentoItem = ({ item }: { item: OrcamentoResumo }) => {
+    const statusStyle = getStatusStyle(item.status);
+    return (
+      <TouchableOpacity
+        style={styles.card}
+        activeOpacity={0.7}
+        onPress={() => router.push(`/orcamentos/${item.id}` as any)}
+      >
+        <View style={styles.cardHeader}>
+          <View style={styles.headerLeft}>
+            <Text style={styles.numeroText}>{item.numero}</Text>
+            <Text style={styles.clienteText} numberOfLines={1}>
+              {item.clienteNome || 'Cliente não identificado'}
+            </Text>
+          </View>
+          <View style={[styles.statusBadge, { backgroundColor: statusStyle.bg, borderColor: statusStyle.border }]}>
+            <Text style={[styles.statusBadgeText, { color: statusStyle.text }]}>
+              {getStatusLabel(item.status)}
+            </Text>
+          </View>
+        </View>
+
+        <View style={styles.cardDivider} />
+
+        <View style={styles.cardFooter}>
+          <View style={styles.infoCol}>
+            <Text style={styles.labelMuted}>Criado em</Text>
+            <Text style={styles.infoValor}>{formatarData(item.dataCriacao)}</Text>
+          </View>
+
+          {item.dataValidade ? (
+            <View style={styles.infoCol}>
+              <Text style={styles.labelMuted}>Validade</Text>
+              <Text style={styles.infoValor}>{formatarData(item.dataValidade)}</Text>
+            </View>
+          ) : null}
+
+          <View style={[styles.infoCol, styles.totalCol]}>
+            <Text style={styles.labelMuted}>Total</Text>
+            <Text style={styles.totalValor}>{formatarMoeda(item.total)}</Text>
+          </View>
+        </View>
+      </TouchableOpacity>
+    );
+  };
+
+  return (
+    <View style={styles.container}>
+      <View style={styles.header}>
+        <View>
+          <Text style={styles.headerTitle}>Orçamentos</Text>
+          <Text style={styles.headerSubtitle}>Gerencie propostas e itens de orçamento</Text>
+        </View>
+        <TouchableOpacity
+          style={styles.btnNovo}
+          activeOpacity={0.8}
+          onPress={() => router.push('/orcamentos/novo' as any)}
+        >
+          <Text style={styles.btnNovoText}>+ Novo</Text>
+        </TouchableOpacity>
+      </View>
+
+      <View style={styles.searchContainer}>
+        <TextInput
+          style={styles.searchInput}
+          placeholder="Buscar por número ou cliente..."
+          placeholderTextColor="#9E9E9E"
+          value={searchQuery}
+          onChangeText={setSearchQuery}
+          clearButtonMode="while-editing"
+        />
+      </View>
+
+      <View style={styles.filterScrollWrapper}>
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={styles.filterContainer}
+        >
+          {STATUS_FILTROS.map((filtro) => {
+            const isSelected = filtroStatus === filtro.valor;
+            return (
+              <TouchableOpacity
+                key={filtro.valor}
+                style={[styles.filterChip, isSelected && styles.filterChipSelected]}
+                onPress={() => setFiltroStatus(filtro.valor)}
+                activeOpacity={0.7}
+              >
+                <Text style={[styles.filterChipText, isSelected && styles.filterChipTextSelected]}>
+                  {filtro.label}
+                </Text>
+              </TouchableOpacity>
+            );
+          })}
+        </ScrollView>
+      </View>
+
+      {isLoading ? (
+        <View style={styles.centerContainer}>
+          <ActivityIndicator size="large" color="#2E7D32" />
+          <Text style={styles.loadingText}>Carregando orçamentos...</Text>
+        </View>
+      ) : error ? (
+        <View style={styles.centerContainer}>
+          <Text style={styles.errorText}>{error}</Text>
+          <TouchableOpacity style={styles.retryButton} onPress={reload}>
+            <Text style={styles.retryButtonText}>Tentar Novamente</Text>
+          </TouchableOpacity>
+        </View>
+      ) : (
+        <FlatList
+          data={filteredOrcamentos}
+          keyExtractor={(item) => item.id}
+          renderItem={renderOrcamentoItem}
+          contentContainerStyle={styles.listContent}
+          refreshControl={
+            <RefreshControl refreshing={isLoading} onRefresh={reload} colors={['#2E7D32']} />
+          }
+          ListEmptyComponent={
+            <View style={styles.emptyContainer}>
+              <Text style={styles.emptyTitle}>Nenhum orçamento encontrado</Text>
+              <Text style={styles.emptySubtitle}>
+                {searchQuery || filtroStatus !== 'TODOS'
+                  ? 'Nenhum resultado corresponde aos filtros aplicados.'
+                  : 'Crie seu primeiro orçamento para começar.'}
+              </Text>
+              {!searchQuery && filtroStatus === 'TODOS' ? (
+                <TouchableOpacity
+                  style={styles.emptyButton}
+                  onPress={() => router.push('/orcamentos/novo' as any)}
+                >
+                  <Text style={styles.emptyButtonText}>Criar Orçamento</Text>
+                </TouchableOpacity>
+              ) : null}
+            </View>
+          }
+        />
+      )}
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#F8F9FA',
+  },
+  header: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: 20,
+    paddingTop: 16,
+    paddingBottom: 12,
+    backgroundColor: '#FFFFFF',
+    borderBottomWidth: 1,
+    borderBottomColor: '#EEEEEE',
+  },
+  headerTitle: {
+    fontSize: 22,
+    fontWeight: '700',
+    color: '#1B5E20',
+  },
+  headerSubtitle: {
+    fontSize: 13,
+    color: '#616161',
+    marginTop: 2,
+  },
+  btnNovo: {
+    backgroundColor: '#2E7D32',
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+    borderRadius: 8,
+  },
+  btnNovoText: {
+    color: '#FFFFFF',
+    fontSize: 14,
+    fontWeight: '600',
+  },
+  searchContainer: {
+    paddingHorizontal: 16,
+    paddingTop: 12,
+    paddingBottom: 8,
+    backgroundColor: '#FFFFFF',
+  },
+  searchInput: {
+    backgroundColor: '#F1F3F4',
+    borderRadius: 8,
+    paddingHorizontal: 14,
+    paddingVertical: 10,
+    fontSize: 14,
+    color: '#212121',
+  },
+  filterScrollWrapper: {
+    backgroundColor: '#FFFFFF',
+    borderBottomWidth: 1,
+    borderBottomColor: '#EEEEEE',
+  },
+  filterContainer: {
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+    gap: 8,
+  },
+  filterChip: {
+    paddingHorizontal: 14,
+    paddingVertical: 6,
+    borderRadius: 20,
+    backgroundColor: '#F1F3F4',
+    marginRight: 6,
+  },
+  filterChipSelected: {
+    backgroundColor: '#2E7D32',
+  },
+  filterChipText: {
+    fontSize: 13,
+    color: '#616161',
+    fontWeight: '500',
+  },
+  filterChipTextSelected: {
+    color: '#FFFFFF',
+    fontWeight: '600',
+  },
+  listContent: {
+    padding: 16,
+    paddingBottom: 32,
+  },
+  card: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 12,
+    padding: 16,
+    marginBottom: 12,
+    borderWidth: 1,
+    borderColor: '#E8EAED',
+    elevation: 2,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.08,
+    shadowRadius: 3,
+  },
+  cardHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
+  },
+  headerLeft: {
+    flex: 1,
+    marginRight: 10,
+  },
+  numeroText: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: '#1B5E20',
+  },
+  clienteText: {
+    fontSize: 14,
+    color: '#424242',
+    marginTop: 2,
+    fontWeight: '500',
+  },
+  statusBadge: {
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 12,
+    borderWidth: 1,
+  },
+  statusBadgeText: {
+    fontSize: 12,
+    fontWeight: '600',
+  },
+  cardDivider: {
+    height: 1,
+    backgroundColor: '#F1F3F4',
+    marginVertical: 12,
+  },
+  cardFooter: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-end',
+  },
+  infoCol: {
+    flex: 1,
+  },
+  totalCol: {
+    alignItems: 'flex-end',
+  },
+  labelMuted: {
+    fontSize: 11,
+    color: '#757575',
+    textTransform: 'uppercase',
+  },
+  infoValor: {
+    fontSize: 13,
+    color: '#212121',
+    marginTop: 2,
+    fontWeight: '500',
+  },
+  totalValor: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: '#2E7D32',
+    marginTop: 2,
+  },
+  centerContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 32,
+  },
+  loadingText: {
+    marginTop: 12,
+    color: '#616161',
+    fontSize: 14,
+  },
+  errorText: {
+    color: '#C62828',
+    fontSize: 14,
+    textAlign: 'center',
+    marginBottom: 16,
+  },
+  retryButton: {
+    backgroundColor: '#2E7D32',
+    paddingHorizontal: 20,
+    paddingVertical: 10,
+    borderRadius: 8,
+  },
+  retryButtonText: {
+    color: '#FFFFFF',
+    fontSize: 14,
+    fontWeight: '600',
+  },
+  emptyContainer: {
+    padding: 40,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  emptyTitle: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: '#424242',
+    marginBottom: 6,
+  },
+  emptySubtitle: {
+    fontSize: 13,
+    color: '#757575',
+    textAlign: 'center',
+    lineHeight: 18,
+    marginBottom: 20,
+  },
+  emptyButton: {
+    backgroundColor: '#2E7D32',
+    paddingHorizontal: 20,
+    paddingVertical: 10,
+    borderRadius: 8,
+  },
+  emptyButtonText: {
+    color: '#FFFFFF',
+    fontSize: 14,
+    fontWeight: '600',
+  },
+});

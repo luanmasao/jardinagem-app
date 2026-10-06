@@ -120,6 +120,130 @@ export default function HomeScreen() {
         )}
       </View>
 
+      {/* Módulo de Negócio: Clientes */}
+      <View style={styles.card}>
+        <View style={styles.cardHeader}>
+          <Text style={[styles.badge, { backgroundColor: '#dcfce7', color: '#166534' }]}>Módulo</Text>
+          <Text style={styles.cardTitle}>Gerenciamento de Clientes</Text>
+        </View>
+
+        <Text style={{ fontSize: 13, color: '#475569', marginBottom: 14 }}>
+          Cadastre clientes, consulte dados cadastrais, endereços e controle status ativo/inativo.
+        </Text>
+
+        <TouchableOpacity
+          style={{
+            backgroundColor: '#15803d',
+            borderRadius: 8,
+            paddingVertical: 12,
+            paddingHorizontal: 16,
+            flexDirection: 'row',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+          }}
+          activeOpacity={0.8}
+          onPress={() => router.push('/clientes' as any)}
+        >
+          <Text style={{ color: '#ffffff', fontSize: 15, fontWeight: 'bold' }}>
+            Acessar Clientes
+          </Text>
+          <Text style={{ color: '#ffffff', fontSize: 18, fontWeight: 'bold' }}>→</Text>
+        </TouchableOpacity>
+      </View>
+
+      {/* Módulo de Catálogo: Serviços */}
+      <View style={styles.card}>
+        <View style={styles.cardHeader}>
+          <Text style={[styles.badge, { backgroundColor: '#fef3c7', color: '#b45309' }]}>Catálogo</Text>
+          <Text style={styles.cardTitle}>Serviços</Text>
+        </View>
+
+        <Text style={{ fontSize: 13, color: '#475569', marginBottom: 14 }}>
+          Gerencie serviços de jardinagem, preços base, unidades e parametrização de medição de área.
+        </Text>
+
+        <TouchableOpacity
+          style={{
+            backgroundColor: '#15803d',
+            borderRadius: 8,
+            paddingVertical: 12,
+            paddingHorizontal: 16,
+            flexDirection: 'row',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+          }}
+          activeOpacity={0.8}
+          onPress={() => router.push('/servicos' as any)}
+        >
+          <Text style={{ color: '#ffffff', fontSize: 15, fontWeight: 'bold' }}>
+            Acessar Serviços
+          </Text>
+          <Text style={{ color: '#ffffff', fontSize: 18, fontWeight: 'bold' }}>→</Text>
+        </TouchableOpacity>
+      </View>
+
+      {/* Módulo de Catálogo: Produtos */}
+      <View style={styles.card}>
+        <View style={styles.cardHeader}>
+          <Text style={[styles.badge, { backgroundColor: '#e0f2fe', color: '#0369a1' }]}>Catálogo</Text>
+          <Text style={styles.cardTitle}>Produtos</Text>
+        </View>
+
+        <Text style={{ fontSize: 13, color: '#475569', marginBottom: 14 }}>
+          Gerencie catálogo de insumos, plantas, fertilizantes e materiais com unidades e preços base.
+        </Text>
+
+        <TouchableOpacity
+          style={{
+            backgroundColor: '#15803d',
+            borderRadius: 8,
+            paddingVertical: 12,
+            paddingHorizontal: 16,
+            flexDirection: 'row',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+          }}
+          activeOpacity={0.8}
+          onPress={() => router.push('/produtos' as any)}
+        >
+          <Text style={{ color: '#ffffff', fontSize: 15, fontWeight: 'bold' }}>
+            Acessar Produtos
+          </Text>
+          <Text style={{ color: '#ffffff', fontSize: 18, fontWeight: 'bold' }}>→</Text>
+        </TouchableOpacity>
+      </View>
+
+      {/* Módulo de Orçamentos */}
+      <View style={styles.card}>
+        <View style={styles.cardHeader}>
+          <Text style={[styles.badge, { backgroundColor: '#dcfce7', color: '#15803d' }]}>Comercial</Text>
+          <Text style={styles.cardTitle}>Orçamentos</Text>
+        </View>
+
+        <Text style={{ fontSize: 13, color: '#475569', marginBottom: 14 }}>
+          Crie e gerencie propostas comerciais, adicione serviços e produtos com snapshot histórico e acompanhe o ciclo de vida.
+        </Text>
+
+        <TouchableOpacity
+          style={{
+            backgroundColor: '#15803d',
+            borderRadius: 8,
+            paddingVertical: 12,
+            paddingHorizontal: 16,
+            flexDirection: 'row',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+          }}
+          activeOpacity={0.8}
+          onPress={() => router.push('/orcamentos' as any)}
+        >
+          <Text style={{ color: '#ffffff', fontSize: 15, fontWeight: 'bold' }}>
+            Acessar Orçamentos
+          </Text>
+          <Text style={{ color: '#ffffff', fontSize: 18, fontWeight: 'bold' }}>→</Text>
+        </TouchableOpacity>
+      </View>
+
       {/* Ações */}
       <View style={styles.actions}>
         <TouchableOpacity

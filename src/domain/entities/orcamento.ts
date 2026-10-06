@@ -120,6 +120,16 @@ export class Orcamento {
     const somaItens = this._itens.reduce((acc, item) => acc + item.valorTotal, 0);
     this.subtotal = arredondarMoeda(somaItens);
 
+    // Caso de borda obrigatório (RN53):
+    // Se durante edição de rascunho os itens forem removidos e o subtotal voltar para 0.00,
+    // não pode permanecer persistido um desconto FIXO positivo. O desconto é resetado para neutro.
+    if (this.subtotal === 0 && this.tipoDesconto === TipoDesconto.FIXO && this.valorDesconto > 0) {
+      this.tipoDesconto = null;
+      this.valorDesconto = 0;
+    } else if (this.tipoDesconto === TipoDesconto.FIXO && this.valorDesconto > this.subtotal) {
+      this.valorDesconto = this.subtotal;
+    }
+
     const descontoDeduzido = calcularValorDesconto(this.subtotal, this.tipoDesconto, this.valorDesconto);
     this.total = calcularTotalOrcamento(this.subtotal, descontoDeduzido);
   }
