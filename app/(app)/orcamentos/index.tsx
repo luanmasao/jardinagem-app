@@ -14,64 +14,11 @@ import { useRouter } from 'expo-router';
 import { useOrcamentos } from '../../../src/presentation/hooks/use-orcamentos';
 import { OrcamentoResumo } from '../../../src/domain/repositories/orcamento.repository.interface';
 import { StatusOrcamento } from '../../../src/domain/enums/status-orcamento';
-
-const STATUS_FILTROS: Array<{ label: string; valor: StatusOrcamento | 'TODOS' }> = [
-  { label: 'Todos', valor: 'TODOS' },
-  { label: 'Rascunho', valor: StatusOrcamento.RASCUNHO },
-  { label: 'Enviado', valor: StatusOrcamento.ENVIADO },
-  { label: 'Em Análise', valor: StatusOrcamento.EM_ANALISE },
-  { label: 'Aprovado', valor: StatusOrcamento.APROVADO },
-  { label: 'Concluído', valor: StatusOrcamento.CONCLUIDO },
-  { label: 'Recusado', valor: StatusOrcamento.RECUSADO },
-  { label: 'Cancelado', valor: StatusOrcamento.CANCELADO },
-  { label: 'Expirado', valor: StatusOrcamento.EXPIRADO },
-];
-
-function getStatusStyle(status: StatusOrcamento) {
-  switch (status) {
-    case StatusOrcamento.RASCUNHO:
-      return { bg: '#FFF3E0', text: '#E65100', border: '#FFE0B2' };
-    case StatusOrcamento.ENVIADO:
-      return { bg: '#E3F2FD', text: '#1565C0', border: '#BBDEFB' };
-    case StatusOrcamento.EM_ANALISE:
-      return { bg: '#EDE7F6', text: '#512DA8', border: '#D1C4E9' };
-    case StatusOrcamento.APROVADO:
-      return { bg: '#E8F5E9', text: '#2E7D32', border: '#C8E6C9' };
-    case StatusOrcamento.CONCLUIDO:
-      return { bg: '#E0F2F1', text: '#004D40', border: '#B2DFDB' };
-    case StatusOrcamento.RECUSADO:
-      return { bg: '#FFEBEE', text: '#C62828', border: '#FFCDD2' };
-    case StatusOrcamento.EXPIRADO:
-      return { bg: '#FFF8E1', text: '#F57F17', border: '#FFECB3' };
-    case StatusOrcamento.CANCELADO:
-      return { bg: '#ECEFF1', text: '#455A64', border: '#CFD8DC' };
-    default:
-      return { bg: '#F5F5F5', text: '#616161', border: '#E0E0E0' };
-  }
-}
-
-function getStatusLabel(status: StatusOrcamento) {
-  switch (status) {
-    case StatusOrcamento.RASCUNHO:
-      return 'Rascunho';
-    case StatusOrcamento.ENVIADO:
-      return 'Enviado';
-    case StatusOrcamento.EM_ANALISE:
-      return 'Em Análise';
-    case StatusOrcamento.APROVADO:
-      return 'Aprovado';
-    case StatusOrcamento.CONCLUIDO:
-      return 'Concluído';
-    case StatusOrcamento.RECUSADO:
-      return 'Recusado';
-    case StatusOrcamento.EXPIRADO:
-      return 'Expirado';
-    case StatusOrcamento.CANCELADO:
-      return 'Cancelado';
-    default:
-      return status;
-  }
-}
+import { formatarDataCivil } from '../../../src/presentation/utils/data-formatters';
+import {
+  STATUS_FILTROS_ORCAMENTO,
+  obterBadgeStatusOrcamento,
+} from '../../../src/presentation/utils/status-orcamento.utils';
 
 export default function OrcamentosListScreen() {
   const router = useRouter();
@@ -91,11 +38,11 @@ export default function OrcamentosListScreen() {
   };
 
   const formatarData = (data: Date): string => {
-    return new Intl.DateTimeFormat('pt-BR').format(data);
+    return formatarDataCivil(data);
   };
 
   const renderOrcamentoItem = ({ item }: { item: OrcamentoResumo }) => {
-    const statusStyle = getStatusStyle(item.status);
+    const badge = obterBadgeStatusOrcamento(item.status);
     return (
       <TouchableOpacity
         style={styles.card}
@@ -109,9 +56,9 @@ export default function OrcamentosListScreen() {
               {item.clienteNome || 'Cliente não identificado'}
             </Text>
           </View>
-          <View style={[styles.statusBadge, { backgroundColor: statusStyle.bg, borderColor: statusStyle.border }]}>
-            <Text style={[styles.statusBadgeText, { color: statusStyle.text }]}>
-              {getStatusLabel(item.status)}
+          <View style={[styles.statusBadge, { backgroundColor: badge.bg, borderColor: badge.border }]}>
+            <Text style={[styles.statusBadgeText, { color: badge.text }]}>
+              {badge.label}
             </Text>
           </View>
         </View>
@@ -173,7 +120,7 @@ export default function OrcamentosListScreen() {
           showsHorizontalScrollIndicator={false}
           contentContainerStyle={styles.filterContainer}
         >
-          {STATUS_FILTROS.map((filtro) => {
+          {STATUS_FILTROS_ORCAMENTO.map((filtro) => {
             const isSelected = filtroStatus === filtro.valor;
             return (
               <TouchableOpacity
@@ -209,6 +156,8 @@ export default function OrcamentosListScreen() {
           keyExtractor={(item) => item.id}
           renderItem={renderOrcamentoItem}
           contentContainerStyle={styles.listContent}
+          keyboardShouldPersistTaps="handled"
+          keyboardDismissMode="on-drag"
           refreshControl={
             <RefreshControl refreshing={isLoading} onRefresh={reload} colors={['#2E7D32']} />
           }

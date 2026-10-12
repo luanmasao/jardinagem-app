@@ -1,4 +1,5 @@
-import { useState, useEffect, useCallback, useMemo } from 'react';
+import { useState, useCallback, useMemo } from 'react';
+import { useFocusEffect } from 'expo-router';
 import { Servico } from '../../domain/entities/servico';
 import { servicoService } from '../../application/services/servico.service';
 
@@ -25,9 +26,11 @@ export function useServicos() {
     }
   }, []);
 
-  useEffect(() => {
-    loadServicos();
-  }, [loadServicos]);
+  useFocusEffect(
+    useCallback(() => {
+      loadServicos();
+    }, [loadServicos])
+  );
 
   // Busca local instantânea por nome em memória
   const filteredServicos = useMemo(() => {

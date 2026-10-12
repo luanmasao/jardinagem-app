@@ -5,6 +5,7 @@ import { AuthService, authService } from '../../services/auth.service';
 import { RegraNegocioError } from '../../../domain/errors/dominio-error';
 import {
   GeocodingProvider,
+  GeocodingError,
 } from '../../interfaces/geocoding-provider.interface';
 import { expoLocationGeocodingProvider } from '../../../infrastructure/services/geocoding/expo-location-geocoding.provider';
 import {
@@ -77,7 +78,15 @@ export class SalvarEnderecoClienteUseCase {
           longitude = null;
         }
       } catch (err) {
-        console.warn('Falha na geocodificação em SalvarEnderecoClienteUseCase:', err);
+        if (err instanceof GeocodingError && err.code === 'PERMISSAO_NEGADA') {
+          console.info('[Geocoding] Permissão de localização não concedida em SalvarEnderecoClienteUseCase. Coordenadas nulas.');
+        } else if (err instanceof GeocodingError && err.code === 'TIMEOUT') {
+          console.warn('[Geocoding] Tempo limite atingido em SalvarEnderecoClienteUseCase. Coordenadas nulas.');
+        } else if (err instanceof GeocodingError && err.code === 'INDISPONIVEL') {
+          console.warn('[Geocoding] Serviço de localização indisponível em SalvarEnderecoClienteUseCase. Coordenadas nulas.');
+        } else {
+          console.warn('Falha na geocodificação em SalvarEnderecoClienteUseCase:', err instanceof Error ? err.message : String(err));
+        }
         latitude = null;
         longitude = null;
       }

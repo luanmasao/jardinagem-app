@@ -1,4 +1,5 @@
-import { useState, useEffect, useCallback, useMemo } from 'react';
+import { useState, useCallback, useMemo } from 'react';
+import { useFocusEffect } from 'expo-router';
 import { Produto } from '../../domain/entities/produto';
 import { produtoService } from '../../application/services/produto.service';
 
@@ -25,9 +26,11 @@ export function useProdutos() {
     }
   }, []);
 
-  useEffect(() => {
-    loadProdutos();
-  }, [loadProdutos]);
+  useFocusEffect(
+    useCallback(() => {
+      loadProdutos();
+    }, [loadProdutos])
+  );
 
   // Busca local instantânea por nome em memória
   const filteredProdutos = useMemo(() => {

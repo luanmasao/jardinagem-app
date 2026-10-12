@@ -64,6 +64,8 @@ class MapErrorBoundary extends Component<{ children: ReactNode }, State> {
  */
 export const MapProvider: React.FC<MapProviderProps> = ({
   regiaoInicial,
+  regiaoFoco,
+  pontoPesquisado,
   modoMapa = 'satellite',
   vertices = [],
   onAdicionarVertice,
@@ -72,6 +74,13 @@ export const MapProvider: React.FC<MapProviderProps> = ({
   children,
 }) => {
   const [mapReady, setMapReady] = React.useState(false);
+  const mapRef = React.useRef<MapView>(null);
+
+  React.useEffect(() => {
+    if (regiaoFoco && mapRef.current) {
+      mapRef.current.animateToRegion(regiaoFoco, 600);
+    }
+  }, [regiaoFoco]);
 
   const initialRegion: Region = regiaoInicial || {
     ...REGIAO_PADRAO,
@@ -92,6 +101,7 @@ export const MapProvider: React.FC<MapProviderProps> = ({
     <MapErrorBoundary>
       <View style={[styles.container, estilo]}>
         <MapView
+          ref={mapRef}
           testID="map-provider-view"
           provider={Platform.OS === 'android' ? PROVIDER_GOOGLE : undefined}
           style={StyleSheet.absoluteFill}
@@ -104,6 +114,16 @@ export const MapProvider: React.FC<MapProviderProps> = ({
           showsCompass={true}
           showsScale={true}
         >
+          {/* Marcador de referência do endereço pesquisado */}
+          {pontoPesquisado && (
+            <Marker
+              key={`pesquisa-${pontoPesquisado.latitude}-${pontoPesquisado.longitude}`}
+              coordinate={pontoPesquisado}
+              title="Endereço pesquisado"
+              pinColor="#1E88E5"
+            />
+          )}
+
           {/* Renderiza marcadores para cada vértice inserido */}
           {vertices.map((vertice, index) => (
             <Marker
@@ -118,25 +138,21 @@ export const MapProvider: React.FC<MapProviderProps> = ({
             </Marker>
           ))}
 
-          {/* Se houver exatamente 2 vértices, desenha uma linha conectando-os */}
-          {vertices.length === 2 && (
-            <Polyline
-              coordinates={vertices}
-              strokeColor="#4CAF50"
-              strokeWidth={3}
-              lineDashPattern={[5, 5]}
-            />
-          )}
+          {/* Linha conectando exatamente 2 vértices (mantida sempre montada para contornar retenção no Fabric/Android) */}
+          <Polyline
+            coordinates={vertices.length === 2 ? vertices : [REGIAO_PADRAO, REGIAO_PADRAO]}
+            strokeColor={vertices.length === 2 ? '#4CAF50' : 'rgba(0, 0, 0, 0)'}
+            strokeWidth={vertices.length === 2 ? 3 : 0}
+            lineDashPattern={[5, 5]}
+          />
 
-          {/* Se houver 3 ou mais vértices, renderiza o polígono fechado em tempo real */}
-          {vertices.length >= 3 && (
-            <Polygon
-              coordinates={vertices}
-              strokeColor="#2E7D32"
-              fillColor="rgba(46, 125, 50, 0.45)"
-              strokeWidth={3}
-            />
-          )}
+          {/* Polígono fechado em tempo real (mantido sempre montado para atualizar coordenadas sem reter geometria ao desfazer/limpar) */}
+          <Polygon
+            coordinates={vertices.length >= 3 ? vertices : [REGIAO_PADRAO, REGIAO_PADRAO, REGIAO_PADRAO]}
+            strokeColor={vertices.length >= 3 ? '#2E7D32' : 'rgba(0, 0, 0, 0)'}
+            fillColor={vertices.length >= 3 ? 'rgba(46, 125, 50, 0.45)' : 'rgba(0, 0, 0, 0)'}
+            strokeWidth={vertices.length >= 3 ? 3 : 0}
+          />
 
           {children}
         </MapView>

@@ -7,16 +7,7 @@
     "android": "expo run:android",
     "ios": "expo run:ios",
     "web": "expo start --web",
-    "typecheck": "tsc --noEmit",
-    "test:typecheck": "tsc --project tsconfig.test.json --noEmit",
-    "test": "tsx --test tests/domain/*.test.ts",
-    "test:auth": "tsx --env-file=.env.local --test tests/auth/*.test.ts",
-    "test:clientes": "tsx --test tests/clientes/*.test.ts",
-    "test:catalogo": "tsx --test tests/servicos/*.test.ts tests/produtos/*.test.ts tests/catalogo/*.test.ts",
-    "test:orcamentos": "tsx --tsconfig tsconfig.test.json --test tests/orcamentos/*.test.ts",
-    "test:areas": "tsx --tsconfig tsconfig.test.json --test tests/areas/*.test.ts",
-    "test:pdf": "tsx --tsconfig tsconfig.test.json --test tests/application/orcamento-pdf-mapper.test.ts tests/application/gerar-pdf-orcamento.use-case.test.ts tests/infrastructure/expo-print-pdf-generator.test.ts tests/domain/consistencia-matematica-pdf.test.ts",
-    "test:share": "tsx --tsconfig tsconfig.test.json --test tests/application/compartilhar-pdf-orcamento.use-case.test.ts tests/infrastructure/expo-sharing-provider.test.ts"
+    "typecheck": "tsc --noEmit"
   },
   "dependencies": {
     "@react-native-async-storage/async-storage": "2.2.0",

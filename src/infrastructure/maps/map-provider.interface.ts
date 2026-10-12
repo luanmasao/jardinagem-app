@@ -19,6 +19,8 @@ export type ModoMapa = 'satellite' | 'standard' | 'hybrid';
 
 export interface MapProviderProps {
   regiaoInicial?: RegiaoMapa;
+  regiaoFoco?: RegiaoMapa;
+  pontoPesquisado?: CoordenadaMapa | null;
   modoMapa?: ModoMapa;
   vertices: CoordenadaMapa[];
   onAdicionarVertice?: (coordenada: CoordenadaMapa) => void;

@@ -151,6 +151,8 @@ export default function ServicosListScreen() {
           keyExtractor={(item) => item.id}
           renderItem={renderServicoItem}
           contentContainerStyle={styles.listContent}
+          keyboardShouldPersistTaps="handled"
+          keyboardDismissMode="on-drag"
           refreshControl={
             <RefreshControl
               refreshing={isLoading}

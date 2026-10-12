@@ -9,6 +9,7 @@ import {
   ActivityIndicator,
   KeyboardAvoidingView,
   Platform,
+  Alert,
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { clienteService } from '../../../src/application/services/cliente.service';
@@ -77,8 +78,27 @@ export default function NovoClienteScreen() {
         endereco: enderecoPayload,
       });
 
-      // Navega diretamente para os detalhes do cliente recém-criado
-      router.replace(`/clientes/${novoCliente.id}` as any);
+      const temCoords = Boolean(
+        novoCliente.endereco &&
+        novoCliente.endereco.latitude != null &&
+        novoCliente.endereco.longitude != null
+      );
+
+      // Se endereço foi informado mas não foi possível obter coordenadas, informa amigavelmente
+      if (enderecoPayload && !temCoords && Platform.OS !== 'web') {
+        Alert.alert(
+          'Cliente Cadastrado',
+          'O cliente e o endereço foram salvos com sucesso. A localização automática no mapa não foi obtida e poderá ser definida manualmente.',
+          [
+            {
+              text: 'OK',
+              onPress: () => router.replace(`/clientes/${novoCliente.id}` as any),
+            },
+          ]
+        );
+      } else {
+        router.replace(`/clientes/${novoCliente.id}` as any);
+      }
     } catch (err) {
       const msg = err instanceof Error ? err.message : 'Falha ao cadastrar cliente.';
       setErrorMessage(msg);
@@ -89,7 +109,7 @@ export default function NovoClienteScreen() {
   return (
     <KeyboardAvoidingView
       style={styles.keyboardContainer}
-      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
     >
       <ScrollView
         style={styles.container}
@@ -302,7 +322,7 @@ const styles = StyleSheet.create({
   },
   content: {
     padding: 16,
-    paddingBottom: 40,
+    paddingBottom: 80,
   },
   errorBanner: {
     flexDirection: 'row',

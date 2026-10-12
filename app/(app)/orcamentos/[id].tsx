@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import {
   View,
   Text,
@@ -8,34 +8,16 @@ import {
   ActivityIndicator,
   Alert,
 } from 'react-native';
-import { useLocalSearchParams, useRouter } from 'expo-router';
+import { useLocalSearchParams, useRouter, useFocusEffect } from 'expo-router';
 import { useOrcamentoDetalhe } from '../../../src/presentation/hooks/use-orcamento-detalhe';
 import { useGerarPdf } from '../../../src/presentation/hooks/use-gerar-pdf';
 import { useCompartilharPdf } from '../../../src/presentation/hooks/use-compartilhar-pdf';
 import { StatusOrcamento } from '../../../src/domain/enums/status-orcamento';
-
-function getStatusBadge(status: StatusOrcamento) {
-  switch (status) {
-    case StatusOrcamento.RASCUNHO:
-      return { label: 'Rascunho', bg: '#FFF3E0', text: '#E65100', border: '#FFE0B2' };
-    case StatusOrcamento.ENVIADO:
-      return { label: 'Enviado', bg: '#E3F2FD', text: '#1565C0', border: '#BBDEFB' };
-    case StatusOrcamento.EM_ANALISE:
-      return { label: 'Em Análise', bg: '#EDE7F6', text: '#512DA8', border: '#D1C4E9' };
-    case StatusOrcamento.APROVADO:
-      return { label: 'Aprovado', bg: '#E8F5E9', text: '#2E7D32', border: '#C8E6C9' };
-    case StatusOrcamento.CONCLUIDO:
-      return { label: 'Concluído', bg: '#E0F2F1', text: '#004D40', border: '#B2DFDB' };
-    case StatusOrcamento.RECUSADO:
-      return { label: 'Recusado', bg: '#FFEBEE', text: '#C62828', border: '#FFCDD2' };
-    case StatusOrcamento.EXPIRADO:
-      return { label: 'Expirado', bg: '#FFF8E1', text: '#F57F17', border: '#FFECB3' };
-    case StatusOrcamento.CANCELADO:
-      return { label: 'Cancelado', bg: '#ECEFF1', text: '#455A64', border: '#CFD8DC' };
-    default:
-      return { label: status, bg: '#F5F5F5', text: '#616161', border: '#E0E0E0' };
-  }
-}
+import { formatarDataCivil } from '../../../src/presentation/utils/data-formatters';
+import {
+  obterBadgeStatusOrcamento,
+  formatarStatusOrcamento,
+} from '../../../src/presentation/utils/status-orcamento.utils';
 
 export default function OrcamentoDetalheScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -57,6 +39,12 @@ export default function OrcamentoDetalheScreen() {
     removerItem,
   } = useOrcamentoDetalhe(id || '');
 
+  useFocusEffect(
+    useCallback(() => {
+      reload();
+    }, [reload])
+  );
+
   const { isGenerating: isGeneratingPdf, gerarEVisualizarPdf, executarBenchmark } = useGerarPdf();
   const { isSharing: isSharingPdf, compartilharPdf } = useCompartilharPdf();
 
@@ -65,7 +53,7 @@ export default function OrcamentoDetalheScreen() {
   };
 
   const formatarData = (data: Date): string => {
-    return new Intl.DateTimeFormat('pt-BR').format(data);
+    return formatarDataCivil(data);
   };
 
   const handleTransitarStatus = (novoStatus: StatusOrcamento, confirmMsg: string) => {
@@ -76,7 +64,7 @@ export default function OrcamentoDetalheScreen() {
         onPress: async () => {
           const ok = await alterarStatus(novoStatus);
           if (ok) {
-            Alert.alert('Sucesso', `Status alterado para ${novoStatus}.`);
+            Alert.alert('Sucesso', `Status alterado para "${formatarStatusOrcamento(novoStatus)}".`);
           }
         },
       },
@@ -162,7 +150,7 @@ export default function OrcamentoDetalheScreen() {
     );
   }
 
-  const badge = getStatusBadge(orcamento.status);
+  const badge = obterBadgeStatusOrcamento(orcamento.status);
   const isRascunho = orcamento.status === StatusOrcamento.RASCUNHO;
 
   return (
@@ -404,11 +392,11 @@ export default function OrcamentoDetalheScreen() {
                     onPress={() =>
                       handleTransitarStatus(
                         StatusOrcamento.EM_ANALISE,
-                        'Marcar orçamento como Em Análise pelo cliente?'
+                        'Marcar orçamento como "Em análise" pelo cliente?'
                       )
                     }
                   >
-                    <Text style={styles.btnAcaoPrimariaText}>Marcar "Em Análise"</Text>
+                    <Text style={styles.btnAcaoPrimariaText}>Marcar "Em análise"</Text>
                   </TouchableOpacity>
 
                   <TouchableOpacity

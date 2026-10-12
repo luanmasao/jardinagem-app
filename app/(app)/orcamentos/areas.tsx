@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import {
   View,
   Text,
@@ -8,7 +8,7 @@ import {
   ActivityIndicator,
   Alert,
 } from 'react-native';
-import { useLocalSearchParams, useRouter } from 'expo-router';
+import { useLocalSearchParams, useRouter, useFocusEffect } from 'expo-router';
 import { useAreas } from '../../../src/presentation/hooks/use-areas';
 import { supabaseOrcamentoRepository } from '../../../src/infrastructure/repositories/supabase-orcamento.repository';
 import { supabaseItemOrcamentoRepository } from '../../../src/infrastructure/repositories/supabase-item-orcamento.repository';
@@ -24,12 +24,17 @@ const formatarMoeda = (valor: number): string => `R$ ${valor.toFixed(2).replace(
  */
 export default function AreasItemScreen() {
   const router = useRouter();
-  const { orcamentoId, itemId } = useLocalSearchParams<{ orcamentoId: string; itemId: string }>();
+  const { orcamentoId, itemId, autoAbrirMapa } = useLocalSearchParams<{
+    orcamentoId: string;
+    itemId: string;
+    autoAbrirMapa?: string;
+  }>();
 
   const [item, setItem] = useState<ItemOrcamento | null>(null);
   const [statusOrcamento, setStatusOrcamento] = useState<StatusOrcamento | null>(null);
   const [clienteId, setClienteId] = useState<string | null>(null);
   const [carregandoItem, setCarregandoItem] = useState<boolean>(true);
+  const abriuMapaAutoRef = useRef(false);
 
   const { areas, loading: loadingAreas, error: errorAreas, metragemTotal, carregarAreas, removerArea } =
     useAreas(itemId || '');
@@ -57,6 +62,13 @@ export default function AreasItemScreen() {
       setCarregandoItem(false);
     }
   };
+
+  useFocusEffect(
+    useCallback(() => {
+      carregarItemEOrcamento();
+      carregarAreas();
+    }, [orcamentoId, itemId])
+  );
 
   useEffect(() => {
     carregarItemEOrcamento();
@@ -130,6 +142,20 @@ export default function AreasItemScreen() {
 
     router.push(`/orcamentos/mapa?orcamentoId=${orcamentoId}&itemId=${itemId}${queryCoords}` as any);
   };
+
+  useEffect(() => {
+    if (
+      autoAbrirMapa === 'true' &&
+      !abriuMapaAutoRef.current &&
+      !carregandoItem &&
+      !loadingAreas &&
+      isRascunho &&
+      areas.length === 0
+    ) {
+      abriuMapaAutoRef.current = true;
+      handleAbrirMapa();
+    }
+  }, [autoAbrirMapa, carregandoItem, loadingAreas, isRascunho, areas.length]);
 
   if (carregandoItem || loadingAreas) {
     return (

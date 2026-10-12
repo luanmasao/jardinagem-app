@@ -1,4 +1,5 @@
-import { useState, useEffect, useCallback, useMemo } from 'react';
+import { useState, useCallback, useMemo } from 'react';
+import { useFocusEffect } from 'expo-router';
 import { OrcamentoResumo } from '../../domain/repositories/orcamento.repository.interface';
 import { StatusOrcamento } from '../../domain/enums/status-orcamento';
 import { orcamentoService } from '../../application/services/orcamento.service';
@@ -43,9 +44,11 @@ export function useOrcamentos() {
   }, [filtroStatus]);
 
 
-  useEffect(() => {
-    loadOrcamentos();
-  }, [loadOrcamentos]);
+  useFocusEffect(
+    useCallback(() => {
+      loadOrcamentos();
+    }, [loadOrcamentos])
+  );
 
   // Busca local instantânea em memória por número ou nome do cliente
   const filteredOrcamentos = useMemo(() => {

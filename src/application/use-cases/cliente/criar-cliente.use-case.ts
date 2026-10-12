@@ -4,6 +4,7 @@ import { supabaseClienteRepository } from '../../../infrastructure/repositories/
 import { AuthService, authService } from '../../services/auth.service';
 import {
   GeocodingProvider,
+  GeocodingError,
 } from '../../interfaces/geocoding-provider.interface';
 import { expoLocationGeocodingProvider } from '../../../infrastructure/services/geocoding/expo-location-geocoding.provider';
 import {
@@ -98,8 +99,16 @@ export class CriarClienteUseCase {
             longitude = null;
           }
         } catch (err) {
-          // DECISÃO-GEO-05 / RNF22: falha na geocodificação não impede o salvamento do cliente
-          console.warn('Falha na geocodificação automática durante criação do cliente:', err);
+          // DECISÃO-GEO-05 / RNF22 / FASE 8: falha na geocodificação não impede o salvamento do cliente
+          if (err instanceof GeocodingError && err.code === 'PERMISSAO_NEGADA') {
+            console.info('[Geocoding] Permissão de localização não concedida. Prosseguindo com coordenadas nulas.');
+          } else if (err instanceof GeocodingError && err.code === 'TIMEOUT') {
+            console.warn('[Geocoding] Tempo limite atingido ao consultar geocodificador. Prosseguindo com coordenadas nulas.');
+          } else if (err instanceof GeocodingError && err.code === 'INDISPONIVEL') {
+            console.warn('[Geocoding] Serviço de localização indisponível. Prosseguindo com coordenadas nulas.');
+          } else {
+            console.warn('[Geocoding] Falha na geocodificação automática durante criação do cliente:', err instanceof Error ? err.message : String(err));
+          }
           latitude = null;
           longitude = null;
         }

@@ -9,6 +9,7 @@ import {
   ActivityIndicator,
   KeyboardAvoidingView,
   Platform,
+  Alert,
 } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { clienteService } from '../../../src/application/services/cliente.service';
@@ -111,7 +112,7 @@ export default function EditarClienteScreen() {
           }
         : null;
 
-      await clienteService.atualizarCliente(id, {
+      const clienteAtualizado = await clienteService.atualizarCliente(id, {
         nome: nome.trim(),
         telefone: telefone.trim() || null,
         email: email.trim() || null,
@@ -120,8 +121,27 @@ export default function EditarClienteScreen() {
         endereco: enderecoPayload,
       });
 
-      // Retorna para a tela de detalhes com dados atualizados
-      router.back();
+      const temCoords = Boolean(
+        clienteAtualizado.endereco &&
+        clienteAtualizado.endereco.latitude != null &&
+        clienteAtualizado.endereco.longitude != null
+      );
+
+      // Se endereço foi informado/alterado mas coordenadas automáticas não foram obtidas, informa amigavelmente
+      if (enderecoPayload && !temCoords && Platform.OS !== 'web') {
+        Alert.alert(
+          'Cliente Atualizado',
+          'Os dados foram atualizados com sucesso. A localização automática no mapa não foi obtida e poderá ser definida manualmente.',
+          [
+            {
+              text: 'OK',
+              onPress: () => router.back(),
+            },
+          ]
+        );
+      } else {
+        router.back();
+      }
     } catch (err) {
       const msg = err instanceof Error ? err.message : 'Falha ao atualizar cliente.';
       setErrorMessage(msg);
@@ -141,7 +161,7 @@ export default function EditarClienteScreen() {
   return (
     <KeyboardAvoidingView
       style={styles.keyboardContainer}
-      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
     >
       <ScrollView
         style={styles.container}
@@ -360,7 +380,7 @@ const styles = StyleSheet.create({
   },
   content: {
     padding: 16,
-    paddingBottom: 40,
+    paddingBottom: 80,
   },
   centerContainer: {
     flex: 1,

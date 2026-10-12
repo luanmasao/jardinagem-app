@@ -1,4 +1,5 @@
-import { useState, useEffect, useCallback, useMemo } from 'react';
+import { useState, useCallback, useMemo } from 'react';
+import { useFocusEffect } from 'expo-router';
 import { Cliente } from '../../domain/entities/cliente';
 import { clienteService } from '../../application/services/cliente.service';
 
@@ -25,9 +26,11 @@ export function useClientes() {
     }
   }, []);
 
-  useEffect(() => {
-    loadClientes();
-  }, [loadClientes]);
+  useFocusEffect(
+    useCallback(() => {
+      loadClientes();
+    }, [loadClientes])
+  );
 
   // Busca local por nome em memória (normalizando acentuação e caixa)
   const filteredClientes = useMemo(() => {

@@ -12,6 +12,7 @@ import {
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useAuth } from '../../src/presentation/contexts/auth-context';
+import { validarFormularioCadastro } from '../../src/presentation/utils/auth-form.utils';
 
 export default function RegisterScreen() {
   const router = useRouter();
@@ -21,30 +22,26 @@ export default function RegisterScreen() {
   const [telefone, setTelefone] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const handleRegister = async () => {
     setErrorMessage(null);
 
-    if (!nome.trim()) {
-      setErrorMessage('Por favor, informe seu nome completo.');
-      return;
-    }
-    if (!email.trim()) {
-      setErrorMessage('Por favor, informe seu e-mail.');
-      return;
-    }
-    if (!password || password.length < 6) {
-      setErrorMessage('A senha deve ter pelo menos 6 caracteres.');
+    const validacao = validarFormularioCadastro({
+      nome,
+      telefone,
+      email,
+      password,
+      confirmPassword,
+    });
+
+    if (!validacao.valido || !validacao.payloadParaSignUp) {
+      setErrorMessage(validacao.mensagemErro || 'Preencha os campos corretamente.');
       return;
     }
 
-    const result = await signUp({
-      nome: nome.trim(),
-      telefone: telefone.trim() || undefined,
-      email: email.trim(),
-      password,
-    });
+    const result = await signUp(validacao.payloadParaSignUp);
 
     if (!result.success) {
       setErrorMessage(result.error || 'Falha ao realizar cadastro.');
@@ -54,7 +51,7 @@ export default function RegisterScreen() {
   return (
     <KeyboardAvoidingView
       style={styles.container}
-      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
     >
       <ScrollView contentContainerStyle={styles.scrollContent} keyboardShouldPersistTaps="handled">
         <View style={styles.header}>
@@ -71,6 +68,7 @@ export default function RegisterScreen() {
             </View>
           )}
 
+          {/* 1. Nome Completo */}
           <View style={styles.inputGroup}>
             <Text style={styles.label}>Nome Completo *</Text>
             <TextInput
@@ -84,19 +82,7 @@ export default function RegisterScreen() {
             />
           </View>
 
-          <View style={styles.inputGroup}>
-            <Text style={styles.label}>Telefone / WhatsApp</Text>
-            <TextInput
-              style={styles.input}
-              placeholder="Ex: (11) 99999-9999"
-              placeholderTextColor="#94a3b8"
-              value={telefone}
-              onChangeText={setTelefone}
-              keyboardType="phone-pad"
-              editable={!isLoading}
-            />
-          </View>
-
+          {/* 2. E-mail */}
           <View style={styles.inputGroup}>
             <Text style={styles.label}>E-mail *</Text>
             <TextInput
@@ -112,6 +98,7 @@ export default function RegisterScreen() {
             />
           </View>
 
+          {/* 3. Senha */}
           <View style={styles.inputGroup}>
             <Text style={styles.label}>Senha * (mínimo 6 caracteres)</Text>
             <TextInput
@@ -121,6 +108,34 @@ export default function RegisterScreen() {
               value={password}
               onChangeText={setPassword}
               secureTextEntry
+              editable={!isLoading}
+            />
+          </View>
+
+          {/* 4. Confirmar senha (ACH-UX-04) */}
+          <View style={styles.inputGroup}>
+            <Text style={styles.label}>Confirmar senha *</Text>
+            <TextInput
+              style={styles.input}
+              placeholder="Repita sua senha segura"
+              placeholderTextColor="#94a3b8"
+              value={confirmPassword}
+              onChangeText={setConfirmPassword}
+              secureTextEntry
+              editable={!isLoading}
+            />
+          </View>
+
+          {/* 5. Telefone / WhatsApp */}
+          <View style={styles.inputGroup}>
+            <Text style={styles.label}>Telefone / WhatsApp</Text>
+            <TextInput
+              style={styles.input}
+              placeholder="Ex: (11) 99999-9999"
+              placeholderTextColor="#94a3b8"
+              value={telefone}
+              onChangeText={setTelefone}
+              keyboardType="phone-pad"
               editable={!isLoading}
             />
           </View>

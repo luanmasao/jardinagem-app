@@ -164,6 +164,22 @@ export default function ClienteDetalheScreen() {
               <Text style={styles.label}>CEP:</Text>
               <Text style={styles.value}>{cliente.endereco.cep || '—'}</Text>
             </View>
+
+            <View style={styles.row}>
+              <Text style={styles.label}>Mapa / Coordenadas:</Text>
+              <Text
+                style={[
+                  styles.value,
+                  cliente.endereco.latitude != null
+                    ? styles.localizacaoMapeada
+                    : styles.localizacaoPendente,
+                ]}
+              >
+                {cliente.endereco.latitude != null
+                  ? '📍 Definida'
+                  : '📍 Não localizada (manual)'}
+              </Text>
+            </View>
           </>
         ) : (
           <View style={styles.emptyEndereco}>
@@ -360,6 +376,14 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     maxWidth: '65%',
     textAlign: 'right',
+  },
+  localizacaoMapeada: {
+    color: '#15803d',
+    fontWeight: '700',
+  },
+  localizacaoPendente: {
+    color: '#b45309',
+    fontWeight: '600',
   },
   observacoesContainer: {
     marginTop: 10,

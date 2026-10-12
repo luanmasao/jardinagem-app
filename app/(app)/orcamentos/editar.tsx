@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import {
   View,
   Text,
@@ -10,8 +10,10 @@ import {
   Alert,
   Modal,
   FlatList,
+  KeyboardAvoidingView,
+  Platform,
 } from 'react-native';
-import { useLocalSearchParams, useRouter } from 'expo-router';
+import { useLocalSearchParams, useRouter, useFocusEffect } from 'expo-router';
 import { useOrcamentoDetalhe } from '../../../src/presentation/hooks/use-orcamento-detalhe';
 import { clienteService } from '../../../src/application/services/cliente.service';
 import { servicoService } from '../../../src/application/services/servico.service';
@@ -23,6 +25,12 @@ import { Produto } from '../../../src/domain/entities/produto';
 import { StatusOrcamento } from '../../../src/domain/enums/status-orcamento';
 import { TipoItem } from '../../../src/domain/enums/tipo-item';
 import { TipoDesconto } from '../../../src/domain/enums/tipo-desconto';
+import {
+  aplicarMascaraData,
+  formatarDataCivil,
+  parseDataCivil,
+} from '../../../src/presentation/utils/data-formatters';
+import { formatarStatusOrcamento } from '../../../src/presentation/utils/status-orcamento.utils';
 
 export default function EditarOrcamentoScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -36,6 +44,12 @@ export default function EditarOrcamentoScreen() {
     adicionarItem,
     removerItem,
   } = useOrcamentoDetalhe(id || '');
+
+  useFocusEffect(
+    useCallback(() => {
+      reload();
+    }, [reload])
+  );
 
   // Formulário
   const [clienteId, setClienteId] = useState<string>('');
@@ -85,7 +99,7 @@ export default function EditarOrcamentoScreen() {
       setClienteId(orcamento.clienteId);
       setDataValidade(
         orcamento.dataValidade
-          ? orcamento.dataValidade.toISOString().split('T')[0]
+          ? formatarDataCivil(orcamento.dataValidade)
           : ''
       );
       if (orcamento.tipoDesconto === TipoDesconto.PERCENTUAL) {
@@ -171,9 +185,14 @@ export default function EditarOrcamentoScreen() {
     try {
       let dataValidadeObj: Date | null = null;
       if (dataValidade && dataValidade.trim() !== '') {
-        const partes = dataValidade.trim().split('-');
-        if (partes.length === 3) {
-          dataValidadeObj = new Date(parseInt(partes[0], 10), parseInt(partes[1], 10) - 1, parseInt(partes[2], 10));
+        dataValidadeObj = parseDataCivil(dataValidade);
+        if (!dataValidadeObj) {
+          Alert.alert(
+            'Data Inválida',
+            'A data de validade informada é inválida. Use o formato DD/MM/AAAA (ex: 07/10/2026).'
+          );
+          setIsSaving(false);
+          return;
         }
       }
 
@@ -246,7 +265,7 @@ export default function EditarOrcamentoScreen() {
         <View style={styles.bloqueioCard}>
           <Text style={styles.bloqueioTitulo}>Edição Direta Não Permitida</Text>
           <Text style={styles.bloqueioMensagem}>
-            Este orçamento está no status "{orcamento.status}". Conforme as regras de negócio homologadas
+            Este orçamento está no status "{formatarStatusOrcamento(orcamento.status)}". Conforme as regras de negócio homologadas
             (RN64 e RN65), propostas fora do status RASCUNHO não podem ser editadas diretamente para
             preservação histórica.
           </Text>
@@ -266,8 +285,11 @@ export default function EditarOrcamentoScreen() {
   }
 
   return (
-    <View style={styles.container}>
-      <ScrollView contentContainerStyle={styles.scrollContent}>
+    <KeyboardAvoidingView
+      style={styles.container}
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+    >
+      <ScrollView contentContainerStyle={styles.scrollContent} keyboardShouldPersistTaps="handled">
         <View style={styles.headerEdicao}>
           <Text style={styles.headerEdicaoNumero}>{orcamento.numero}</Text>
           <Text style={styles.headerEdicaoStatus}>Status: Rascunho (Editável)</Text>
@@ -291,13 +313,15 @@ export default function EditarOrcamentoScreen() {
         <View style={styles.sectionCard}>
           <Text style={styles.sectionTitle}>Prazos</Text>
           <View style={styles.inputGroup}>
-            <Text style={styles.inputLabel}>Data de Validade (AAAA-MM-DD)</Text>
+            <Text style={styles.inputLabel}>Data de Validade (DD/MM/AAAA)</Text>
             <TextInput
               style={styles.textInput}
-              placeholder="Ex: 2026-10-15"
+              placeholder="DD/MM/AAAA (ex: 07/10/2026)"
               placeholderTextColor="#9E9E9E"
               value={dataValidade}
-              onChangeText={setDataValidade}
+              onChangeText={(val) => setDataValidade(aplicarMascaraData(val))}
+              keyboardType="numeric"
+              maxLength={10}
             />
           </View>
         </View>
@@ -323,14 +347,44 @@ export default function EditarOrcamentoScreen() {
             itens.map((it) => (
               <View key={it.id} style={styles.itemRowCard}>
                 <View style={{ flex: 1, marginRight: 8 }}>
+                  <View style={{ flexDirection: 'row', gap: 6, marginBottom: 4 }}>
+                    <View style={styles.itemTipoBadge}>
+                      <Text style={styles.itemTipoBadgeText}>{it.tipo}</Text>
+                    </View>
+                    {it.usaMedicaoArea ? (
+                      <View style={styles.itemMedicaoBadge}>
+                        <Text style={styles.itemMedicaoBadgeText}>MEDIÇÃO DE ÁREA</Text>
+                      </View>
+                    ) : null}
+                  </View>
                   <Text style={styles.itemDescricao}>{it.descricao}</Text>
                   <Text style={styles.itemDetalhes}>
                     {it.usaMedicaoArea
-                      ? 'Medição por Área (0 m²)'
+                      ? `${it.quantidade > 0 ? `${it.quantidade.toFixed(2)} m²` : '0,00 m² (Pendente)'} x ${formatarMoeda(it.valorUnitario)}`
                       : `${it.quantidade} ${it.unidade} x ${formatarMoeda(it.valorUnitario)}`}
                   </Text>
+                  {it.usaMedicaoArea ? (
+                    <TouchableOpacity
+                      style={styles.btnMedirArea}
+                      onPress={() =>
+                        router.push({
+                          pathname: '/orcamentos/areas',
+                          params: {
+                            orcamentoId: orcamento?.id || id,
+                            itemId: it.id,
+                            autoAbrirMapa: it.quantidade === 0 ? 'true' : 'false',
+                          },
+                        } as any)
+                      }
+                      activeOpacity={0.7}
+                    >
+                      <Text style={styles.btnMedirAreaText}>
+                        🗺️ {it.quantidade > 0 ? `Áreas Medidas (${it.quantidade.toFixed(2)} m²)` : 'Medir Área no Mapa'}
+                      </Text>
+                    </TouchableOpacity>
+                  ) : null}
                 </View>
-                <View style={{ alignItems: 'flex-end' }}>
+                <View style={{ alignItems: 'flex-end', justifyContent: 'space-between' }}>
                   <Text style={styles.itemValorTotal}>{formatarMoeda(it.valorTotal)}</Text>
                   <TouchableOpacity onPress={() => handleRemoverItemConfirm(it.id, it.descricao)}>
                     <Text style={styles.btnRemoverText}>Excluir</Text>
@@ -439,6 +493,7 @@ export default function EditarOrcamentoScreen() {
             <FlatList
               data={clientes}
               keyExtractor={(item) => item.id}
+              keyboardShouldPersistTaps="handled"
               renderItem={({ item }) => (
                 <TouchableOpacity
                   style={[styles.modalItemRow, item.id === clienteId && styles.modalItemRowSelected]}
@@ -461,7 +516,10 @@ export default function EditarOrcamentoScreen() {
 
       {/* Modal Adição de Item */}
       <Modal visible={modalItemVisible} animationType="slide" transparent>
-        <View style={styles.modalOverlay}>
+        <KeyboardAvoidingView
+          style={styles.modalOverlay}
+          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        >
           <View style={styles.modalContainer}>
             <Text style={styles.modalTitle}>Adicionar do Catálogo</Text>
             <View style={styles.modalTabsRow}>
@@ -556,9 +614,9 @@ export default function EditarOrcamentoScreen() {
               <Text style={styles.modalBtnFecharText}>Cancelar</Text>
             </TouchableOpacity>
           </View>
-        </View>
+        </KeyboardAvoidingView>
       </Modal>
-    </View>
+    </KeyboardAvoidingView>
   );
 }
 
@@ -569,7 +627,7 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     padding: 16,
-    paddingBottom: 40,
+    paddingBottom: 100,
   },
   headerEdicao: {
     backgroundColor: '#FFFFFF',
@@ -672,6 +730,49 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     borderBottomWidth: 1,
     borderBottomColor: '#F1F3F4',
+  },
+  itemTipoBadge: {
+    backgroundColor: '#E0F2F1',
+    alignSelf: 'flex-start',
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    borderRadius: 4,
+  },
+  itemTipoBadgeText: {
+    fontSize: 10,
+    fontWeight: '700',
+    color: '#004D40',
+  },
+  itemMedicaoBadge: {
+    backgroundColor: '#E8F5E9',
+    borderWidth: 1,
+    borderColor: '#C8E6C9',
+    alignSelf: 'flex-start',
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    borderRadius: 4,
+  },
+  itemMedicaoBadgeText: {
+    fontSize: 10,
+    fontWeight: '700',
+    color: '#2E7D32',
+  },
+  btnMedirArea: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#E8F5E9',
+    borderWidth: 1,
+    borderColor: '#A5D6A7',
+    paddingHorizontal: 8,
+    paddingVertical: 5,
+    borderRadius: 6,
+    marginTop: 6,
+    alignSelf: 'flex-start',
+  },
+  btnMedirAreaText: {
+    color: '#1B5E20',
+    fontSize: 12,
+    fontWeight: '700',
   },
   itemDescricao: {
     fontSize: 14,

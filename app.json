@@ -11,6 +11,7 @@
     },
     "android": {
       "package": "com.jardinagem.app",
+      "softwareKeyboardLayoutMode": "resize",
       "adaptiveIcon": {
         "backgroundColor": "#2e7d32"
       },
@@ -18,7 +19,14 @@
     },
     "plugins": [
       "expo-router",
-      "expo-secure-store"
+      "expo-secure-store",
+      [
+        "expo-location",
+        {
+          "locationWhenInUsePermission": "Permitir que o aplicativo acesse sua localização para posicionar o mapa no terreno de serviço.",
+          "isAndroidBackgroundLocationEnabled": false
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true

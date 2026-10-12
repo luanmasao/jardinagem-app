@@ -145,6 +145,8 @@ export default function ProdutosListScreen() {
           keyExtractor={(item) => item.id}
           renderItem={renderProdutoItem}
           contentContainerStyle={styles.listContent}
+          keyboardShouldPersistTaps="handled"
+          keyboardDismissMode="on-drag"
           refreshControl={
             <RefreshControl
               refreshing={isLoading}

@@ -5,6 +5,7 @@ import { AuthService, authService } from '../../services/auth.service';
 import { RegraNegocioError } from '../../../domain/errors/dominio-error';
 import {
   GeocodingProvider,
+  GeocodingError,
 } from '../../interfaces/geocoding-provider.interface';
 import { expoLocationGeocodingProvider } from '../../../infrastructure/services/geocoding/expo-location-geocoding.provider';
 import {
@@ -124,9 +125,17 @@ export class AtualizarClienteUseCase {
               longitude = null;
             }
           } catch (err) {
-            // DECISÃO-GEO-09: Timeout ou erro externo com endereço novo obrigatoriamente
+            // DECISÃO-GEO-09 / FASE 8: Timeout ou erro externo com endereço novo obrigatoriamente
             // limpa as coordenadas antigas para NULL para evitar endereço novo com coordenada antiga
-            console.warn('Falha na geocodificação ao atualizar endereço do cliente:', err);
+            if (err instanceof GeocodingError && err.code === 'PERMISSAO_NEGADA') {
+              console.info('[Geocoding] Permissão de localização não concedida ao atualizar endereço. Coordenadas limpas para NULL.');
+            } else if (err instanceof GeocodingError && err.code === 'TIMEOUT') {
+              console.warn('[Geocoding] Tempo limite atingido ao geocodificar novo endereço. Coordenadas limpas para NULL.');
+            } else if (err instanceof GeocodingError && err.code === 'INDISPONIVEL') {
+              console.warn('[Geocoding] Serviço de localização indisponível ao atualizar endereço. Coordenadas limpas para NULL.');
+            } else {
+              console.warn('Falha na geocodificação ao atualizar endereço do cliente:', err instanceof Error ? err.message : String(err));
+            }
             latitude = null;
             longitude = null;
           }

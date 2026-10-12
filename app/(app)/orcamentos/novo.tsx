@@ -10,6 +10,8 @@ import {
   Alert,
   Modal,
   FlatList,
+  KeyboardAvoidingView,
+  Platform,
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { orcamentoService } from '../../../src/application/services/orcamento.service';
@@ -21,6 +23,10 @@ import { Servico } from '../../../src/domain/entities/servico';
 import { Produto } from '../../../src/domain/entities/produto';
 import { TipoItem } from '../../../src/domain/enums/tipo-item';
 import { TipoDesconto } from '../../../src/domain/enums/tipo-desconto';
+import {
+  aplicarMascaraData,
+  parseDataCivil,
+} from '../../../src/presentation/utils/data-formatters';
 
 interface ItemTemporario {
   tempId: string;
@@ -158,6 +164,115 @@ export default function NovoOrcamentoScreen() {
     setItens((prev) => prev.filter((it) => it.tempId !== tempId));
   };
 
+  const handleMedirAreaItemTemporario = async (itemTemp: ItemTemporario) => {
+    if (!clienteId) {
+      Alert.alert(
+        'Cliente Obrigatório',
+        'Selecione um cliente para o orçamento antes de delimitar a área no mapa.'
+      );
+      return;
+    }
+
+    setIsSaving(true);
+    try {
+      let dataValidadeObj: Date | null = null;
+      if (dataValidade && dataValidade.trim() !== '') {
+        dataValidadeObj = parseDataCivil(dataValidade);
+        if (!dataValidadeObj) {
+          Alert.alert(
+            'Data Inválida',
+            'A data de validade informada é inválida. Use o formato DD/MM/AAAA (ex: 07/10/2026).'
+          );
+          setIsSaving(false);
+          return;
+        }
+      }
+
+      const subtotalCalculado = itens.reduce((acc, it) => acc + it.valorTotal, 0);
+
+      const tipoDescEnum =
+        tipoDesconto === 'PERCENTUAL'
+          ? TipoDesconto.PERCENTUAL
+          : tipoDesconto === 'FIXO'
+          ? TipoDesconto.FIXO
+          : null;
+
+      const valDescNum = tipoDescEnum ? parseFloat(valorDescontoStr.replace(',', '.')) || 0 : 0;
+
+      if (tipoDescEnum === TipoDesconto.FIXO && valDescNum > subtotalCalculado) {
+        Alert.alert(
+          'Desconto Inválido',
+          `O desconto fixo (R$ ${valDescNum.toFixed(2)}) não pode ser superior ao subtotal dos itens (R$ ${subtotalCalculado.toFixed(2)}).`
+        );
+        setIsSaving(false);
+        return;
+      }
+
+      const adiarDescontoFixo = tipoDescEnum === TipoDesconto.FIXO && valDescNum > 0;
+
+      // 1. Cria o orçamento em status RASCUNHO com desconto neutro quando adiarDescontoFixo
+      const novoOrcamento = await orcamentoService.criarOrcamento({
+        clienteId,
+        numero: numero.trim() || undefined,
+        dataValidade: dataValidadeObj,
+        tipoDesconto: adiarDescontoFixo ? null : tipoDescEnum,
+        valorDesconto: adiarDescontoFixo ? 0 : valDescNum,
+        observacoes: observacoes.trim() || null,
+        condicoesPagamento: condicoesPagamento.trim() || null,
+      });
+
+      // 2. Adiciona os itens e identifica o ID persistido do item alvo da medição
+      let itemPersistidoAlvoId: string | null = null;
+      for (const it of itens) {
+        const itemCriado = await orcamentoService.adicionarItem({
+          orcamentoId: novoOrcamento.id,
+          tipo: it.tipo,
+          servicoId: it.tipo === TipoItem.SERVICO ? it.origemId : null,
+          produtoId: it.tipo === TipoItem.PRODUTO ? it.origemId : null,
+          quantidade: it.quantidade,
+        });
+
+        if (it.tempId === itemTemp.tempId) {
+          itemPersistidoAlvoId = itemCriado.id;
+        }
+      }
+
+      // 3. Somente após existir subtotal dos itens, persiste o desconto fixo informado e recalcula o total
+      if (adiarDescontoFixo) {
+        await orcamentoService.atualizarOrcamento(novoOrcamento.id, {
+          tipoDesconto: TipoDesconto.FIXO,
+          valorDesconto: valDescNum,
+        });
+      }
+
+      if (!itemPersistidoAlvoId) {
+        Alert.alert('Erro', 'Não foi possível identificar o item de serviço para medição.');
+        return;
+      }
+
+      // 4. Substitui a rota atual por EditarOrcamento para continuidade fluida do fluxo
+      router.replace({
+        pathname: '/orcamentos/editar',
+        params: { id: novoOrcamento.id },
+      } as any);
+
+      // 5. Navega imediatamente para a gestão de áreas do item com auto-abertura do mapa
+      router.push({
+        pathname: '/orcamentos/areas',
+        params: {
+          orcamentoId: novoOrcamento.id,
+          itemId: itemPersistidoAlvoId,
+          autoAbrirMapa: 'true',
+        },
+      } as any);
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : 'Falha ao iniciar medição de área.';
+      Alert.alert('Erro ao Iniciar Medição', msg);
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
   const handleSalvarOrcamento = async () => {
     if (!clienteId) {
       Alert.alert('Campo Obrigatório', 'Selecione um cliente para o orçamento.');
@@ -168,9 +283,14 @@ export default function NovoOrcamentoScreen() {
     try {
       let dataValidadeObj: Date | null = null;
       if (dataValidade && dataValidade.trim() !== '') {
-        const partes = dataValidade.trim().split('-');
-        if (partes.length === 3) {
-          dataValidadeObj = new Date(parseInt(partes[0], 10), parseInt(partes[1], 10) - 1, parseInt(partes[2], 10));
+        dataValidadeObj = parseDataCivil(dataValidade);
+        if (!dataValidadeObj) {
+          Alert.alert(
+            'Data Inválida',
+            'A data de validade informada é inválida. Use o formato DD/MM/AAAA (ex: 07/10/2026).'
+          );
+          setIsSaving(false);
+          return;
         }
       }
 
@@ -252,8 +372,11 @@ export default function NovoOrcamentoScreen() {
   }
 
   return (
-    <View style={styles.container}>
-      <ScrollView contentContainerStyle={styles.scrollContent}>
+    <KeyboardAvoidingView
+      style={styles.container}
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+    >
+      <ScrollView contentContainerStyle={styles.scrollContent} keyboardShouldPersistTaps="handled">
         {/* Card do Cliente */}
         <View style={styles.sectionCard}>
           <Text style={styles.sectionTitle}>1. Cliente *</Text>
@@ -288,10 +411,12 @@ export default function NovoOrcamentoScreen() {
             <Text style={styles.inputLabel}>Data de Validade (opcional no Rascunho)</Text>
             <TextInput
               style={styles.textInput}
-              placeholder="AAAA-MM-DD (ex: 2026-10-15)"
+              placeholder="DD/MM/AAAA (ex: 07/10/2026)"
               placeholderTextColor="#9E9E9E"
               value={dataValidade}
-              onChangeText={setDataValidade}
+              onChangeText={(val) => setDataValidade(aplicarMascaraData(val))}
+              keyboardType="numeric"
+              maxLength={10}
             />
           </View>
         </View>
@@ -323,15 +448,33 @@ export default function NovoOrcamentoScreen() {
             itens.map((it, idx) => (
               <View key={it.tempId} style={styles.itemRowCard}>
                 <View style={styles.itemInfoCol}>
-                  <View style={styles.itemTipoBadge}>
-                    <Text style={styles.itemTipoText}>{it.tipo}</Text>
+                  <View style={{ flexDirection: 'row', gap: 6, marginBottom: 4 }}>
+                    <View style={styles.itemTipoBadge}>
+                      <Text style={styles.itemTipoText}>{it.tipo}</Text>
+                    </View>
+                    {it.usaMedicaoArea ? (
+                      <View style={styles.itemMedicaoBadge}>
+                        <Text style={styles.itemMedicaoBadgeText}>MEDIÇÃO DE ÁREA</Text>
+                      </View>
+                    ) : null}
                   </View>
                   <Text style={styles.itemDescricao}>{it.descricao}</Text>
                   <Text style={styles.itemDetalhes}>
                     {it.usaMedicaoArea
-                      ? 'Medição por Área (0 m²)'
+                      ? `${it.quantidade > 0 ? `${it.quantidade.toFixed(2)} m²` : '0,00 m² (Pendente)'} x ${formatarMoeda(it.valorUnitario)}`
                       : `${it.quantidade} ${it.unidade} x ${formatarMoeda(it.valorUnitario)}`}
                   </Text>
+                  {it.usaMedicaoArea ? (
+                    <TouchableOpacity
+                      style={styles.btnMedirArea}
+                      onPress={() => handleMedirAreaItemTemporario(it)}
+                      activeOpacity={0.7}
+                    >
+                      <Text style={styles.btnMedirAreaText}>
+                        🗺️ {it.quantidade > 0 ? `Áreas Medidas (${it.quantidade.toFixed(2)} m²)` : 'Medir Área no Mapa'}
+                      </Text>
+                    </TouchableOpacity>
+                  ) : null}
                 </View>
                 <View style={styles.itemAcoesCol}>
                   <Text style={styles.itemValorTotal}>{formatarMoeda(it.valorTotal)}</Text>
@@ -461,6 +604,7 @@ export default function NovoOrcamentoScreen() {
             <FlatList
               data={clientes}
               keyExtractor={(item) => item.id}
+              keyboardShouldPersistTaps="handled"
               renderItem={({ item }) => (
                 <TouchableOpacity
                   style={[styles.modalItemRow, item.id === clienteId && styles.modalItemRowSelected]}
@@ -484,7 +628,10 @@ export default function NovoOrcamentoScreen() {
 
       {/* Modal de Seleção de Item (Serviço XOR Produto) */}
       <Modal visible={modalItemVisible} animationType="slide" transparent>
-        <View style={styles.modalOverlay}>
+        <KeyboardAvoidingView
+          style={styles.modalOverlay}
+          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        >
           <View style={styles.modalContainer}>
             <Text style={styles.modalTitle}>Adicionar do Catálogo</Text>
 
@@ -593,9 +740,9 @@ export default function NovoOrcamentoScreen() {
               <Text style={styles.modalBtnFecharText}>Cancelar</Text>
             </TouchableOpacity>
           </View>
-        </View>
+        </KeyboardAvoidingView>
       </Modal>
-    </View>
+    </KeyboardAvoidingView>
   );
 }
 
@@ -606,7 +753,7 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     padding: 16,
-    paddingBottom: 40,
+    paddingBottom: 100,
   },
   sectionCard: {
     backgroundColor: '#FFFFFF',
@@ -724,6 +871,38 @@ const styles = StyleSheet.create({
     fontSize: 10,
     fontWeight: '700',
     color: '#004D40',
+  },
+  itemMedicaoBadge: {
+    backgroundColor: '#E8F5E9',
+    borderWidth: 1,
+    borderColor: '#C8E6C9',
+    alignSelf: 'flex-start',
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    borderRadius: 4,
+    marginBottom: 4,
+  },
+  itemMedicaoBadgeText: {
+    fontSize: 10,
+    fontWeight: '700',
+    color: '#2E7D32',
+  },
+  btnMedirArea: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#E8F5E9',
+    borderWidth: 1,
+    borderColor: '#A5D6A7',
+    paddingHorizontal: 8,
+    paddingVertical: 5,
+    borderRadius: 6,
+    marginTop: 6,
+    alignSelf: 'flex-start',
+  },
+  btnMedirAreaText: {
+    color: '#1B5E20',
+    fontSize: 12,
+    fontWeight: '700',
   },
   itemDescricao: {
     fontSize: 14,

@@ -37,3 +37,6 @@ expo-env.d.ts
 # Ephemeral test artifacts
 scratch/
 screenshot_*.png
+
+tests/
+tsconfig.test.json

@@ -33,6 +33,7 @@ export interface GeocodificarOptions {
 export type GeocodingErrorCode =
   | 'TIMEOUT'
   | 'CANCELADO'
+  | 'PERMISSAO_NEGADA'
   | 'INDISPONIVEL'
   | 'FORMATO_INVALIDO'
   | 'ERRO_DESCONHECIDO';
@@ -58,4 +59,10 @@ export interface GeocodingProvider {
     endereco: EnderecoConsultaGeocoding,
     options?: GeocodificarOptions
   ): Promise<CoordenadasGeocoding | null>;
+
+  pesquisarEndereco(
+    texto: string,
+    options?: GeocodificarOptions
+  ): Promise<CoordenadasGeocoding | null>;
 }
+

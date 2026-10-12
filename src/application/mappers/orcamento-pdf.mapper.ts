@@ -56,7 +56,7 @@ export function formatarStatusBadge(status: StatusOrcamento): string {
     case StatusOrcamento.ENVIADO:
       return 'Enviado';
     case StatusOrcamento.EM_ANALISE:
-      return 'Em Análise';
+      return 'Em análise';
     case StatusOrcamento.APROVADO:
       return 'Aprovado';
     case StatusOrcamento.CONCLUIDO:
