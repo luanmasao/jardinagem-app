@@ -6,9 +6,7 @@ O sistema permite cadastrar clientes, serviços e produtos, criar e reutilizar o
 
 ## Status
 
-✅ Autenticação implementada e homologada
-
-🚧 Em desenvolvimento — CRUD de clientes.
+✅ Versão 1.0 da aplicação completa
 
 ## Stack em avaliação
 
@@ -22,3 +20,19 @@ O sistema permite cadastrar clientes, serviços e produtos, criar e reutilizar o
 ## Objetivo acadêmico
 
 O projeto busca aplicar conceitos de Engenharia de Software, requisitos, modelagem UML, banco de dados, arquitetura de software e desenvolvimento mobile em uma solução prática para o setor de jardinagem.
+
+## Utilização de API
+
+Para que as imagens de satélite renderizem, é necessário cadastrar uma chave **API Google Maps**. Acesse o arquivo .env.example para acessar o modelo **.env**, que deve ser criado para criar sincronizar sua **API Maps** com o projeto. 
+ 
+ Para gerar a API, Clique em **"Create your account"**:
+https://mapsplatform.google.com/lp/maps-apis/
+
+## Comandos apara iniciar
+
+- Instalar dependências: **npm install**
+- Iniciar servidor de desenvolvimento (Metro Bundler): **npm start** ou **npm expo start**
+
+# Atenção!
+Para que a **aplicação** funcione corretamente com a **API**, é necessário gerar a **Development Build**. Com o seu **celular** conectado via **USB** (Com depuração ativada) ou emulador **Android Studio**: 
+utilize **npx expo run: android** ou **npm run android**
