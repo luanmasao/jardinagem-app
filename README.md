@@ -8,7 +8,7 @@ O sistema permite cadastrar clientes, serviços e produtos, criar e reutilizar o
 
 ✅ Versão 1.0 da aplicação completa
 
-## Stack em avaliação
+## Stack 
 
 - React Native
 - Expo
