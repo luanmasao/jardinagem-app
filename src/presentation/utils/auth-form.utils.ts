@@ -16,7 +16,7 @@ export interface RegisterValidationResult {
 
 /**
  * Validação puramente local da tela de Cadastro (Presentation Layer).
- * Atende ACH-UX-04:
+ * Correção para cadastro de usuários no Supabase Auth(Confirmação de senha):
  * - Valida preenchimento de nome, email, senha e confirmação de senha;
  * - Garante que senha === confirmação;
  * - Bloqueia cadastro e emite mensagens claras de divergência;

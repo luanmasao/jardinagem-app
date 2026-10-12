@@ -1,7 +1,6 @@
 /**
- * Utilitários de Apresentação para Formatação e Parsing de Datas Civis (pt-BR).
+ * Utilitários de Apresentação para Formatação e Parsing de Datas Civis em pt-br.
  *
- * Atende ao ACH-UX-02 (Release 1.0 — Correção Controlada).
  * Padrão canônico de interface: DD/MM/AAAA (ex: 07/10/2026).
  *
  * Princípios Fundamentais:

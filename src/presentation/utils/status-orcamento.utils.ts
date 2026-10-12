@@ -2,9 +2,9 @@ import { StatusOrcamento } from '../../domain/enums/status-orcamento';
 
 /**
  * Mapeamento explícito e determinístico dos estados técnicos do orçamento
- * para rótulos visuais legíveis e amigáveis ao usuário (pt-BR).
+ * para rótulos visuais legíveis e amigáveis ao usuário em pt-br.
  *
- * Atende ao ACH-UX-03 (Release 1.0 — Correção Controlada).
+ * Correção visando unificação da experiência de usuário (UX) em toda a aplicação.
  */
 export const STATUS_ORCAMENTO_LABELS: Readonly<Record<StatusOrcamento, string>> = Object.freeze({
   [StatusOrcamento.RASCUNHO]: 'Rascunho',
