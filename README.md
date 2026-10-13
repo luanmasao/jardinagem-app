@@ -1,3 +1,8 @@
+# Uniruy Wyden - Programação para Dispositivos Móveis em Android 
+
+- Luan Masao
+- Aila Stefani
+
 # Sistema de Orçamentos para Jardinagem
 
 Aplicativo Android desenvolvido como projeto acadêmico para auxiliar profissionais de jardinagem na criação e gerenciamento de orçamentos.
@@ -8,13 +13,9 @@ O sistema permite cadastrar clientes, serviços e produtos, criar e reutilizar o
 
 ✅ Versão 1.0 da aplicação completa
 
-<<<<<<< HEAD
 🚧 Em desenvolvimento: documentação final e atualizada
 
-## Stack em avaliação
-=======
 ## Stack 
->>>>>>> f546bad7b09895ff7b95fc321f4d4e8005d38313
 
 - React Native
 - Expo
