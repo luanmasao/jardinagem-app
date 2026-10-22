@@ -249,9 +249,11 @@ export const MapaDelimitacao: React.FC<MapaDelimitacaoProps> = ({
 
       {/* Modal para Definir Nome e Observações da Área */}
       <Modal visible={modalVisible} transparent animationType="slide">
+        {/* No Android a janela do Modal já usa SOFT_INPUT_ADJUST_RESIZE; compensar também com
+            behavior="height" fazia o painel oscilar verticalmente ao abrir o teclado. */}
         <KeyboardAvoidingView
           style={styles.modalOverlay}
-          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+          behavior={Platform.OS === 'ios' ? 'padding' : undefined}
         >
           <View style={styles.modalContent}>
             <ScrollView
