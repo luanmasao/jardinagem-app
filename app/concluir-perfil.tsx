@@ -8,8 +8,8 @@ import {
   ScrollView,
 } from 'react-native';
 import { useAuth } from '../src/presentation/contexts/auth-context';
-import { colors } from '../src/presentation/theme';
-import { Button, Card, TextField } from '../src/presentation/components/ui';
+import { colors, fonts } from '../src/presentation/theme';
+import { Button, Card, Icon, TextField } from '../src/presentation/components/ui';
 
 export default function ConcluirPerfilScreen() {
   const { user, concluirPerfil, signOut, isLoading } = useAuth();
@@ -43,7 +43,7 @@ export default function ConcluirPerfilScreen() {
     >
       <ScrollView contentContainerStyle={styles.scrollContent} keyboardShouldPersistTaps="handled">
         <View style={styles.header}>
-          <Text style={styles.appTitle}>🌿 Jardinagem App</Text>
+          <Text style={styles.appTitle}><Icon name="leaf" size={26} color={colors.primary} /> Jardinagem App</Text>
           <Text style={styles.subtitle}>Conclusão Defensiva de Perfil</Text>
         </View>
 
@@ -119,23 +119,25 @@ const styles = StyleSheet.create({
   },
   appTitle: {
     fontSize: 28,
-    fontWeight: 'bold',
+    fontFamily: fonts.bold,
     color: colors.text,
     marginBottom: 6,
   },
   subtitle: {
     fontSize: 14,
+    fontFamily: fonts.regular,
     color: colors.textMuted,
     textAlign: 'center',
   },
   cardTitle: {
     fontSize: 20,
-    fontWeight: '700',
+    fontFamily: fonts.bold,
     color: colors.text,
     marginBottom: 8,
   },
   cardDescription: {
     fontSize: 13,
+    fontFamily: fonts.regular,
     color: colors.textMuted,
     lineHeight: 18,
     marginBottom: 20,
@@ -151,6 +153,7 @@ const styles = StyleSheet.create({
   errorText: {
     color: colors.danger,
     fontSize: 13,
+    fontFamily: fonts.regular,
     lineHeight: 18,
   },
   button: {

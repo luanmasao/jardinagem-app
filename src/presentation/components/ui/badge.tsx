@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, Text, StyleSheet, StyleProp, ViewStyle } from 'react-native';
-import { colors } from '../../theme';
+import { colors, fonts } from '../../theme';
 
 export type BadgeTone = 'success' | 'danger' | 'warning' | 'info' | 'neutral';
 
@@ -50,6 +50,6 @@ const styles = StyleSheet.create({
   },
   text: {
     fontSize: 12,
-    fontWeight: '700',
+    fontFamily: fonts.bold,
   },
 });

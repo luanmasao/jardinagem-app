@@ -10,8 +10,8 @@ import {
 } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useServicoDetalhe } from '../../../src/presentation/hooks/use-servico-detalhe';
-import { colors } from '../../../src/presentation/theme';
-import { Badge, Button, Card } from '../../../src/presentation/components/ui';
+import { colors, fonts } from '../../../src/presentation/theme';
+import { Badge, Button, Card, Icon } from '../../../src/presentation/components/ui';
 
 export default function ServicoDetalheScreen() {
   const router = useRouter();
@@ -66,7 +66,7 @@ export default function ServicoDetalheScreen() {
   if (error || !servico) {
     return (
       <View style={styles.centerContainer}>
-        <Text style={styles.errorIcon}>⚠️</Text>
+        <Icon name="alert" size={40} color={colors.danger} style={styles.errorIcon} />
         <Text style={styles.errorTitle}>Serviço não encontrado</Text>
         <Text style={styles.errorMessage}>
           {error || 'O serviço solicitado não pôde ser localizado ou você não possui permissão para acessá-lo.'}
@@ -158,6 +158,7 @@ const styles = StyleSheet.create({
   loadingText: {
     marginTop: 12,
     fontSize: 14,
+    fontFamily: fonts.regular,
     color: colors.textMuted,
   },
   errorIcon: {
@@ -166,12 +167,13 @@ const styles = StyleSheet.create({
   },
   errorTitle: {
     fontSize: 18,
-    fontWeight: 'bold',
+    fontFamily: fonts.bold,
     color: colors.danger,
     marginBottom: 6,
   },
   errorMessage: {
     fontSize: 13,
+    fontFamily: fonts.regular,
     color: colors.textMuted,
     textAlign: 'center',
     marginBottom: 20,
@@ -184,7 +186,7 @@ const styles = StyleSheet.create({
   },
   headerNome: {
     fontSize: 20,
-    fontWeight: 'bold',
+    fontFamily: fonts.bold,
     color: colors.text,
     flex: 1,
     marginRight: 10,
@@ -194,7 +196,7 @@ const styles = StyleSheet.create({
   },
   cardTitle: {
     fontSize: 16,
-    fontWeight: '700',
+    fontFamily: fonts.bold,
     color: colors.text,
     marginBottom: 12,
     borderBottomWidth: 1,
@@ -211,19 +213,19 @@ const styles = StyleSheet.create({
   label: {
     fontSize: 13,
     color: colors.textMuted,
-    fontWeight: '500',
+    fontFamily: fonts.medium,
   },
   value: {
     fontSize: 13,
     color: colors.text,
-    fontWeight: '600',
+    fontFamily: fonts.semibold,
     maxWidth: '65%',
     textAlign: 'right',
   },
   valuePreco: {
     fontSize: 15,
     color: colors.primary,
-    fontWeight: '700',
+    fontFamily: fonts.bold,
   },
   textAreaSim: {
     color: colors.warning,
@@ -239,6 +241,7 @@ const styles = StyleSheet.create({
   },
   descricaoText: {
     fontSize: 13,
+    fontFamily: fonts.regular,
     color: colors.textSecondary,
     marginTop: 4,
     lineHeight: 18,

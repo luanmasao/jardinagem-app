@@ -2,7 +2,8 @@ import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
 import { useAuth } from '../../src/presentation/contexts/auth-context';
 import { useRouter } from 'expo-router';
-import { colors } from '../../src/presentation/theme';
+import { colors, fonts } from '../../src/presentation/theme';
+import { Icon } from '../../src/presentation/components/ui';
 
 const MODULOS = [
   {
@@ -50,7 +51,7 @@ export default function HomeScreen() {
               style={[styles.secondaryButton, { backgroundColor: colors.primary, marginRight: 8 }]}
               onPress={() => router.push('/concluir-perfil')}
             >
-              <Text style={[styles.secondaryButtonText, { color: colors.textOnColor, fontWeight: 'bold' }]}>
+              <Text style={[styles.secondaryButtonText, { color: colors.textOnColor, fontFamily: fonts.bold }]}>
                 Concluir Meu Perfil
               </Text>
             </TouchableOpacity>
@@ -72,7 +73,7 @@ export default function HomeScreen() {
             onPress={() => router.push(modulo.rota as any)}
           >
             <Text style={styles.primaryButtonText}>Acessar {modulo.titulo}</Text>
-            <Text style={styles.primaryButtonArrow}>→</Text>
+            <Icon name="arrow-right" size={18} color={colors.textOnColor} style={styles.primaryButtonArrow} />
           </TouchableOpacity>
         </View>
       ))}
@@ -99,7 +100,7 @@ const styles = StyleSheet.create({
   },
   welcomeTitle: {
     fontSize: 20,
-    fontWeight: 'bold',
+    fontFamily: fonts.bold,
     color: colors.primaryDark,
   },
   warningCard: {
@@ -112,6 +113,7 @@ const styles = StyleSheet.create({
   },
   warningText: {
     fontSize: 13,
+    fontFamily: fonts.regular,
     color: colors.warning,
     marginBottom: 12,
   },
@@ -132,12 +134,13 @@ const styles = StyleSheet.create({
   },
   cardTitle: {
     fontSize: 16,
-    fontWeight: '700',
+    fontFamily: fonts.bold,
     color: colors.text,
     marginBottom: 6,
   },
   cardDescription: {
     fontSize: 13,
+    fontFamily: fonts.regular,
     color: colors.textSecondary,
     marginBottom: 14,
   },
@@ -153,12 +156,11 @@ const styles = StyleSheet.create({
   primaryButtonText: {
     color: colors.textOnColor,
     fontSize: 15,
-    fontWeight: 'bold',
+    fontFamily: fonts.bold,
   },
   primaryButtonArrow: {
     color: colors.textOnColor,
     fontSize: 18,
-    fontWeight: 'bold',
   },
   secondaryButton: {
     paddingHorizontal: 14,
@@ -169,6 +171,6 @@ const styles = StyleSheet.create({
   secondaryButtonText: {
     fontSize: 13,
     color: colors.textSecondary,
-    fontWeight: '600',
+    fontFamily: fonts.semibold,
   },
 });

@@ -15,8 +15,8 @@ import { useCompartilharPdf } from '../../../src/presentation/hooks/use-comparti
 import { StatusOrcamento } from '../../../src/domain/enums/status-orcamento';
 import { formatarDataCivil } from '../../../src/presentation/utils/data-formatters';
 import { formatarStatusOrcamento } from '../../../src/presentation/utils/status-orcamento.utils';
-import { colors } from '../../../src/presentation/theme';
-import { Button, Card, StatusBadge } from '../../../src/presentation/components/ui';
+import { colors, fonts } from '../../../src/presentation/theme';
+import { Button, Card, Icon, StatusBadge } from '../../../src/presentation/components/ui';
 
 export default function OrcamentoDetalheScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -209,7 +209,7 @@ export default function OrcamentoDetalheScreen() {
                       activeOpacity={0.7}
                     >
                       <Text style={styles.btnGerenciarAreasText}>
-                        🗺️ Áreas Medidas ({it.areas.length})
+                        <Icon name="map" size={12} /> Áreas Medidas ({it.areas.length})
                       </Text>
                     </TouchableOpacity>
                   ) : null}
@@ -316,7 +316,7 @@ export default function OrcamentoDetalheScreen() {
                 </View>
               ) : (
                 <View style={styles.loadingRow}>
-                  <Text style={styles.btnGerarPdfIcon}>📄</Text>
+                  <Icon name="file" size={18} color={colors.textOnColor} style={styles.btnGerarPdfIcon} />
                   <Text style={styles.btnGerarPdfText}>Visualizar PDF</Text>
                 </View>
               )}
@@ -336,7 +336,7 @@ export default function OrcamentoDetalheScreen() {
                 </View>
               ) : (
                 <View style={styles.loadingRow}>
-                  <Text style={styles.btnCompartilharPdfIcon}>📤</Text>
+                  <Icon name="share" size={18} color={colors.textOnColor} style={styles.btnCompartilharPdfIcon} />
                   <Text style={styles.btnCompartilharPdfText}>Compartilhar</Text>
                 </View>
               )}
@@ -480,11 +480,12 @@ const styles = StyleSheet.create({
   },
   numeroOrcamento: {
     fontSize: 20,
-    fontWeight: '700',
+    fontFamily: fonts.bold,
     color: colors.primaryDark,
   },
   dataCriacaoSub: {
     fontSize: 13,
+    fontFamily: fonts.regular,
     color: colors.textMuted,
     marginTop: 2,
   },
@@ -493,17 +494,18 @@ const styles = StyleSheet.create({
   },
   cardSectionTitle: {
     fontSize: 15,
-    fontWeight: '700',
+    fontFamily: fonts.bold,
     color: colors.primaryDark,
     marginBottom: 8,
   },
   clienteNome: {
     fontSize: 16,
-    fontWeight: '600',
+    fontFamily: fonts.semibold,
     color: colors.text,
   },
   clienteInfoText: {
     fontSize: 13,
+    fontFamily: fonts.regular,
     color: colors.textMuted,
     marginTop: 2,
   },
@@ -521,11 +523,12 @@ const styles = StyleSheet.create({
   },
   btnEditarItensHeaderText: {
     fontSize: 12,
-    fontWeight: '700',
+    fontFamily: fonts.bold,
     color: colors.primary,
   },
   emptyItensAviso: {
     fontSize: 13,
+    fontFamily: fonts.regular,
     color: colors.textPlaceholder,
     fontStyle: 'italic',
     paddingVertical: 8,
@@ -547,26 +550,28 @@ const styles = StyleSheet.create({
   },
   itemTipoBadgeText: {
     fontSize: 10,
-    fontWeight: '700',
+    fontFamily: fonts.bold,
     color: colors.teal,
   },
   itemDescricao: {
     fontSize: 14,
-    fontWeight: '600',
+    fontFamily: fonts.semibold,
     color: colors.text,
   },
   itemSubinfo: {
     fontSize: 12,
+    fontFamily: fonts.regular,
     color: colors.textMuted,
     marginTop: 2,
   },
   itemTotal: {
     fontSize: 14,
-    fontWeight: '700',
+    fontFamily: fonts.bold,
     color: colors.primary,
   },
   btnRemoverItem: {
     fontSize: 12,
+    fontFamily: fonts.regular,
     color: colors.danger,
     marginTop: 4,
   },
@@ -582,7 +587,7 @@ const styles = StyleSheet.create({
   },
   btnGerenciarAreasText: {
     fontSize: 12,
-    fontWeight: '700',
+    fontFamily: fonts.bold,
     color: colors.primary,
   },
   financeiroRow: {
@@ -592,20 +597,22 @@ const styles = StyleSheet.create({
   },
   financeiroLabel: {
     fontSize: 14,
+    fontFamily: fonts.regular,
     color: colors.textMuted,
   },
   financeiroValor: {
     fontSize: 14,
-    fontWeight: '600',
+    fontFamily: fonts.semibold,
     color: colors.text,
   },
   financeiroLabelDesconto: {
     fontSize: 14,
+    fontFamily: fonts.regular,
     color: colors.danger,
   },
   financeiroValorDesconto: {
     fontSize: 14,
-    fontWeight: '600',
+    fontFamily: fonts.semibold,
     color: colors.danger,
   },
   financeiroTotalRow: {
@@ -616,12 +623,12 @@ const styles = StyleSheet.create({
   },
   financeiroTotalLabel: {
     fontSize: 16,
-    fontWeight: '700',
+    fontFamily: fonts.bold,
     color: colors.primaryDark,
   },
   financeiroTotalValor: {
     fontSize: 18,
-    fontWeight: '700',
+    fontFamily: fonts.bold,
     color: colors.primary,
   },
   infoCampoRow: {
@@ -629,11 +636,12 @@ const styles = StyleSheet.create({
   },
   infoCampoLabel: {
     fontSize: 12,
-    fontWeight: '600',
+    fontFamily: fonts.semibold,
     color: colors.textMuted,
   },
   infoCampoValor: {
     fontSize: 14,
+    fontFamily: fonts.regular,
     color: colors.text,
     marginTop: 2,
   },
@@ -651,10 +659,12 @@ const styles = StyleSheet.create({
     marginTop: 12,
     color: colors.textMuted,
     fontSize: 14,
+    fontFamily: fonts.regular,
   },
   errorText: {
     color: colors.danger,
     fontSize: 15,
+    fontFamily: fonts.regular,
     textAlign: 'center',
     marginBottom: 16,
   },
@@ -696,7 +706,7 @@ const styles = StyleSheet.create({
   btnCompartilharPdfText: {
     color: colors.textOnColor,
     fontSize: 15,
-    fontWeight: '700',
+    fontFamily: fonts.bold,
   },
   btnGerarPdfIcon: {
     fontSize: 18,
@@ -705,7 +715,7 @@ const styles = StyleSheet.create({
   btnGerarPdfText: {
     color: colors.textOnColor,
     fontSize: 15,
-    fontWeight: '700',
+    fontFamily: fonts.bold,
   },
   btnDesabilitado: {
     opacity: 0.65,

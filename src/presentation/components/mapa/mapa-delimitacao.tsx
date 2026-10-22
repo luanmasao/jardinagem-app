@@ -18,8 +18,8 @@ import { RegiaoMapa } from '../../../infrastructure/maps/map-provider.interface'
 import { useMapaDelimitacao } from '../../hooks/use-mapa-delimitacao';
 import { usePesquisaEndereco } from '../../hooks/use-pesquisa-endereco';
 import { GeometriaPoligono } from '../../../domain/types/geometria';
-import { colors } from '../../theme';
-import { Button, TextField } from '../ui';
+import { colors, fonts } from '../../theme';
+import { Button, Icon, TextField } from '../ui';
 
 interface MapaDelimitacaoProps {
   regiaoInicial?: RegiaoMapa;
@@ -129,7 +129,7 @@ export const MapaDelimitacao: React.FC<MapaDelimitacaoProps> = ({
             disabled={salvando}
             activeOpacity={0.7}
           >
-            <Text style={styles.btnVoltarTopText}>✕ Voltar</Text>
+            <Text style={styles.btnVoltarTopText}><Icon name="close" size={13} /> Voltar</Text>
           </TouchableOpacity>
 
           <TouchableOpacity
@@ -138,7 +138,8 @@ export const MapaDelimitacao: React.FC<MapaDelimitacaoProps> = ({
             activeOpacity={0.7}
           >
             <Text style={styles.btnModoMapaText}>
-              {modoMapa === 'satellite' ? '🛰️ Satélite' : '🗺️ Padrão'}
+              <Icon name={modoMapa === 'satellite' ? 'satellite' : 'map'} size={13} />{' '}
+              {modoMapa === 'satellite' ? 'Satélite' : 'Padrão'}
             </Text>
           </TouchableOpacity>
         </View>
@@ -163,7 +164,7 @@ export const MapaDelimitacao: React.FC<MapaDelimitacaoProps> = ({
               disabled={pesquisandoEndereco || salvando}
               hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
             >
-              <Text style={styles.btnSearchClearText}>✕</Text>
+              <Icon name="close" size={14} color={colors.textMuted} style={styles.btnSearchClearText} />
             </TouchableOpacity>
           )}
           <TouchableOpacity
@@ -178,7 +179,7 @@ export const MapaDelimitacao: React.FC<MapaDelimitacaoProps> = ({
             {pesquisandoEndereco ? (
               <ActivityIndicator size="small" color={colors.surface} />
             ) : (
-              <Text style={styles.btnSearchText}>🔍</Text>
+              <Icon name="search" size={16} color={colors.textOnColor} style={styles.btnSearchText} />
             )}
           </TouchableOpacity>
         </View>
@@ -203,7 +204,7 @@ export const MapaDelimitacao: React.FC<MapaDelimitacaoProps> = ({
             </Text>
           ) : (
             <Text style={styles.dicaSucessoText}>
-              ✓ Polígono delimitado. Toque para adicionar mais pontos ou conclua a medição.
+              <Icon name="check" size={12} /> Polígono delimitado. Toque para adicionar mais pontos ou conclua a medição.
             </Text>
           )}
         </View>
@@ -219,7 +220,7 @@ export const MapaDelimitacao: React.FC<MapaDelimitacaoProps> = ({
             activeOpacity={0.7}
           >
             <Text style={[styles.btnToolText, vertices.length === 0 && styles.btnToolTextDisabled]}>
-              ↩ Desfazer
+              <Icon name="undo" size={13} /> Desfazer
             </Text>
           </TouchableOpacity>
 
@@ -230,7 +231,7 @@ export const MapaDelimitacao: React.FC<MapaDelimitacaoProps> = ({
             activeOpacity={0.7}
           >
             <Text style={[styles.btnToolText, vertices.length === 0 && styles.btnToolTextDisabled]}>
-              🗑️ Limpar
+              <Icon name="trash" size={13} /> Limpar
             </Text>
           </TouchableOpacity>
 
@@ -336,7 +337,7 @@ const styles = StyleSheet.create({
   },
   btnVoltarTopText: {
     color: colors.textOnColor,
-    fontWeight: 'bold',
+    fontFamily: fonts.bold,
     fontSize: 13,
   },
   btnModoMapa: {
@@ -349,7 +350,7 @@ const styles = StyleSheet.create({
   },
   btnModoMapaText: {
     color: colors.textOnColor,
-    fontWeight: 'bold',
+    fontFamily: fonts.bold,
     fontSize: 13,
   },
   searchBarContainer: {
@@ -369,6 +370,7 @@ const styles = StyleSheet.create({
   searchBarInput: {
     flex: 1,
     fontSize: 14,
+    fontFamily: fonts.regular,
     color: colors.text,
     paddingVertical: 6,
     paddingHorizontal: 4,
@@ -380,7 +382,6 @@ const styles = StyleSheet.create({
   btnSearchClearText: {
     color: colors.textMuted,
     fontSize: 14,
-    fontWeight: 'bold',
   },
   btnSearch: {
     backgroundColor: colors.primary,
@@ -417,11 +418,11 @@ const styles = StyleSheet.create({
   feedbackLabel: {
     fontSize: 12,
     color: colors.textMuted,
-    fontWeight: '500',
+    fontFamily: fonts.medium,
   },
   feedbackValor: {
     fontSize: 22,
-    fontWeight: 'bold',
+    fontFamily: fonts.bold,
     color: colors.primary,
   },
   verticeBadge: {
@@ -434,18 +435,19 @@ const styles = StyleSheet.create({
   },
   verticeBadgeText: {
     fontSize: 12,
-    fontWeight: 'bold',
+    fontFamily: fonts.bold,
     color: colors.primary,
   },
   dicaText: {
     fontSize: 12,
+    fontFamily: fonts.regular,
     color: colors.textMuted,
     marginTop: 2,
   },
   dicaSucessoText: {
     fontSize: 12,
     color: colors.primary,
-    fontWeight: '600',
+    fontFamily: fonts.semibold,
     marginTop: 2,
   },
   bottomOverlay: {
@@ -473,7 +475,7 @@ const styles = StyleSheet.create({
   },
   btnToolText: {
     color: colors.textOnColor,
-    fontWeight: '600',
+    fontFamily: fonts.semibold,
     fontSize: 13,
   },
   btnToolTextDisabled: {
@@ -498,7 +500,7 @@ const styles = StyleSheet.create({
   },
   btnConcluirText: {
     color: colors.textOnColor,
-    fontWeight: 'bold',
+    fontFamily: fonts.bold,
     fontSize: 14,
   },
   btnConcluirTextDisabled: {
@@ -527,18 +529,19 @@ const styles = StyleSheet.create({
   },
   modalTitulo: {
     fontSize: 18,
-    fontWeight: 'bold',
+    fontFamily: fonts.bold,
     color: colors.text,
     marginBottom: 4,
   },
   modalSubtitulo: {
     fontSize: 14,
+    fontFamily: fonts.regular,
     color: colors.textMuted,
     marginBottom: 16,
   },
   modalDestaque: {
     color: colors.primary,
-    fontWeight: 'bold',
+    fontFamily: fonts.bold,
   },
   textArea: {
     height: 70,

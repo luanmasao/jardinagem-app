@@ -1,7 +1,7 @@
 import React from 'react';
 import { Text, TouchableOpacity } from 'react-native';
 import { Stack, useRouter } from 'expo-router';
-import { colors } from '../../src/presentation/theme';
+import { colors, fonts } from '../../src/presentation/theme';
 
 export default function AppLayout() {
   const router = useRouter();
@@ -12,7 +12,7 @@ export default function AppLayout() {
       screenOptions={{
         headerStyle: { backgroundColor: colors.primary },
         headerTintColor: colors.textOnColor,
-        headerTitleStyle: { fontWeight: 'bold' },
+        headerTitleStyle: { fontFamily: fonts.bold },
       }}
     >
       <Stack.Screen
@@ -27,7 +27,7 @@ export default function AppLayout() {
               accessibilityRole="button"
               accessibilityLabel="Meus dados"
             >
-              <Text style={{ color: colors.textOnColor, fontSize: 15, fontWeight: 'bold' }}>Perfil</Text>
+              <Text style={{ color: colors.textOnColor, fontSize: 15, fontFamily: fonts.bold }}>Perfil</Text>
             </TouchableOpacity>
           ),
         }}

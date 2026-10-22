@@ -10,8 +10,8 @@ import {
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useAuth } from '../../src/presentation/contexts/auth-context';
-import { colors } from '../../src/presentation/theme';
-import { Button, Card, TextField } from '../../src/presentation/components/ui';
+import { colors, fonts } from '../../src/presentation/theme';
+import { Button, Card, Icon, TextField } from '../../src/presentation/components/ui';
 
 export default function LoginScreen() {
   const router = useRouter();
@@ -41,7 +41,7 @@ export default function LoginScreen() {
     >
       <ScrollView contentContainerStyle={styles.scrollContent} keyboardShouldPersistTaps="handled">
         <View style={styles.header}>
-          <Text style={styles.appTitle}>🌿 Jardinagem App</Text>
+          <Text style={styles.appTitle}><Icon name="leaf" size={26} color={colors.primary} /> Jardinagem App</Text>
           <Text style={styles.subtitle}>Gestão de Orçamentos e Serviços</Text>
         </View>
 
@@ -115,18 +115,19 @@ const styles = StyleSheet.create({
   },
   appTitle: {
     fontSize: 28,
-    fontWeight: 'bold',
+    fontFamily: fonts.bold,
     color: colors.text,
     marginBottom: 6,
   },
   subtitle: {
     fontSize: 14,
+    fontFamily: fonts.regular,
     color: colors.textMuted,
     textAlign: 'center',
   },
   cardTitle: {
     fontSize: 20,
-    fontWeight: '700',
+    fontFamily: fonts.bold,
     color: colors.text,
     marginBottom: 20,
   },
@@ -141,6 +142,7 @@ const styles = StyleSheet.create({
   errorText: {
     color: colors.danger,
     fontSize: 13,
+    fontFamily: fonts.regular,
     lineHeight: 18,
   },
   button: {
@@ -154,11 +156,12 @@ const styles = StyleSheet.create({
   },
   footerText: {
     fontSize: 14,
+    fontFamily: fonts.regular,
     color: colors.textMuted,
   },
   linkText: {
     fontSize: 14,
     color: colors.primary,
-    fontWeight: '600',
+    fontFamily: fonts.semibold,
   },
 });

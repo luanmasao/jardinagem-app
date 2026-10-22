@@ -8,7 +8,7 @@ import {
 } from 'react-native';
 import { useAuth } from '../../src/presentation/contexts/auth-context';
 import { useRouter } from 'expo-router';
-import { colors } from '../../src/presentation/theme';
+import { colors, fonts } from '../../src/presentation/theme';
 import { Button, Card } from '../../src/presentation/components/ui';
 
 export default function PerfilScreen() {
@@ -104,12 +104,12 @@ const styles = StyleSheet.create({
   label: {
     fontSize: 13,
     color: colors.textMuted,
-    fontWeight: '500',
+    fontFamily: fonts.medium,
   },
   value: {
     fontSize: 13,
     color: colors.text,
-    fontWeight: '600',
+    fontFamily: fonts.semibold,
     flexShrink: 1,
     textAlign: 'right',
     marginLeft: 12,
@@ -121,6 +121,7 @@ const styles = StyleSheet.create({
   loadingText: {
     marginTop: 8,
     fontSize: 12,
+    fontFamily: fonts.regular,
     color: colors.textMuted,
   },
   emptyContainer: {
@@ -129,6 +130,7 @@ const styles = StyleSheet.create({
   },
   emptyText: {
     fontSize: 13,
+    fontFamily: fonts.regular,
     color: colors.textMuted,
     textAlign: 'center',
     marginBottom: 12,

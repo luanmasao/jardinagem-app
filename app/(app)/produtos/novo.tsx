@@ -9,8 +9,8 @@ import {
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { produtoService } from '../../../src/application/services/produto.service';
-import { colors } from '../../../src/presentation/theme';
-import { Button, Card, TextField } from '../../../src/presentation/components/ui';
+import { colors, fonts } from '../../../src/presentation/theme';
+import { Button, Card, Icon, TextField } from '../../../src/presentation/components/ui';
 
 export default function NovoProdutoScreen() {
   const router = useRouter();
@@ -76,7 +76,7 @@ export default function NovoProdutoScreen() {
       >
         {errorMessage ? (
           <View style={styles.errorBanner}>
-            <Text style={styles.errorIcon}>⚠️</Text>
+            <Icon name="alert" size={16} color={colors.danger} style={styles.errorIcon} />
             <Text style={styles.errorText}>{errorMessage}</Text>
           </View>
         ) : null}
@@ -166,6 +166,7 @@ const styles = StyleSheet.create({
   },
   errorText: {
     fontSize: 13,
+    fontFamily: fonts.regular,
     color: colors.danger,
     flex: 1,
   },
@@ -174,7 +175,7 @@ const styles = StyleSheet.create({
   },
   sectionTitle: {
     fontSize: 16,
-    fontWeight: '700',
+    fontFamily: fonts.bold,
     color: colors.text,
     marginBottom: 14,
   },

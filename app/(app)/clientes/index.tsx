@@ -13,8 +13,8 @@ import {
 import { useRouter } from 'expo-router';
 import { useClientes } from '../../../src/presentation/hooks/use-clientes';
 import { Cliente } from '../../../src/domain/entities/cliente';
-import { colors } from '../../../src/presentation/theme';
-import { Badge, Button } from '../../../src/presentation/components/ui';
+import { colors, fonts } from '../../../src/presentation/theme';
+import { Badge, Button, Icon } from '../../../src/presentation/components/ui';
 
 export default function ClientesListScreen() {
   const router = useRouter();
@@ -64,7 +64,7 @@ export default function ClientesListScreen() {
 
         {item.endereco?.cidade ? (
           <Text style={styles.clienteEndereco}>
-            📍 {item.endereco.cidade}
+            <Icon name="map-pin" size={12} /> {item.endereco.cidade}
             {item.endereco.estado ? ` - ${item.endereco.estado}` : ''}
           </Text>
         ) : null}
@@ -77,7 +77,7 @@ export default function ClientesListScreen() {
       {/* Barra de Busca e Ação Novo */}
       <View style={styles.headerContainer}>
         <View style={styles.searchBar}>
-          <Text style={styles.searchIcon}>🔍</Text>
+          <Icon name="search" size={14} color={colors.textMuted} style={styles.searchIcon} />
           <TextInput
             style={styles.searchInput}
             placeholder="Buscar por nome, doc ou telefone..."
@@ -88,7 +88,7 @@ export default function ClientesListScreen() {
           />
           {searchQuery.length > 0 ? (
             <TouchableOpacity onPress={() => setSearchQuery('')} hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
-              <Text style={styles.clearSearchText}>✕</Text>
+              <Icon name="close" size={14} color={colors.textMuted} style={styles.clearSearchText} />
             </TouchableOpacity>
           ) : null}
         </View>
@@ -109,14 +109,14 @@ export default function ClientesListScreen() {
         </View>
       ) : error ? (
         <View style={styles.centerContainer}>
-          <Text style={styles.errorIcon}>⚠️</Text>
+          <Icon name="alert" size={36} color={colors.danger} style={styles.errorIcon} />
           <Text style={styles.errorTitle}>Erro ao carregar clientes</Text>
           <Text style={styles.errorMessage}>{error}</Text>
           <Button title="Tentar Novamente" size="compact" onPress={reload} />
         </View>
       ) : filteredClientes.length === 0 ? (
         <View style={styles.centerContainer}>
-          <Text style={styles.emptyIcon}>👥</Text>
+          <Icon name="users" size={48} color={colors.textPlaceholder} style={styles.emptyIcon} />
           <Text style={styles.emptyTitle}>
             {searchQuery ? 'Nenhum cliente encontrado' : 'Nenhum cliente cadastrado'}
           </Text>
@@ -186,6 +186,7 @@ const styles = StyleSheet.create({
   searchInput: {
     flex: 1,
     fontSize: 14,
+    fontFamily: fonts.regular,
     color: colors.text,
     paddingVertical: 0,
   },
@@ -218,25 +219,26 @@ const styles = StyleSheet.create({
   },
   clienteNome: {
     fontSize: 16,
-    fontWeight: '700',
+    fontFamily: fonts.bold,
     color: colors.text,
     flex: 1,
     marginRight: 8,
   },
   clienteInfo: {
     fontSize: 13,
+    fontFamily: fonts.regular,
     color: colors.textSecondary,
     marginBottom: 4,
   },
   infoLabel: {
-    fontWeight: '600',
+    fontFamily: fonts.semibold,
     color: colors.textMuted,
   },
   clienteEndereco: {
     fontSize: 12,
     color: colors.primary,
     marginTop: 4,
-    fontWeight: '500',
+    fontFamily: fonts.medium,
   },
   centerContainer: {
     flex: 1,
@@ -247,6 +249,7 @@ const styles = StyleSheet.create({
   loadingText: {
     marginTop: 12,
     fontSize: 14,
+    fontFamily: fonts.regular,
     color: colors.textMuted,
   },
   errorIcon: {
@@ -255,12 +258,13 @@ const styles = StyleSheet.create({
   },
   errorTitle: {
     fontSize: 16,
-    fontWeight: 'bold',
+    fontFamily: fonts.bold,
     color: colors.danger,
     marginBottom: 4,
   },
   errorMessage: {
     fontSize: 13,
+    fontFamily: fonts.regular,
     color: colors.textMuted,
     textAlign: 'center',
     marginBottom: 16,
@@ -271,13 +275,14 @@ const styles = StyleSheet.create({
   },
   emptyTitle: {
     fontSize: 18,
-    fontWeight: 'bold',
+    fontFamily: fonts.bold,
     color: colors.textSecondary,
     marginBottom: 6,
     textAlign: 'center',
   },
   emptySubtitle: {
     fontSize: 13,
+    fontFamily: fonts.regular,
     color: colors.textMuted,
     textAlign: 'center',
     marginBottom: 20,

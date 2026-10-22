@@ -15,8 +15,8 @@ import { supabaseItemOrcamentoRepository } from '../../../src/infrastructure/rep
 import { clienteService } from '../../../src/application/services/cliente.service';
 import { StatusOrcamento } from '../../../src/domain/enums/status-orcamento';
 import { ItemOrcamento } from '../../../src/domain/entities/item-orcamento';
-import { colors } from '../../../src/presentation/theme';
-import { Button, Card } from '../../../src/presentation/components/ui';
+import { colors, fonts } from '../../../src/presentation/theme';
+import { Button, Card, Icon } from '../../../src/presentation/components/ui';
 
 const formatarMoeda = (valor: number): string => `R$ ${valor.toFixed(2).replace('.', ',')}`;
 
@@ -205,7 +205,7 @@ export default function AreasItemScreen() {
           </Text>
           {isRascunho && (
             <TouchableOpacity style={styles.btnAtualizar} onPress={carregarAreas}>
-              <Text style={styles.btnAtualizarText}>🔄 Atualizar</Text>
+              <Text style={styles.btnAtualizarText}><Icon name="refresh" size={12} /> Atualizar</Text>
             </TouchableOpacity>
           )}
         </View>
@@ -214,7 +214,7 @@ export default function AreasItemScreen() {
           <Text style={styles.erroText}>{errorAreas}</Text>
         ) : areas.length === 0 ? (
           <View style={styles.emptyContainer}>
-            <Text style={styles.emptyIcon}>🗺️</Text>
+            <Icon name="map" size={40} color={colors.textPlaceholder} style={styles.emptyIcon} />
             <Text style={styles.emptyTitulo}>Nenhuma área delimitada</Text>
             <Text style={styles.emptySubtitulo}>
               Toque no botão abaixo para abrir o mapa em modo Satélite e delimitar polígonos sobre o terreno.
@@ -262,7 +262,8 @@ export default function AreasItemScreen() {
       {isRascunho ? (
         <View style={styles.footerContainer}>
           <Button
-            title="🛰️ Delimitar Nova Área no Mapa"
+            title="Delimitar Nova Área no Mapa"
+            icon="satellite"
             onPress={handleAbrirMapa}
             style={styles.btnDelimitarMapa}
           />
@@ -287,6 +288,7 @@ const styles = StyleSheet.create({
   loadingText: {
     marginTop: 10,
     fontSize: 14,
+    fontFamily: fonts.regular,
     color: colors.textMuted,
   },
   headerCard: {
@@ -303,15 +305,16 @@ const styles = StyleSheet.create({
   tipoBadgeText: {
     color: colors.primary,
     fontSize: 11,
-    fontWeight: 'bold',
+    fontFamily: fonts.bold,
   },
   itemDescricao: {
     fontSize: 18,
-    fontWeight: 'bold',
+    fontFamily: fonts.bold,
     color: colors.text,
   },
   itemPrecoBase: {
     fontSize: 13,
+    fontFamily: fonts.regular,
     color: colors.textMuted,
     marginTop: 2,
   },
@@ -327,17 +330,18 @@ const styles = StyleSheet.create({
   },
   resumoLabel: {
     fontSize: 12,
+    fontFamily: fonts.regular,
     color: colors.textMuted,
     marginBottom: 2,
   },
   resumoValorMetragem: {
     fontSize: 20,
-    fontWeight: 'bold',
+    fontFamily: fonts.bold,
     color: colors.primary,
   },
   resumoValorFinanceiro: {
     fontSize: 20,
-    fontWeight: 'bold',
+    fontFamily: fonts.bold,
     color: colors.info,
   },
   listaSection: {
@@ -352,7 +356,7 @@ const styles = StyleSheet.create({
   },
   listaTitulo: {
     fontSize: 16,
-    fontWeight: 'bold',
+    fontFamily: fonts.bold,
     color: colors.textSecondary,
   },
   btnAtualizar: {
@@ -364,7 +368,7 @@ const styles = StyleSheet.create({
   btnAtualizarText: {
     fontSize: 12,
     color: colors.textMuted,
-    fontWeight: '600',
+    fontFamily: fonts.semibold,
   },
   listContent: {
     paddingBottom: 80,
@@ -392,21 +396,22 @@ const styles = StyleSheet.create({
   areaNumeroText: {
     color: colors.textOnColor,
     fontSize: 12,
-    fontWeight: 'bold',
+    fontFamily: fonts.bold,
   },
   areaNome: {
     fontSize: 15,
-    fontWeight: 'bold',
+    fontFamily: fonts.bold,
     color: colors.text,
   },
   areaObs: {
     fontSize: 12,
+    fontFamily: fonts.regular,
     color: colors.textMuted,
     marginTop: 2,
   },
   areaMetragem: {
     fontSize: 16,
-    fontWeight: 'bold',
+    fontFamily: fonts.bold,
     color: colors.primary,
   },
   areaCardFooter: {
@@ -420,12 +425,13 @@ const styles = StyleSheet.create({
   },
   areaVertices: {
     fontSize: 11,
+    fontFamily: fonts.regular,
     color: colors.textPlaceholder,
   },
   btnExcluirArea: {
     color: colors.danger,
     fontSize: 12,
-    fontWeight: 'bold',
+    fontFamily: fonts.bold,
   },
   emptyContainer: {
     alignItems: 'center',
@@ -443,12 +449,13 @@ const styles = StyleSheet.create({
   },
   emptyTitulo: {
     fontSize: 16,
-    fontWeight: 'bold',
+    fontFamily: fonts.bold,
     color: colors.textSecondary,
     marginBottom: 6,
   },
   emptySubtitulo: {
     fontSize: 13,
+    fontFamily: fonts.regular,
     color: colors.textMuted,
     textAlign: 'center',
     lineHeight: 18,
@@ -456,6 +463,7 @@ const styles = StyleSheet.create({
   erroText: {
     color: colors.danger,
     fontSize: 14,
+    fontFamily: fonts.regular,
     textAlign: 'center',
     marginTop: 20,
   },

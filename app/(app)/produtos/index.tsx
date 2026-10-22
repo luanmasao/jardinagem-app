@@ -12,8 +12,8 @@ import {
 import { useRouter } from 'expo-router';
 import { useProdutos } from '../../../src/presentation/hooks/use-produtos';
 import { Produto } from '../../../src/domain/entities/produto';
-import { colors } from '../../../src/presentation/theme';
-import { Badge, Button } from '../../../src/presentation/components/ui';
+import { colors, fonts } from '../../../src/presentation/theme';
+import { Badge, Button, Icon } from '../../../src/presentation/components/ui';
 
 export default function ProdutosListScreen() {
   const router = useRouter();
@@ -66,7 +66,7 @@ export default function ProdutosListScreen() {
       {/* Barra de Busca e Ação Novo */}
       <View style={styles.headerContainer}>
         <View style={styles.searchBar}>
-          <Text style={styles.searchIcon}>🔍</Text>
+          <Icon name="search" size={14} color={colors.textMuted} style={styles.searchIcon} />
           <TextInput
             style={styles.searchInput}
             placeholder="Buscar por nome ou descrição..."
@@ -77,7 +77,7 @@ export default function ProdutosListScreen() {
           />
           {searchQuery.length > 0 ? (
             <TouchableOpacity onPress={() => setSearchQuery('')} hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
-              <Text style={styles.clearSearchText}>✕</Text>
+              <Icon name="close" size={14} color={colors.textMuted} style={styles.clearSearchText} />
             </TouchableOpacity>
           ) : null}
         </View>
@@ -98,14 +98,14 @@ export default function ProdutosListScreen() {
         </View>
       ) : error ? (
         <View style={styles.centerContainer}>
-          <Text style={styles.errorIcon}>⚠️</Text>
+          <Icon name="alert" size={36} color={colors.danger} style={styles.errorIcon} />
           <Text style={styles.errorTitle}>Erro ao carregar produtos</Text>
           <Text style={styles.errorMessage}>{error}</Text>
           <Button title="Tentar Novamente" size="compact" onPress={reload} />
         </View>
       ) : filteredProdutos.length === 0 ? (
         <View style={styles.centerContainer}>
-          <Text style={styles.emptyIcon}>📦</Text>
+          <Icon name="package" size={48} color={colors.textPlaceholder} style={styles.emptyIcon} />
           <Text style={styles.emptyTitle}>
             {searchQuery ? 'Nenhum produto encontrado' : 'Nenhum produto cadastrado'}
           </Text>
@@ -175,6 +175,7 @@ const styles = StyleSheet.create({
   searchInput: {
     flex: 1,
     fontSize: 14,
+    fontFamily: fonts.regular,
     color: colors.text,
     paddingVertical: 0,
   },
@@ -207,13 +208,14 @@ const styles = StyleSheet.create({
   },
   produtoNome: {
     fontSize: 16,
-    fontWeight: '700',
+    fontFamily: fonts.bold,
     color: colors.text,
     flex: 1,
     marginRight: 8,
   },
   produtoDescricao: {
     fontSize: 13,
+    fontFamily: fonts.regular,
     color: colors.textSecondary,
     marginBottom: 10,
     lineHeight: 18,
@@ -232,12 +234,12 @@ const styles = StyleSheet.create({
   },
   unidadeText: {
     fontSize: 12,
-    fontWeight: '600',
+    fontFamily: fonts.semibold,
     color: colors.info,
   },
   precoText: {
     fontSize: 15,
-    fontWeight: '700',
+    fontFamily: fonts.bold,
     color: colors.primary,
     marginLeft: 'auto',
   },
@@ -250,6 +252,7 @@ const styles = StyleSheet.create({
   loadingText: {
     marginTop: 12,
     fontSize: 14,
+    fontFamily: fonts.regular,
     color: colors.textMuted,
   },
   errorIcon: {
@@ -258,12 +261,13 @@ const styles = StyleSheet.create({
   },
   errorTitle: {
     fontSize: 16,
-    fontWeight: 'bold',
+    fontFamily: fonts.bold,
     color: colors.danger,
     marginBottom: 4,
   },
   errorMessage: {
     fontSize: 13,
+    fontFamily: fonts.regular,
     color: colors.textMuted,
     textAlign: 'center',
     marginBottom: 16,
@@ -274,13 +278,14 @@ const styles = StyleSheet.create({
   },
   emptyTitle: {
     fontSize: 18,
-    fontWeight: 'bold',
+    fontFamily: fonts.bold,
     color: colors.textSecondary,
     marginBottom: 6,
     textAlign: 'center',
   },
   emptySubtitle: {
     fontSize: 13,
+    fontFamily: fonts.regular,
     color: colors.textMuted,
     textAlign: 'center',
     marginBottom: 20,

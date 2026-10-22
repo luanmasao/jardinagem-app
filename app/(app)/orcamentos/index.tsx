@@ -16,7 +16,7 @@ import { OrcamentoResumo } from '../../../src/domain/repositories/orcamento.repo
 import { StatusOrcamento } from '../../../src/domain/enums/status-orcamento';
 import { formatarDataCivil } from '../../../src/presentation/utils/data-formatters';
 import { STATUS_FILTROS_ORCAMENTO } from '../../../src/presentation/utils/status-orcamento.utils';
-import { colors } from '../../../src/presentation/theme';
+import { colors, fonts } from '../../../src/presentation/theme';
 import { Button, StatusBadge } from '../../../src/presentation/components/ui';
 
 export default function OrcamentosListScreen() {
@@ -193,11 +193,12 @@ const styles = StyleSheet.create({
   },
   headerTitle: {
     fontSize: 22,
-    fontWeight: '700',
+    fontFamily: fonts.bold,
     color: colors.primaryDark,
   },
   headerSubtitle: {
     fontSize: 13,
+    fontFamily: fonts.regular,
     color: colors.textMuted,
     marginTop: 2,
   },
@@ -210,7 +211,7 @@ const styles = StyleSheet.create({
   btnNovoText: {
     color: colors.textOnColor,
     fontSize: 14,
-    fontWeight: '600',
+    fontFamily: fonts.semibold,
   },
   searchContainer: {
     paddingHorizontal: 16,
@@ -224,6 +225,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 14,
     paddingVertical: 10,
     fontSize: 14,
+    fontFamily: fonts.regular,
     color: colors.text,
   },
   filterScrollWrapper: {
@@ -249,11 +251,11 @@ const styles = StyleSheet.create({
   filterChipText: {
     fontSize: 13,
     color: colors.textMuted,
-    fontWeight: '500',
+    fontFamily: fonts.medium,
   },
   filterChipTextSelected: {
     color: colors.textOnColor,
-    fontWeight: '600',
+    fontFamily: fonts.semibold,
   },
   listContent: {
     padding: 16,
@@ -283,14 +285,14 @@ const styles = StyleSheet.create({
   },
   numeroText: {
     fontSize: 16,
-    fontWeight: '700',
+    fontFamily: fonts.bold,
     color: colors.primaryDark,
   },
   clienteText: {
     fontSize: 14,
     color: colors.textSecondary,
     marginTop: 2,
-    fontWeight: '500',
+    fontFamily: fonts.medium,
   },
   statusBadge: {
     paddingHorizontal: 10,
@@ -300,7 +302,7 @@ const styles = StyleSheet.create({
   },
   statusBadgeText: {
     fontSize: 12,
-    fontWeight: '600',
+    fontFamily: fonts.semibold,
   },
   cardDivider: {
     height: 1,
@@ -320,6 +322,7 @@ const styles = StyleSheet.create({
   },
   labelMuted: {
     fontSize: 11,
+    fontFamily: fonts.regular,
     color: colors.textMuted,
     textTransform: 'uppercase',
   },
@@ -327,11 +330,11 @@ const styles = StyleSheet.create({
     fontSize: 13,
     color: colors.text,
     marginTop: 2,
-    fontWeight: '500',
+    fontFamily: fonts.medium,
   },
   totalValor: {
     fontSize: 16,
-    fontWeight: '700',
+    fontFamily: fonts.bold,
     color: colors.primary,
     marginTop: 2,
   },
@@ -345,10 +348,12 @@ const styles = StyleSheet.create({
     marginTop: 12,
     color: colors.textMuted,
     fontSize: 14,
+    fontFamily: fonts.regular,
   },
   errorText: {
     color: colors.danger,
     fontSize: 14,
+    fontFamily: fonts.regular,
     textAlign: 'center',
     marginBottom: 16,
   },
@@ -361,7 +366,7 @@ const styles = StyleSheet.create({
   retryButtonText: {
     color: colors.textOnColor,
     fontSize: 14,
-    fontWeight: '600',
+    fontFamily: fonts.semibold,
   },
   emptyContainer: {
     padding: 40,
@@ -370,12 +375,13 @@ const styles = StyleSheet.create({
   },
   emptyTitle: {
     fontSize: 16,
-    fontWeight: '700',
+    fontFamily: fonts.bold,
     color: colors.textSecondary,
     marginBottom: 6,
   },
   emptySubtitle: {
     fontSize: 13,
+    fontFamily: fonts.regular,
     color: colors.textMuted,
     textAlign: 'center',
     lineHeight: 18,
@@ -390,6 +396,6 @@ const styles = StyleSheet.create({
   emptyButtonText: {
     color: colors.textOnColor,
     fontSize: 14,
-    fontWeight: '600',
+    fontFamily: fonts.semibold,
   },
 });

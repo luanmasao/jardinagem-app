@@ -6,7 +6,7 @@ import { areaService } from '../../../src/application/services/area.service';
 import { GeometriaPoligono } from '../../../src/domain/types/geometria';
 import { RegiaoMapa } from '../../../src/infrastructure/maps/map-provider.interface';
 import { deviceLocationService } from '../../../src/infrastructure/services/location';
-import { colors } from '../../../src/presentation/theme';
+import { colors, fonts } from '../../../src/presentation/theme';
 
 /**
  * Tela de Delimitação e Desenho de Área no Mapa.
@@ -164,6 +164,6 @@ const styles = StyleSheet.create({
     color: colors.textOnColor,
     marginTop: 12,
     fontSize: 14,
-    fontWeight: '600',
+    fontFamily: fonts.semibold,
   },
 });

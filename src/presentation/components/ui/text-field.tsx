@@ -8,7 +8,7 @@ import {
   StyleProp,
   ViewStyle,
 } from 'react-native';
-import { colors } from '../../theme';
+import { colors, fonts } from '../../theme';
 
 interface TextFieldProps extends TextInputProps {
   label: string;
@@ -68,7 +68,7 @@ const styles = StyleSheet.create({
   },
   label: {
     fontSize: 13,
-    fontWeight: '600',
+    fontFamily: fonts.semibold,
     color: colors.textSecondary,
     marginBottom: 6,
   },
@@ -83,6 +83,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 14,
     paddingVertical: 12,
     fontSize: 15,
+    fontFamily: fonts.regular,
     color: colors.text,
     backgroundColor: colors.surface,
   },

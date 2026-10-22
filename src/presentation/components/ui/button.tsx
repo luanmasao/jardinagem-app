@@ -7,7 +7,8 @@ import {
   StyleProp,
   ViewStyle,
 } from 'react-native';
-import { colors } from '../../theme';
+import { colors, fonts } from '../../theme';
+import { Icon, IconName } from './icon';
 
 export type ButtonVariant = 'primary' | 'secondary' | 'danger' | 'neutral';
 export type ButtonSize = 'regular' | 'compact';
@@ -18,6 +19,8 @@ interface ButtonProps {
   variant?: ButtonVariant;
   /** compact: para cabeçalhos de lista e ações secundárias em linha. */
   size?: ButtonSize;
+  /** Ícone exibido antes do texto, na mesma cor dele. */
+  icon?: IconName;
   /** Exibe indicador de carregamento no lugar do texto e bloqueia o toque. */
   loading?: boolean;
   disabled?: boolean;
@@ -38,6 +41,7 @@ export const Button: React.FC<ButtonProps> = ({
   onPress,
   variant = 'primary',
   size = 'regular',
+  icon,
   loading = false,
   disabled = false,
   style,
@@ -65,6 +69,8 @@ export const Button: React.FC<ButtonProps> = ({
         <ActivityIndicator color={variant === 'primary' ? colors.textOnColor : colors.primary} />
       ) : (
         <Text style={[styles.text, size === 'compact' && styles.compactText, textStyles[variant]]}>
+          {icon ? <Icon name={icon} size={size === 'compact' ? 15 : 17} /> : null}
+          {icon ? '  ' : null}
           {title}
         </Text>
       )}
@@ -108,7 +114,7 @@ const styles = StyleSheet.create({
   },
   text: {
     fontSize: 16,
-    fontWeight: '700',
+    fontFamily: fonts.bold,
   },
   compactText: {
     fontSize: 14,

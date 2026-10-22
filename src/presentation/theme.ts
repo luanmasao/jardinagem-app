@@ -47,3 +47,17 @@ export const colors = Object.freeze({
 
   shadow: '#000000',
 });
+
+/**
+ * Famílias da fonte Plus Jakarta Sans, carregadas no layout raiz (app/_layout.tsx).
+ *
+ * No Android, fontes customizadas não selecionam o peso por `fontWeight`: cada peso é
+ * uma família própria. Use `fontFamily: fonts.bold` em vez de `fontWeight: 'bold'`.
+ */
+export const fonts = Object.freeze({
+  regular: 'PlusJakartaSans_400Regular',
+  medium: 'PlusJakartaSans_500Medium',
+  semibold: 'PlusJakartaSans_600SemiBold',
+  bold: 'PlusJakartaSans_700Bold',
+  extrabold: 'PlusJakartaSans_800ExtraBold',
+});

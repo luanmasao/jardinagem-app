@@ -10,8 +10,8 @@ import {
 } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useClienteDetalhe } from '../../../src/presentation/hooks/use-cliente-detalhe';
-import { colors } from '../../../src/presentation/theme';
-import { Badge, Button, Card } from '../../../src/presentation/components/ui';
+import { colors, fonts } from '../../../src/presentation/theme';
+import { Badge, Button, Card, Icon } from '../../../src/presentation/components/ui';
 
 export default function ClienteDetalheScreen() {
   const router = useRouter();
@@ -62,7 +62,7 @@ export default function ClienteDetalheScreen() {
   if (error || !cliente) {
     return (
       <View style={styles.centerContainer}>
-        <Text style={styles.errorIcon}>⚠️</Text>
+        <Icon name="alert" size={40} color={colors.danger} style={styles.errorIcon} />
         <Text style={styles.errorTitle}>Cliente não encontrado</Text>
         <Text style={styles.errorMessage}>
           {error || 'O cliente solicitado não pôde ser localizado ou você não possui permissão para acessá-lo.'}
@@ -158,9 +158,10 @@ export default function ClienteDetalheScreen() {
                     : styles.localizacaoPendente,
                 ]}
               >
+                <Icon name="map-pin" size={13} />{' '}
                 {cliente.endereco.latitude != null
-                  ? '📍 Definida'
-                  : '📍 Não localizada (manual)'}
+                  ? 'Definida'
+                  : 'Não localizada (manual)'}
               </Text>
             </View>
           </>
@@ -216,6 +217,7 @@ const styles = StyleSheet.create({
   loadingText: {
     marginTop: 12,
     fontSize: 14,
+    fontFamily: fonts.regular,
     color: colors.textMuted,
   },
   errorIcon: {
@@ -224,12 +226,13 @@ const styles = StyleSheet.create({
   },
   errorTitle: {
     fontSize: 18,
-    fontWeight: 'bold',
+    fontFamily: fonts.bold,
     color: colors.danger,
     marginBottom: 6,
   },
   errorMessage: {
     fontSize: 13,
+    fontFamily: fonts.regular,
     color: colors.textMuted,
     textAlign: 'center',
     marginBottom: 20,
@@ -242,7 +245,7 @@ const styles = StyleSheet.create({
   },
   headerNome: {
     fontSize: 20,
-    fontWeight: 'bold',
+    fontFamily: fonts.bold,
     color: colors.text,
     flex: 1,
     marginRight: 10,
@@ -252,7 +255,7 @@ const styles = StyleSheet.create({
   },
   cardTitle: {
     fontSize: 16,
-    fontWeight: '700',
+    fontFamily: fonts.bold,
     color: colors.text,
     marginBottom: 12,
     borderBottomWidth: 1,
@@ -269,22 +272,22 @@ const styles = StyleSheet.create({
   label: {
     fontSize: 13,
     color: colors.textMuted,
-    fontWeight: '500',
+    fontFamily: fonts.medium,
   },
   value: {
     fontSize: 13,
     color: colors.text,
-    fontWeight: '600',
+    fontFamily: fonts.semibold,
     maxWidth: '65%',
     textAlign: 'right',
   },
   localizacaoMapeada: {
     color: colors.primary,
-    fontWeight: '700',
+    fontFamily: fonts.bold,
   },
   localizacaoPendente: {
     color: colors.warning,
-    fontWeight: '600',
+    fontFamily: fonts.semibold,
   },
   observacoesContainer: {
     marginTop: 10,
@@ -294,6 +297,7 @@ const styles = StyleSheet.create({
   },
   observacoesText: {
     fontSize: 13,
+    fontFamily: fonts.regular,
     color: colors.textSecondary,
     marginTop: 4,
     lineHeight: 18,
@@ -304,6 +308,7 @@ const styles = StyleSheet.create({
   },
   emptyEnderecoText: {
     fontSize: 13,
+    fontFamily: fonts.regular,
     color: colors.textPlaceholder,
     fontStyle: 'italic',
   },

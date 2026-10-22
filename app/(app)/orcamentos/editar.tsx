@@ -30,8 +30,8 @@ import {
   parseDataCivil,
 } from '../../../src/presentation/utils/data-formatters';
 import { formatarStatusOrcamento } from '../../../src/presentation/utils/status-orcamento.utils';
-import { colors } from '../../../src/presentation/theme';
-import { Button, Card, TextField } from '../../../src/presentation/components/ui';
+import { colors, fonts } from '../../../src/presentation/theme';
+import { Button, Card, Icon, TextField } from '../../../src/presentation/components/ui';
 
 export default function EditarOrcamentoScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -372,7 +372,7 @@ export default function EditarOrcamentoScreen() {
                       activeOpacity={0.7}
                     >
                       <Text style={styles.btnMedirAreaText}>
-                        🗺️ {it.quantidade > 0 ? `Áreas Medidas (${it.quantidade.toFixed(2)} m²)` : 'Medir Área no Mapa'}
+                        <Icon name="map" size={12} /> {it.quantidade > 0 ? `Áreas Medidas (${it.quantidade.toFixed(2)} m²)` : 'Medir Área no Mapa'}
                       </Text>
                     </TouchableOpacity>
                   ) : null}
@@ -617,21 +617,21 @@ const styles = StyleSheet.create({
   },
   headerEdicaoNumero: {
     fontSize: 18,
-    fontWeight: '700',
+    fontFamily: fonts.bold,
     color: colors.primaryDark,
   },
   headerEdicaoStatus: {
     fontSize: 13,
     color: colors.warning,
     marginTop: 2,
-    fontWeight: '600',
+    fontFamily: fonts.semibold,
   },
   sectionCard: {
     marginBottom: 12,
   },
   sectionTitle: {
     fontSize: 15,
-    fontWeight: '700',
+    fontFamily: fonts.bold,
     color: colors.primaryDark,
     marginBottom: 10,
   },
@@ -650,11 +650,12 @@ const styles = StyleSheet.create({
   },
   selectButtonTextSelected: {
     fontSize: 15,
-    fontWeight: '600',
+    fontFamily: fonts.semibold,
     color: colors.text,
   },
   selectButtonTextPlaceholder: {
     fontSize: 14,
+    fontFamily: fonts.regular,
     color: colors.textMuted,
   },
   textArea: {
@@ -663,6 +664,7 @@ const styles = StyleSheet.create({
   },
   emptyItensTexto: {
     fontSize: 13,
+    fontFamily: fonts.regular,
     color: colors.textPlaceholder,
     fontStyle: 'italic',
     paddingVertical: 8,
@@ -683,7 +685,7 @@ const styles = StyleSheet.create({
   },
   itemTipoBadgeText: {
     fontSize: 10,
-    fontWeight: '700',
+    fontFamily: fonts.bold,
     color: colors.teal,
   },
   itemMedicaoBadge: {
@@ -697,7 +699,7 @@ const styles = StyleSheet.create({
   },
   itemMedicaoBadgeText: {
     fontSize: 10,
-    fontWeight: '700',
+    fontFamily: fonts.bold,
     color: colors.primary,
   },
   btnMedirArea: {
@@ -715,25 +717,27 @@ const styles = StyleSheet.create({
   btnMedirAreaText: {
     color: colors.primaryDark,
     fontSize: 12,
-    fontWeight: '700',
+    fontFamily: fonts.bold,
   },
   itemDescricao: {
     fontSize: 14,
-    fontWeight: '600',
+    fontFamily: fonts.semibold,
     color: colors.text,
   },
   itemDetalhes: {
     fontSize: 12,
+    fontFamily: fonts.regular,
     color: colors.textMuted,
     marginTop: 2,
   },
   itemValorTotal: {
     fontSize: 14,
-    fontWeight: '700',
+    fontFamily: fonts.bold,
     color: colors.primary,
   },
   btnRemoverText: {
     fontSize: 12,
+    fontFamily: fonts.regular,
     color: colors.danger,
     marginTop: 4,
   },
@@ -754,7 +758,7 @@ const styles = StyleSheet.create({
   },
   tipoDescText: {
     fontSize: 12,
-    fontWeight: '600',
+    fontFamily: fonts.semibold,
     color: colors.textMuted,
   },
   tipoDescTextActive: {
@@ -772,11 +776,12 @@ const styles = StyleSheet.create({
   },
   resumoLabel: {
     fontSize: 14,
+    fontFamily: fonts.regular,
     color: colors.textMuted,
   },
   resumoValor: {
     fontSize: 14,
-    fontWeight: '600',
+    fontFamily: fonts.semibold,
     color: colors.text,
   },
   totalRow: {
@@ -787,12 +792,12 @@ const styles = StyleSheet.create({
   },
   totalLabel: {
     fontSize: 15,
-    fontWeight: '700',
+    fontFamily: fonts.bold,
     color: colors.primaryDark,
   },
   totalFinalValor: {
     fontSize: 17,
-    fontWeight: '700',
+    fontFamily: fonts.bold,
     color: colors.primary,
   },
   btnSalvar: {
@@ -808,10 +813,12 @@ const styles = StyleSheet.create({
     marginTop: 12,
     color: colors.textMuted,
     fontSize: 14,
+    fontFamily: fonts.regular,
   },
   errorText: {
     color: colors.danger,
     fontSize: 15,
+    fontFamily: fonts.regular,
     textAlign: 'center',
     marginBottom: 16,
   },
@@ -822,12 +829,13 @@ const styles = StyleSheet.create({
   },
   bloqueioTitulo: {
     fontSize: 18,
-    fontWeight: '700',
+    fontFamily: fonts.bold,
     color: colors.danger,
     marginBottom: 12,
   },
   bloqueioMensagem: {
     fontSize: 14,
+    fontFamily: fonts.regular,
     color: colors.textSecondary,
     textAlign: 'center',
     lineHeight: 20,
@@ -835,6 +843,7 @@ const styles = StyleSheet.create({
   },
   bloqueioMensagemSub: {
     fontSize: 13,
+    fontFamily: fonts.regular,
     color: colors.textMuted,
     textAlign: 'center',
     lineHeight: 18,
@@ -854,7 +863,7 @@ const styles = StyleSheet.create({
   },
   modalTitle: {
     fontSize: 18,
-    fontWeight: '700',
+    fontFamily: fonts.bold,
     color: colors.primaryDark,
     marginBottom: 14,
   },
@@ -875,7 +884,7 @@ const styles = StyleSheet.create({
   },
   modalTabText: {
     fontSize: 14,
-    fontWeight: '600',
+    fontFamily: fonts.semibold,
     color: colors.textMuted,
   },
   modalTabTextActive: {
@@ -893,11 +902,12 @@ const styles = StyleSheet.create({
   },
   modalItemTitle: {
     fontSize: 15,
-    fontWeight: '600',
+    fontFamily: fonts.semibold,
     color: colors.text,
   },
   modalItemSub: {
     fontSize: 13,
+    fontFamily: fonts.regular,
     color: colors.textMuted,
     marginTop: 2,
   },
@@ -911,7 +921,7 @@ const styles = StyleSheet.create({
   },
   itemConfigTitle: {
     fontSize: 14,
-    fontWeight: '700',
+    fontFamily: fonts.bold,
     color: colors.primary,
     marginBottom: 8,
   },
@@ -923,6 +933,7 @@ const styles = StyleSheet.create({
   },
   avisoMedicaoText: {
     fontSize: 12,
+    fontFamily: fonts.regular,
     color: colors.warning,
     lineHeight: 16,
   },

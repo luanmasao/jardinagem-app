@@ -26,8 +26,8 @@ import {
   aplicarMascaraData,
   parseDataCivil,
 } from '../../../src/presentation/utils/data-formatters';
-import { colors } from '../../../src/presentation/theme';
-import { Button, Card, TextField } from '../../../src/presentation/components/ui';
+import { colors, fonts } from '../../../src/presentation/theme';
+import { Button, Card, Icon, TextField } from '../../../src/presentation/components/ui';
 
 interface ItemTemporario {
   tempId: string;
@@ -463,7 +463,7 @@ export default function NovoOrcamentoScreen() {
                       activeOpacity={0.7}
                     >
                       <Text style={styles.btnMedirAreaText}>
-                        🗺️ {it.quantidade > 0 ? `Áreas Medidas (${it.quantidade.toFixed(2)} m²)` : 'Medir Área no Mapa'}
+                        <Icon name="map" size={12} /> {it.quantidade > 0 ? `Áreas Medidas (${it.quantidade.toFixed(2)} m²)` : 'Medir Área no Mapa'}
                       </Text>
                     </TouchableOpacity>
                   ) : null}
@@ -735,7 +735,7 @@ const styles = StyleSheet.create({
   },
   sectionTitle: {
     fontSize: 16,
-    fontWeight: '700',
+    fontFamily: fonts.bold,
     color: colors.primaryDark,
     marginBottom: 12,
   },
@@ -754,15 +754,17 @@ const styles = StyleSheet.create({
   },
   selectButtonTextSelected: {
     fontSize: 15,
-    fontWeight: '600',
+    fontFamily: fonts.semibold,
     color: colors.text,
   },
   selectButtonTextPlaceholder: {
     fontSize: 14,
+    fontFamily: fonts.regular,
     color: colors.textMuted,
   },
   clienteSubtext: {
     fontSize: 13,
+    fontFamily: fonts.regular,
     color: colors.textMuted,
     marginTop: 6,
     marginLeft: 2,
@@ -779,11 +781,12 @@ const styles = StyleSheet.create({
   },
   emptyItensText: {
     fontSize: 14,
-    fontWeight: '600',
+    fontFamily: fonts.semibold,
     color: colors.textMuted,
   },
   emptyItensSubtext: {
     fontSize: 12,
+    fontFamily: fonts.regular,
     color: colors.textPlaceholder,
     textAlign: 'center',
     marginTop: 4,
@@ -809,7 +812,7 @@ const styles = StyleSheet.create({
   },
   itemTipoText: {
     fontSize: 10,
-    fontWeight: '700',
+    fontFamily: fonts.bold,
     color: colors.teal,
   },
   itemMedicaoBadge: {
@@ -824,7 +827,7 @@ const styles = StyleSheet.create({
   },
   itemMedicaoBadgeText: {
     fontSize: 10,
-    fontWeight: '700',
+    fontFamily: fonts.bold,
     color: colors.primary,
   },
   btnMedirArea: {
@@ -842,15 +845,16 @@ const styles = StyleSheet.create({
   btnMedirAreaText: {
     color: colors.primaryDark,
     fontSize: 12,
-    fontWeight: '700',
+    fontFamily: fonts.bold,
   },
   itemDescricao: {
     fontSize: 14,
-    fontWeight: '600',
+    fontFamily: fonts.semibold,
     color: colors.text,
   },
   itemDetalhes: {
     fontSize: 12,
+    fontFamily: fonts.regular,
     color: colors.textMuted,
     marginTop: 2,
   },
@@ -860,11 +864,12 @@ const styles = StyleSheet.create({
   },
   itemValorTotal: {
     fontSize: 14,
-    fontWeight: '700',
+    fontFamily: fonts.bold,
     color: colors.primary,
   },
   btnRemoverText: {
     fontSize: 12,
+    fontFamily: fonts.regular,
     color: colors.danger,
     marginTop: 4,
   },
@@ -885,7 +890,7 @@ const styles = StyleSheet.create({
   },
   tipoDescText: {
     fontSize: 12,
-    fontWeight: '600',
+    fontFamily: fonts.semibold,
     color: colors.textMuted,
   },
   tipoDescTextActive: {
@@ -903,20 +908,22 @@ const styles = StyleSheet.create({
   },
   resumoLabel: {
     fontSize: 14,
+    fontFamily: fonts.regular,
     color: colors.textMuted,
   },
   resumoValor: {
     fontSize: 14,
-    fontWeight: '600',
+    fontFamily: fonts.semibold,
     color: colors.text,
   },
   resumoLabelDesconto: {
     fontSize: 14,
+    fontFamily: fonts.regular,
     color: colors.danger,
   },
   resumoValorDesconto: {
     fontSize: 14,
-    fontWeight: '600',
+    fontFamily: fonts.semibold,
     color: colors.danger,
   },
   totalRow: {
@@ -927,12 +934,12 @@ const styles = StyleSheet.create({
   },
   totalLabel: {
     fontSize: 16,
-    fontWeight: '700',
+    fontFamily: fonts.bold,
     color: colors.primaryDark,
   },
   totalFinalValor: {
     fontSize: 18,
-    fontWeight: '700',
+    fontFamily: fonts.bold,
     color: colors.primary,
   },
   btnSalvar: {
@@ -948,6 +955,7 @@ const styles = StyleSheet.create({
     marginTop: 12,
     color: colors.textMuted,
     fontSize: 14,
+    fontFamily: fonts.regular,
   },
   modalOverlay: {
     flex: 1,
@@ -963,7 +971,7 @@ const styles = StyleSheet.create({
   },
   modalTitle: {
     fontSize: 18,
-    fontWeight: '700',
+    fontFamily: fonts.bold,
     color: colors.primaryDark,
     marginBottom: 14,
   },
@@ -984,7 +992,7 @@ const styles = StyleSheet.create({
   },
   modalTabText: {
     fontSize: 14,
-    fontWeight: '600',
+    fontFamily: fonts.semibold,
     color: colors.textMuted,
   },
   modalTabTextActive: {
@@ -1002,11 +1010,12 @@ const styles = StyleSheet.create({
   },
   modalItemTitle: {
     fontSize: 15,
-    fontWeight: '600',
+    fontFamily: fonts.semibold,
     color: colors.text,
   },
   modalItemSub: {
     fontSize: 13,
+    fontFamily: fonts.regular,
     color: colors.textMuted,
     marginTop: 2,
   },
@@ -1020,7 +1029,7 @@ const styles = StyleSheet.create({
   },
   itemConfigTitle: {
     fontSize: 14,
-    fontWeight: '700',
+    fontFamily: fonts.bold,
     color: colors.primary,
     marginBottom: 8,
   },
@@ -1032,6 +1041,7 @@ const styles = StyleSheet.create({
   },
   avisoMedicaoText: {
     fontSize: 12,
+    fontFamily: fonts.regular,
     color: colors.warning,
     lineHeight: 16,
   },

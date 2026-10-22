@@ -11,8 +11,8 @@ import {
 } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { clienteService } from '../../../src/application/services/cliente.service';
-import { colors } from '../../../src/presentation/theme';
-import { Button, Card, TextField } from '../../../src/presentation/components/ui';
+import { colors, fonts } from '../../../src/presentation/theme';
+import { Button, Card, Icon, TextField } from '../../../src/presentation/components/ui';
 
 export default function EditarClienteScreen() {
   const router = useRouter();
@@ -170,7 +170,7 @@ export default function EditarClienteScreen() {
       >
         {errorMessage ? (
           <View style={styles.errorBanner}>
-            <Text style={styles.errorIcon}>⚠️</Text>
+            <Icon name="alert" size={16} color={colors.danger} style={styles.errorIcon} />
             <Text style={styles.errorText}>{errorMessage}</Text>
           </View>
         ) : null}
@@ -341,6 +341,7 @@ const styles = StyleSheet.create({
   loadingText: {
     marginTop: 12,
     fontSize: 14,
+    fontFamily: fonts.regular,
     color: colors.textMuted,
   },
   errorBanner: {
@@ -359,6 +360,7 @@ const styles = StyleSheet.create({
   },
   errorText: {
     fontSize: 13,
+    fontFamily: fonts.regular,
     color: colors.danger,
     flex: 1,
   },
@@ -367,7 +369,7 @@ const styles = StyleSheet.create({
   },
   sectionTitle: {
     fontSize: 16,
-    fontWeight: '700',
+    fontFamily: fonts.bold,
     color: colors.text,
     marginBottom: 12,
   },
