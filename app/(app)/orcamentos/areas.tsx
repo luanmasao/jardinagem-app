@@ -41,7 +41,7 @@ export default function AreasItemScreen() {
   const { areas, loading: loadingAreas, error: errorAreas, metragemTotal, carregarAreas, removerArea } =
     useAreas(itemId || '');
 
-  const carregarItemEOrcamento = async () => {
+  const carregarItemEOrcamento = useCallback(async () => {
     if (!orcamentoId || !itemId) return;
     setCarregandoItem(true);
     try {
@@ -63,18 +63,15 @@ export default function AreasItemScreen() {
     } finally {
       setCarregandoItem(false);
     }
-  };
+  }, [orcamentoId, itemId]);
 
+  // Carrega ao abrir a tela e de novo ao voltar do mapa (nova área salva).
   useFocusEffect(
     useCallback(() => {
       carregarItemEOrcamento();
       carregarAreas();
-    }, [orcamentoId, itemId])
+    }, [carregarItemEOrcamento, carregarAreas])
   );
-
-  useEffect(() => {
-    carregarItemEOrcamento();
-  }, [orcamentoId, itemId]);
 
   const isRascunho = statusOrcamento === StatusOrcamento.RASCUNHO;
 
@@ -110,7 +107,7 @@ export default function AreasItemScreen() {
     );
   };
 
-  const handleAbrirMapa = async () => {
+  const handleAbrirMapa = useCallback(async () => {
     if (!isRascunho) {
       Alert.alert(
         'Ação Bloqueada',
@@ -143,7 +140,7 @@ export default function AreasItemScreen() {
     }
 
     router.push(`/orcamentos/mapa?orcamentoId=${orcamentoId}&itemId=${itemId}${queryCoords}` as any);
-  };
+  }, [isRascunho, clienteId, orcamentoId, itemId, router]);
 
   useEffect(() => {
     if (
@@ -157,7 +154,7 @@ export default function AreasItemScreen() {
       abriuMapaAutoRef.current = true;
       handleAbrirMapa();
     }
-  }, [autoAbrirMapa, carregandoItem, loadingAreas, isRascunho, areas.length]);
+  }, [autoAbrirMapa, carregandoItem, loadingAreas, isRascunho, areas.length, handleAbrirMapa]);
 
   if (carregandoItem || loadingAreas) {
     return (

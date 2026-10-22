@@ -2,7 +2,9 @@ import aesjs from 'aes-js';
 
 // Inicialização segura do polyfill CSPRNG para React Native / Android antes de qualquer uso.
 // Em ambiente Node.js / testes rápidos, o runtime já disponibiliza globalThis.crypto.getRandomValues nativamente.
+// require() intencional: um import falharia ao carregar o módulo fora do React Native.
 try {
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
   require('react-native-get-random-values');
 } catch {
   // Ambiente sem bundle React Native (ex.: testes em Node.js com tsx).
@@ -59,8 +61,12 @@ export class LargeSecureStore implements SupportedStorage {
   }
 
   private initNativeModules(): void {
+    // require() intencional: carrega os módulos nativos só quando existem, para os testes
+    // em Node.js usarem o armazenamento em memória em vez de falhar no import.
     try {
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
       this.secureStoreModule = require('expo-secure-store');
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
       const asyncStoragePkg = require('@react-native-async-storage/async-storage');
       this.asyncStorageModule = asyncStoragePkg.default || asyncStoragePkg;
       this.isNativeAvailable = !!(

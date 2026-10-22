@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback } from 'react';
 import { Area } from '../../domain/entities/area';
 import { areaService, CriarAreaServiceInput } from '../../application/services/area.service';
 
@@ -14,6 +14,7 @@ interface UseAreasReturn {
 
 /**
  * Hook para gerenciamento do ciclo de vida das Áreas de um Item de Orçamento na camada de apresentação.
+ * Não carrega sozinho: a tela chama `carregarAreas` no foco (ao abrir e ao voltar do mapa).
  */
 export function useAreas(itemOrcamentoId: string): UseAreasReturn {
   const [areas, setAreas] = useState<Area[]>([]);
@@ -34,10 +35,6 @@ export function useAreas(itemOrcamentoId: string): UseAreasReturn {
       setLoading(false);
     }
   }, [itemOrcamentoId]);
-
-  useEffect(() => {
-    carregarAreas();
-  }, [carregarAreas]);
 
   const criarArea = useCallback(
     async (dados: CriarAreaServiceInput): Promise<Area> => {
