@@ -1,82 +1,164 @@
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView, ActivityIndicator } from 'react-native';
 import { useAuth } from '../../src/presentation/contexts/auth-context';
 import { useRouter } from 'expo-router';
+import { useOrcamentos } from '../../src/presentation/hooks/use-orcamentos';
 import { colors, fonts } from '../../src/presentation/theme';
-import { Icon } from '../../src/presentation/components/ui';
+import { Button, Icon, IconName, StatusBadge } from '../../src/presentation/components/ui';
 
-const MODULOS = [
+const MODULOS: { titulo: string; descricao: string; rota: string; icone: IconName }[] = [
+  {
+    titulo: 'Orçamentos',
+    descricao: 'Propostas, áreas e PDF',
+    rota: '/orcamentos',
+    icone: 'file',
+  },
   {
     titulo: 'Clientes',
-    descricao: 'Cadastre e consulte seus clientes e endereços.',
+    descricao: 'Contatos e endereços',
     rota: '/clientes',
+    icone: 'users',
   },
   {
     titulo: 'Serviços',
-    descricao: 'Gerencie seus serviços e preços.',
+    descricao: 'Serviços e preços',
     rota: '/servicos',
+    icone: 'leaf',
   },
   {
     titulo: 'Produtos',
-    descricao: 'Gerencie insumos, plantas e materiais.',
+    descricao: 'Insumos, plantas e materiais',
     rota: '/produtos',
-  },
-  {
-    titulo: 'Orçamentos',
-    descricao: 'Crie orçamentos, meça áreas no mapa e gere PDF.',
-    rota: '/orcamentos',
+    icone: 'package',
   },
 ];
+
+/** Quantidade de orçamentos exibidos em "Recentes" (a lista já vem do mais novo para o mais antigo). */
+const QTD_RECENTES = 3;
+
+const formatarMoeda = (valor: number): string => `R$ ${valor.toFixed(2).replace('.', ',')}`;
+
+function formatarDataHoje(): string {
+  const texto = new Date().toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'long' });
+  return texto.charAt(0).toUpperCase() + texto.slice(1);
+}
 
 export default function HomeScreen() {
   const router = useRouter();
   const { user, perfil, isLoading, refreshPerfil } = useAuth();
+  const { orcamentos, isLoading: carregandoOrcamentos, error: erroOrcamentos, reload } = useOrcamentos();
+
+  const recentes = orcamentos.slice(0, QTD_RECENTES);
 
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.content}>
-      <View style={styles.welcomeBanner}>
-        <Text style={styles.welcomeTitle}>
+      <View style={styles.hero}>
+        <Text style={styles.heroData}>{formatarDataHoje()}</Text>
+        <Text style={styles.heroSaudacao}>
           Olá, {perfil?.nome || user?.nome || 'Profissional'}!
         </Text>
       </View>
 
-      {/* Aviso exibido apenas quando o perfil não pôde ser carregado */}
-      {!isLoading && !perfil && (
-        <View style={styles.warningCard}>
-          <Text style={styles.warningText}>
-            Seu perfil ainda não foi carregado. Conclua seu cadastro ou tente novamente.
-          </Text>
-          <View style={styles.warningActions}>
+      <View style={styles.corpo}>
+        <TouchableOpacity
+          style={styles.ctaCard}
+          activeOpacity={0.8}
+          onPress={() => router.push('/orcamentos/novo' as any)}
+          accessibilityRole="button"
+          accessibilityLabel="Novo orçamento"
+        >
+          <View style={styles.ctaIcone}>
+            <Icon name="plus" size={26} color={colors.textOnColor} />
+          </View>
+          <View style={styles.ctaTextos}>
+            <Text style={styles.ctaTitulo}>Novo orçamento</Text>
+            <Text style={styles.ctaDescricao}>Escolha o cliente; começa como rascunho</Text>
+          </View>
+          <Icon name="chevron-right" size={22} color={colors.textMuted} />
+        </TouchableOpacity>
+
+        {/* Aviso exibido apenas quando o perfil não pôde ser carregado */}
+        {!isLoading && !perfil && (
+          <View style={styles.warningCard}>
+            <Text style={styles.warningText}>
+              Seu perfil ainda não foi carregado. Conclua seu cadastro ou tente novamente.
+            </Text>
+            <View style={styles.warningActions}>
+              <Button
+                title="Concluir Meu Perfil"
+                size="compact"
+                onPress={() => router.push('/concluir-perfil')}
+              />
+              <Button title="Tentar novamente" size="compact" variant="neutral" onPress={refreshPerfil} />
+            </View>
+          </View>
+        )}
+
+        <View style={styles.grid}>
+          {MODULOS.map((modulo) => (
             <TouchableOpacity
-              style={[styles.secondaryButton, { backgroundColor: colors.primary, marginRight: 8 }]}
-              onPress={() => router.push('/concluir-perfil')}
+              key={modulo.rota}
+              style={styles.modulo}
+              activeOpacity={0.7}
+              onPress={() => router.push(modulo.rota as any)}
+              accessibilityRole="button"
+              accessibilityLabel={modulo.titulo}
             >
-              <Text style={[styles.secondaryButtonText, { color: colors.textOnColor, fontFamily: fonts.bold }]}>
-                Concluir Meu Perfil
-              </Text>
+              <View style={styles.moduloIcone}>
+                <Icon name={modulo.icone} size={20} color={colors.primaryDark} />
+              </View>
+              <Text style={styles.moduloTitulo}>{modulo.titulo}</Text>
+              <Text style={styles.moduloDescricao}>{modulo.descricao}</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.secondaryButton} onPress={refreshPerfil}>
-              <Text style={styles.secondaryButtonText}>Tentar novamente</Text>
+          ))}
+        </View>
+
+        <View style={styles.recentes}>
+          <View style={styles.recentesHeader}>
+            <Text style={styles.recentesTitulo}>Recentes</Text>
+            <TouchableOpacity
+              onPress={() => router.push('/orcamentos' as any)}
+              hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+              accessibilityRole="button"
+            >
+              <Text style={styles.verTodos}>Ver todos</Text>
             </TouchableOpacity>
           </View>
-        </View>
-      )}
 
-      {MODULOS.map((modulo) => (
-        <View key={modulo.rota} style={styles.card}>
-          <Text style={styles.cardTitle}>{modulo.titulo}</Text>
-          <Text style={styles.cardDescription}>{modulo.descricao}</Text>
-
-          <TouchableOpacity
-            style={styles.primaryButton}
-            activeOpacity={0.8}
-            onPress={() => router.push(modulo.rota as any)}
-          >
-            <Text style={styles.primaryButtonText}>Acessar {modulo.titulo}</Text>
-            <Icon name="arrow-right" size={18} color={colors.textOnColor} style={styles.primaryButtonArrow} />
-          </TouchableOpacity>
+          {carregandoOrcamentos && orcamentos.length === 0 ? (
+            <ActivityIndicator color={colors.primary} style={styles.recentesLoading} />
+          ) : erroOrcamentos ? (
+            <View style={styles.recentesAviso}>
+              <Text style={styles.recentesAvisoTexto}>{erroOrcamentos}</Text>
+              <Button title="Tentar novamente" size="compact" variant="neutral" onPress={reload} />
+            </View>
+          ) : recentes.length === 0 ? (
+            <View style={styles.recentesAviso}>
+              <Text style={styles.recentesAvisoTexto}>Nenhum orçamento criado ainda.</Text>
+            </View>
+          ) : (
+            recentes.map((orc) => (
+              <TouchableOpacity
+                key={orc.id}
+                style={styles.recenteItem}
+                activeOpacity={0.7}
+                onPress={() => router.push(`/orcamentos/${orc.id}` as any)}
+                accessibilityRole="button"
+              >
+                <View style={styles.recenteTextos}>
+                  <Text style={styles.recenteCliente} numberOfLines={1}>
+                    {orc.clienteNome || 'Cliente não identificado'}
+                  </Text>
+                  <Text style={styles.recenteDetalhe}>
+                    {orc.numero} · {formatarMoeda(orc.total)}
+                  </Text>
+                </View>
+                <StatusBadge status={orc.status} />
+              </TouchableOpacity>
+            ))
+          )}
         </View>
-      ))}
+      </View>
     </ScrollView>
   );
 }
@@ -87,29 +169,71 @@ const styles = StyleSheet.create({
     backgroundColor: colors.background,
   },
   content: {
-    padding: 20,
     paddingBottom: 30,
   },
-  welcomeBanner: {
-    backgroundColor: colors.primarySubtle,
-    borderColor: colors.primaryBorder,
-    borderWidth: 1,
-    borderRadius: 12,
-    padding: 16,
-    marginBottom: 20,
+  hero: {
+    backgroundColor: colors.primaryDark,
+    paddingHorizontal: 20,
+    paddingTop: 8,
+    paddingBottom: 60,
   },
-  welcomeTitle: {
-    fontSize: 20,
-    fontFamily: fonts.bold,
-    color: colors.primaryDark,
+  heroData: {
+    fontSize: 14,
+    fontFamily: fonts.medium,
+    color: colors.primarySoft,
+  },
+  heroSaudacao: {
+    fontSize: 26,
+    fontFamily: fonts.extrabold,
+    color: colors.textOnColor,
+    marginTop: 4,
+  },
+  corpo: {
+    paddingHorizontal: 20,
+    marginTop: -44,
+    gap: 18,
+  },
+  ctaCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: colors.surface,
+    borderRadius: 20,
+    padding: 18,
+    shadowColor: colors.primaryDark,
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.12,
+    shadowRadius: 16,
+    elevation: 4,
+  },
+  ctaIcone: {
+    width: 52,
+    height: 52,
+    borderRadius: 16,
+    backgroundColor: colors.primary,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: 14,
+  },
+  ctaTextos: {
+    flex: 1,
+  },
+  ctaTitulo: {
+    fontSize: 17,
+    fontFamily: fonts.extrabold,
+    color: colors.text,
+  },
+  ctaDescricao: {
+    fontSize: 13,
+    fontFamily: fonts.regular,
+    color: colors.textMuted,
+    marginTop: 2,
   },
   warningCard: {
     backgroundColor: colors.warningSoft,
     borderColor: colors.warningBorder,
     borderWidth: 1,
-    borderRadius: 12,
+    borderRadius: 18,
     padding: 16,
-    marginBottom: 16,
   },
   warningText: {
     fontSize: 13,
@@ -120,57 +244,100 @@ const styles = StyleSheet.create({
   warningActions: {
     flexDirection: 'row',
     flexWrap: 'wrap',
+    gap: 8,
   },
-  card: {
+  grid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'space-between',
+    rowGap: 12,
+  },
+  modulo: {
+    width: '48.5%',
     backgroundColor: colors.surface,
+    borderRadius: 18,
+    borderWidth: 1,
+    borderColor: colors.border,
+    padding: 16,
+  },
+  moduloIcone: {
+    width: 40,
+    height: 40,
     borderRadius: 12,
-    padding: 18,
-    marginBottom: 16,
-    shadowColor: colors.shadow,
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.05,
-    shadowRadius: 6,
-    elevation: 2,
-  },
-  cardTitle: {
-    fontSize: 16,
-    fontFamily: fonts.bold,
-    color: colors.text,
-    marginBottom: 6,
-  },
-  cardDescription: {
-    fontSize: 13,
-    fontFamily: fonts.regular,
-    color: colors.textSecondary,
+    backgroundColor: colors.primarySoft,
+    alignItems: 'center',
+    justifyContent: 'center',
     marginBottom: 14,
   },
-  primaryButton: {
-    backgroundColor: colors.primary,
-    borderRadius: 8,
-    paddingVertical: 12,
-    paddingHorizontal: 16,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  primaryButtonText: {
-    color: colors.textOnColor,
+  moduloTitulo: {
     fontSize: 15,
     fontFamily: fonts.bold,
+    color: colors.text,
   },
-  primaryButtonArrow: {
-    color: colors.textOnColor,
-    fontSize: 18,
+  moduloDescricao: {
+    fontSize: 12,
+    fontFamily: fonts.regular,
+    color: colors.textMuted,
+    marginTop: 2,
   },
-  secondaryButton: {
-    paddingHorizontal: 14,
-    paddingVertical: 8,
-    backgroundColor: colors.border,
-    borderRadius: 6,
+  recentes: {
+    gap: 10,
   },
-  secondaryButtonText: {
+  recentesHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'baseline',
+  },
+  recentesTitulo: {
+    fontSize: 17,
+    fontFamily: fonts.extrabold,
+    color: colors.text,
+  },
+  verTodos: {
     fontSize: 13,
-    color: colors.textSecondary,
-    fontFamily: fonts.semibold,
+    fontFamily: fonts.bold,
+    color: colors.primary,
+  },
+  recentesLoading: {
+    marginVertical: 12,
+  },
+  recentesAviso: {
+    backgroundColor: colors.surface,
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: colors.border,
+    padding: 16,
+    gap: 10,
+    alignItems: 'flex-start',
+  },
+  recentesAvisoTexto: {
+    fontSize: 13,
+    fontFamily: fonts.regular,
+    color: colors.textMuted,
+  },
+  recenteItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: colors.surface,
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: colors.border,
+    paddingVertical: 12,
+    paddingHorizontal: 14,
+  },
+  recenteTextos: {
+    flex: 1,
+    marginRight: 10,
+  },
+  recenteCliente: {
+    fontSize: 14,
+    fontFamily: fonts.bold,
+    color: colors.text,
+  },
+  recenteDetalhe: {
+    fontSize: 12,
+    fontFamily: fonts.regular,
+    color: colors.textMuted,
+    marginTop: 2,
   },
 });
