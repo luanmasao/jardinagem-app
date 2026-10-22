@@ -1,7 +1,11 @@
 import React from 'react';
-import { Stack } from 'expo-router';
+import { Text, TouchableOpacity } from 'react-native';
+import { Stack, useRouter } from 'expo-router';
 
 export default function AppLayout() {
+  const router = useRouter();
+
+
   return (
     <Stack
       screenOptions={{
@@ -14,6 +18,23 @@ export default function AppLayout() {
         name="index"
         options={{
           title: 'Sistema de Orçamentos',
+          headerShown: true,
+          headerRight: () => (
+            <TouchableOpacity
+              onPress={() => router.push('/perfil')}
+              hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+              accessibilityRole="button"
+              accessibilityLabel="Meus dados"
+            >
+              <Text style={{ color: '#ffffff', fontSize: 15, fontWeight: 'bold' }}>Perfil</Text>
+            </TouchableOpacity>
+          ),
+        }}
+      />
+      <Stack.Screen
+        name="perfil"
+        options={{
+          title: 'Meus Dados',
           headerShown: true,
         }}
       />

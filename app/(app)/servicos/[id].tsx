@@ -99,8 +99,6 @@ export default function ServicoDetalheScreen() {
             </Text>
           </View>
         </View>
-
-        <Text style={styles.servicoIdMono}>ID: {servico.id}</Text>
       </View>
 
       {/* Card: Detalhes Comerciais e Técnicos */}
@@ -272,11 +270,6 @@ const styles = StyleSheet.create({
   },
   statusTextInativo: {
     color: '#b91c1c',
-  },
-  servicoIdMono: {
-    fontSize: 11,
-    color: '#64748b',
-    fontFamily: Platform.OS === 'ios' ? 'Menlo' : 'monospace',
   },
   card: {
     backgroundColor: '#ffffff',

@@ -1,19 +1,34 @@
 import React from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  ScrollView,
-  ActivityIndicator,
-  Platform,
-} from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
 import { useAuth } from '../../src/presentation/contexts/auth-context';
 import { useRouter } from 'expo-router';
 
+const MODULOS = [
+  {
+    titulo: 'Clientes',
+    descricao: 'Cadastre e consulte seus clientes e endereços.',
+    rota: '/clientes',
+  },
+  {
+    titulo: 'Serviços',
+    descricao: 'Gerencie seus serviços e preços.',
+    rota: '/servicos',
+  },
+  {
+    titulo: 'Produtos',
+    descricao: 'Gerencie insumos, plantas e materiais.',
+    rota: '/produtos',
+  },
+  {
+    titulo: 'Orçamentos',
+    descricao: 'Crie orçamentos, meça áreas no mapa e gere PDF.',
+    rota: '/orcamentos',
+  },
+];
+
 export default function HomeScreen() {
   const router = useRouter();
-  const { user, perfil, isLoading, signOut, refreshPerfil } = useAuth();
+  const { user, perfil, isLoading, refreshPerfil } = useAuth();
 
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.content}>
@@ -21,92 +36,17 @@ export default function HomeScreen() {
         <Text style={styles.welcomeTitle}>
           Olá, {perfil?.nome || user?.nome || 'Profissional'}!
         </Text>
-        <Text style={styles.welcomeSubtitle}>
-          Sessão autenticada e perfil carregado com sucesso.
-        </Text>
       </View>
 
-      {/* Card 1: Informações de Autenticação (auth.users) */}
-      <View style={styles.card}>
-        <View style={styles.cardHeader}>
-          <Text style={styles.badge}>Auth.Users</Text>
-          <Text style={styles.cardTitle}>Dados de Autenticação</Text>
-        </View>
-
-        <View style={styles.row}>
-          <Text style={styles.label}>UUID (auth.uid):</Text>
-          <Text style={styles.valueMono}>{user?.id || '—'}</Text>
-        </View>
-
-        <View style={styles.row}>
-          <Text style={styles.label}>E-mail:</Text>
-          <Text style={styles.value}>{user?.email || '—'}</Text>
-        </View>
-
-        <View style={styles.row}>
-          <Text style={styles.label}>Estado da Sessão:</Text>
-          <View style={styles.statusBadge}>
-            <Text style={styles.statusText}>Ativa / Persistida</Text>
-          </View>
-        </View>
-      </View>
-
-      {/* Card 2: Informações de Perfil de Negócio (public.usuario via RLS) */}
-      <View style={styles.card}>
-        <View style={styles.cardHeader}>
-          <Text style={[styles.badge, styles.badgeProfile]}>Public.Usuario</Text>
-          <Text style={styles.cardTitle}>Perfil de Negócio</Text>
-        </View>
-
-        {isLoading ? (
-          <View style={styles.loadingContainer}>
-            <ActivityIndicator color="#15803d" />
-            <Text style={styles.loadingText}>Atualizando dados do perfil...</Text>
-          </View>
-        ) : perfil ? (
-          <>
-            <View style={styles.row}>
-              <Text style={styles.label}>ID do Perfil:</Text>
-              <Text style={styles.valueMono}>{perfil.id}</Text>
-            </View>
-
-            <View style={styles.row}>
-              <Text style={styles.label}>Nome Cadastrado:</Text>
-              <Text style={styles.value}>{perfil.nome}</Text>
-            </View>
-
-            <View style={styles.row}>
-              <Text style={styles.label}>Telefone:</Text>
-              <Text style={styles.value}>{perfil.telefone || 'Não informado'}</Text>
-            </View>
-
-            <View style={styles.row}>
-              <Text style={styles.label}>Data de Cadastro:</Text>
-              <Text style={styles.value}>
-                {perfil.dataCadastro ? new Date(perfil.dataCadastro).toLocaleString('pt-BR') : '—'}
-              </Text>
-            </View>
-
-            <View style={styles.row}>
-              <Text style={styles.label}>Status do Perfil:</Text>
-              <Text style={[styles.value, { color: perfil.ativo ? '#15803d' : '#b91c1c' }]}>
-                {perfil.ativo ? 'Ativo' : 'Inativo'}
-              </Text>
-            </View>
-
-            <View style={styles.rlsNotice}>
-              <Text style={styles.rlsNoticeText}>
-                ✓ Acesso verificado via RLS (usuario_select_policy). Sem privilégios administrativos.
-              </Text>
-            </View>
-          </>
-        ) : (
-          <View style={styles.emptyContainer}>
-            <Text style={styles.emptyText}>
-              Perfil ainda não carregado ou em processamento assíncrono pelo banco.
-            </Text>
+      {/* Aviso exibido apenas quando o perfil não pôde ser carregado */}
+      {!isLoading && !perfil && (
+        <View style={styles.warningCard}>
+          <Text style={styles.warningText}>
+            Seu perfil ainda não foi carregado. Conclua seu cadastro ou tente novamente.
+          </Text>
+          <View style={styles.warningActions}>
             <TouchableOpacity
-              style={[styles.secondaryButton, { backgroundColor: '#15803d', marginBottom: 8 }]}
+              style={[styles.secondaryButton, { backgroundColor: '#15803d', marginRight: 8 }]}
               onPress={() => router.push('/concluir-perfil')}
             >
               <Text style={[styles.secondaryButtonText, { color: '#ffffff', fontWeight: 'bold' }]}>
@@ -114,156 +54,27 @@ export default function HomeScreen() {
               </Text>
             </TouchableOpacity>
             <TouchableOpacity style={styles.secondaryButton} onPress={refreshPerfil}>
-              <Text style={styles.secondaryButtonText}>Recarregar Perfil</Text>
+              <Text style={styles.secondaryButtonText}>Tentar novamente</Text>
             </TouchableOpacity>
           </View>
-        )}
-      </View>
-
-      {/* Módulo de Negócio: Clientes */}
-      <View style={styles.card}>
-        <View style={styles.cardHeader}>
-          <Text style={[styles.badge, { backgroundColor: '#dcfce7', color: '#166534' }]}>Módulo</Text>
-          <Text style={styles.cardTitle}>Gerenciamento de Clientes</Text>
         </View>
+      )}
 
-        <Text style={{ fontSize: 13, color: '#475569', marginBottom: 14 }}>
-          Cadastre clientes, consulte dados cadastrais, endereços e controle status ativo/inativo.
-        </Text>
+      {MODULOS.map((modulo) => (
+        <View key={modulo.rota} style={styles.card}>
+          <Text style={styles.cardTitle}>{modulo.titulo}</Text>
+          <Text style={styles.cardDescription}>{modulo.descricao}</Text>
 
-        <TouchableOpacity
-          style={{
-            backgroundColor: '#15803d',
-            borderRadius: 8,
-            paddingVertical: 12,
-            paddingHorizontal: 16,
-            flexDirection: 'row',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-          }}
-          activeOpacity={0.8}
-          onPress={() => router.push('/clientes' as any)}
-        >
-          <Text style={{ color: '#ffffff', fontSize: 15, fontWeight: 'bold' }}>
-            Acessar Clientes
-          </Text>
-          <Text style={{ color: '#ffffff', fontSize: 18, fontWeight: 'bold' }}>→</Text>
-        </TouchableOpacity>
-      </View>
-
-      {/* Módulo de Catálogo: Serviços */}
-      <View style={styles.card}>
-        <View style={styles.cardHeader}>
-          <Text style={[styles.badge, { backgroundColor: '#fef3c7', color: '#b45309' }]}>Catálogo</Text>
-          <Text style={styles.cardTitle}>Serviços</Text>
+          <TouchableOpacity
+            style={styles.primaryButton}
+            activeOpacity={0.8}
+            onPress={() => router.push(modulo.rota as any)}
+          >
+            <Text style={styles.primaryButtonText}>Acessar {modulo.titulo}</Text>
+            <Text style={styles.primaryButtonArrow}>→</Text>
+          </TouchableOpacity>
         </View>
-
-        <Text style={{ fontSize: 13, color: '#475569', marginBottom: 14 }}>
-          Gerencie serviços de jardinagem, preços base, unidades e parametrização de medição de área.
-        </Text>
-
-        <TouchableOpacity
-          style={{
-            backgroundColor: '#15803d',
-            borderRadius: 8,
-            paddingVertical: 12,
-            paddingHorizontal: 16,
-            flexDirection: 'row',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-          }}
-          activeOpacity={0.8}
-          onPress={() => router.push('/servicos' as any)}
-        >
-          <Text style={{ color: '#ffffff', fontSize: 15, fontWeight: 'bold' }}>
-            Acessar Serviços
-          </Text>
-          <Text style={{ color: '#ffffff', fontSize: 18, fontWeight: 'bold' }}>→</Text>
-        </TouchableOpacity>
-      </View>
-
-      {/* Módulo de Catálogo: Produtos */}
-      <View style={styles.card}>
-        <View style={styles.cardHeader}>
-          <Text style={[styles.badge, { backgroundColor: '#e0f2fe', color: '#0369a1' }]}>Catálogo</Text>
-          <Text style={styles.cardTitle}>Produtos</Text>
-        </View>
-
-        <Text style={{ fontSize: 13, color: '#475569', marginBottom: 14 }}>
-          Gerencie catálogo de insumos, plantas, fertilizantes e materiais com unidades e preços base.
-        </Text>
-
-        <TouchableOpacity
-          style={{
-            backgroundColor: '#15803d',
-            borderRadius: 8,
-            paddingVertical: 12,
-            paddingHorizontal: 16,
-            flexDirection: 'row',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-          }}
-          activeOpacity={0.8}
-          onPress={() => router.push('/produtos' as any)}
-        >
-          <Text style={{ color: '#ffffff', fontSize: 15, fontWeight: 'bold' }}>
-            Acessar Produtos
-          </Text>
-          <Text style={{ color: '#ffffff', fontSize: 18, fontWeight: 'bold' }}>→</Text>
-        </TouchableOpacity>
-      </View>
-
-      {/* Módulo de Orçamentos */}
-      <View style={styles.card}>
-        <View style={styles.cardHeader}>
-          <Text style={[styles.badge, { backgroundColor: '#dcfce7', color: '#15803d' }]}>Comercial</Text>
-          <Text style={styles.cardTitle}>Orçamentos</Text>
-        </View>
-
-        <Text style={{ fontSize: 13, color: '#475569', marginBottom: 14 }}>
-          Crie e gerencie propostas comerciais, adicione serviços e produtos com snapshot histórico e acompanhe o ciclo de vida.
-        </Text>
-
-        <TouchableOpacity
-          style={{
-            backgroundColor: '#15803d',
-            borderRadius: 8,
-            paddingVertical: 12,
-            paddingHorizontal: 16,
-            flexDirection: 'row',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-          }}
-          activeOpacity={0.8}
-          onPress={() => router.push('/orcamentos' as any)}
-        >
-          <Text style={{ color: '#ffffff', fontSize: 15, fontWeight: 'bold' }}>
-            Acessar Orçamentos
-          </Text>
-          <Text style={{ color: '#ffffff', fontSize: 18, fontWeight: 'bold' }}>→</Text>
-        </TouchableOpacity>
-      </View>
-
-      {/* Ações */}
-      <View style={styles.actions}>
-        <TouchableOpacity
-          style={styles.refreshButton}
-          onPress={refreshPerfil}
-          disabled={isLoading}
-          activeOpacity={0.8}
-        >
-          <Text style={styles.refreshButtonText}>Recarregar Dados</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          style={styles.logoutButton}
-          onPress={signOut}
-          disabled={isLoading}
-          activeOpacity={0.8}
-        >
-          <Text style={styles.logoutButtonText}>Sair da Conta (Logout)</Text>
-        </TouchableOpacity>
-      </View>
+      ))}
     </ScrollView>
   );
 }
@@ -275,6 +86,7 @@ const styles = StyleSheet.create({
   },
   content: {
     padding: 20,
+    paddingBottom: 30,
   },
   welcomeBanner: {
     backgroundColor: '#ecfdf5',
@@ -288,11 +100,23 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: 'bold',
     color: '#065f46',
-    marginBottom: 4,
   },
-  welcomeSubtitle: {
+  warningCard: {
+    backgroundColor: '#fffbeb',
+    borderColor: '#fcd34d',
+    borderWidth: 1,
+    borderRadius: 12,
+    padding: 16,
+    marginBottom: 16,
+  },
+  warningText: {
     fontSize: 13,
-    color: '#047857',
+    color: '#92400e',
+    marginBottom: 12,
+  },
+  warningActions: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
   },
   card: {
     backgroundColor: '#ffffff',
@@ -305,97 +129,35 @@ const styles = StyleSheet.create({
     shadowRadius: 6,
     elevation: 2,
   },
-  cardHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 14,
-  },
-  badge: {
-    fontSize: 10,
-    fontWeight: '700',
-    color: '#1e40af',
-    backgroundColor: '#dbeafe',
-    paddingHorizontal: 8,
-    paddingVertical: 3,
-    borderRadius: 6,
-    marginRight: 8,
-    textTransform: 'uppercase',
-  },
-  badgeProfile: {
-    color: '#166534',
-    backgroundColor: '#dcfce7',
-  },
   cardTitle: {
     fontSize: 16,
     fontWeight: '700',
     color: '#1e293b',
+    marginBottom: 6,
   },
-  row: {
+  cardDescription: {
+    fontSize: 13,
+    color: '#475569',
+    marginBottom: 14,
+  },
+  primaryButton: {
+    backgroundColor: '#15803d',
+    borderRadius: 8,
+    paddingVertical: 12,
+    paddingHorizontal: 16,
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingVertical: 8,
-    borderBottomWidth: 1,
-    borderBottomColor: '#f1f5f9',
   },
-  label: {
-    fontSize: 13,
-    color: '#64748b',
-    fontWeight: '500',
+  primaryButtonText: {
+    color: '#ffffff',
+    fontSize: 15,
+    fontWeight: 'bold',
   },
-  value: {
-    fontSize: 13,
-    color: '#0f172a',
-    fontWeight: '600',
-  },
-  valueMono: {
-    fontSize: 11,
-    color: '#334155',
-    fontFamily: Platform.OS === 'ios' ? 'Menlo' : 'monospace',
-    maxWidth: '65%',
-  },
-  statusBadge: {
-    backgroundColor: '#dcfce7',
-    paddingHorizontal: 8,
-    paddingVertical: 3,
-    borderRadius: 6,
-  },
-  statusText: {
-    color: '#166534',
-    fontSize: 12,
-    fontWeight: '600',
-  },
-  rlsNotice: {
-    marginTop: 12,
-    backgroundColor: '#f0fdf4',
-    borderColor: '#bbf7d0',
-    borderWidth: 1,
-    borderRadius: 6,
-    padding: 10,
-  },
-  rlsNoticeText: {
-    fontSize: 11,
-    color: '#15803d',
-    lineHeight: 16,
-  },
-  loadingContainer: {
-    paddingVertical: 20,
-    alignItems: 'center',
-  },
-  loadingText: {
-    marginTop: 8,
-    fontSize: 12,
-    color: '#64748b',
-  },
-  emptyContainer: {
-    paddingVertical: 16,
-    alignItems: 'center',
-  },
-  emptyText: {
-    fontSize: 13,
-    color: '#64748b',
-    textAlign: 'center',
-    marginBottom: 12,
+  primaryButtonArrow: {
+    color: '#ffffff',
+    fontSize: 18,
+    fontWeight: 'bold',
   },
   secondaryButton: {
     paddingHorizontal: 14,
@@ -407,34 +169,5 @@ const styles = StyleSheet.create({
     fontSize: 13,
     color: '#334155',
     fontWeight: '600',
-  },
-  actions: {
-    marginTop: 10,
-    marginBottom: 30,
-  },
-  refreshButton: {
-    backgroundColor: '#e2e8f0',
-    borderRadius: 8,
-    paddingVertical: 14,
-    alignItems: 'center',
-    marginBottom: 10,
-  },
-  refreshButtonText: {
-    color: '#1e293b',
-    fontSize: 15,
-    fontWeight: '600',
-  },
-  logoutButton: {
-    backgroundColor: '#fee2e2',
-    borderColor: '#fca5a5',
-    borderWidth: 1,
-    borderRadius: 8,
-    paddingVertical: 14,
-    alignItems: 'center',
-  },
-  logoutButtonText: {
-    color: '#b91c1c',
-    fontSize: 15,
-    fontWeight: 'bold',
   },
 });

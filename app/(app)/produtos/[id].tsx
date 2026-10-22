@@ -99,8 +99,6 @@ export default function ProdutoDetalheScreen() {
             </Text>
           </View>
         </View>
-
-        <Text style={styles.produtoIdMono}>ID: {produto.id}</Text>
       </View>
 
       {/* Card: Detalhes Comerciais */}
@@ -265,11 +263,6 @@ const styles = StyleSheet.create({
   },
   statusTextInativo: {
     color: '#b91c1c',
-  },
-  produtoIdMono: {
-    fontSize: 11,
-    color: '#64748b',
-    fontFamily: Platform.OS === 'ios' ? 'Menlo' : 'monospace',
   },
   card: {
     backgroundColor: '#ffffff',

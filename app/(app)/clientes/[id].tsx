@@ -95,8 +95,6 @@ export default function ClienteDetalheScreen() {
             </Text>
           </View>
         </View>
-
-        <Text style={styles.clienteIdMono}>ID: {cliente.id}</Text>
       </View>
 
       {/* Card 1: Informações de Contato e Documento */}
@@ -330,11 +328,6 @@ const styles = StyleSheet.create({
   },
   statusTextInativo: {
     color: '#b91c1c',
-  },
-  clienteIdMono: {
-    fontSize: 11,
-    color: '#64748b',
-    fontFamily: Platform.OS === 'ios' ? 'Menlo' : 'monospace',
   },
   card: {
     backgroundColor: '#ffffff',
