@@ -1,11 +1,10 @@
 import { Asset } from 'expo-asset';
 import * as FileSystem from 'expo-file-system/legacy';
-import {
-  PlusJakartaSans_400Regular,
-  PlusJakartaSans_600SemiBold,
-  PlusJakartaSans_700Bold,
-  PlusJakartaSans_800ExtraBold,
-} from '@expo-google-fonts/plus-jakarta-sans';
+// Importação por peso, para só os arquivos usados entrarem no app (ver app/_layout.tsx).
+import { PlusJakartaSans_400Regular } from '@expo-google-fonts/plus-jakarta-sans/400Regular';
+import { PlusJakartaSans_600SemiBold } from '@expo-google-fonts/plus-jakarta-sans/600SemiBold';
+import { PlusJakartaSans_700Bold } from '@expo-google-fonts/plus-jakarta-sans/700Bold';
+import { PlusJakartaSans_800ExtraBold } from '@expo-google-fonts/plus-jakarta-sans/800ExtraBold';
 
 /** Pesos da Plus Jakarta Sans usados no template do PDF. */
 const FONTES_PDF: ReadonlyArray<{ peso: number; modulo: number }> = [

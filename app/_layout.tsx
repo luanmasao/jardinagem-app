@@ -1,14 +1,14 @@
 import 'react-native-get-random-values';
 import React, { useEffect, useState } from 'react';
 import { Stack, useRouter, useSegments } from 'expo-router';
-import {
-  useFonts,
-  PlusJakartaSans_400Regular,
-  PlusJakartaSans_500Medium,
-  PlusJakartaSans_600SemiBold,
-  PlusJakartaSans_700Bold,
-  PlusJakartaSans_800ExtraBold,
-} from '@expo-google-fonts/plus-jakarta-sans';
+// Importação por peso: o ponto de entrada geral do pacote referencia os 14 arquivos da
+// família (inclusive itálicos e pesos finos), e todos entrariam no app instalado.
+import { useFonts } from '@expo-google-fonts/plus-jakarta-sans/useFonts';
+import { PlusJakartaSans_400Regular } from '@expo-google-fonts/plus-jakarta-sans/400Regular';
+import { PlusJakartaSans_500Medium } from '@expo-google-fonts/plus-jakarta-sans/500Medium';
+import { PlusJakartaSans_600SemiBold } from '@expo-google-fonts/plus-jakarta-sans/600SemiBold';
+import { PlusJakartaSans_700Bold } from '@expo-google-fonts/plus-jakarta-sans/700Bold';
+import { PlusJakartaSans_800ExtraBold } from '@expo-google-fonts/plus-jakarta-sans/800ExtraBold';
 import { AuthProvider, useAuth } from '../src/presentation/contexts/auth-context';
 import { ActivityIndicator, View, StyleSheet } from 'react-native';
 import { colors } from '../src/presentation/theme';
