@@ -1,170 +1,85 @@
 import React from 'react';
-import { Text, TouchableOpacity } from 'react-native';
-import { Stack, useRouter } from 'expo-router';
+import { View, StyleSheet } from 'react-native';
+import { usePathname } from 'expo-router';
+import { Tabs } from 'expo-router/js-tabs';
 import { colors, fonts } from '../../src/presentation/theme';
+import { Icon, IconName } from '../../src/presentation/components/ui';
+import { opcoesCabecalho } from '../../src/presentation/navigation/header-options';
 
-export default function AppLayout() {
-  const router = useRouter();
+/**
+ * A barra inferior aparece só nas telas principais de cada aba.
+ * Formulários, detalhes, áreas, mapa e as listas de serviços/produtos ficam sem ela.
+ */
+const ROTAS_COM_BARRA = ['/', '/orcamentos', '/clientes', '/catalogo', '/perfil'];
 
-
-  return (
-    <Stack
-      screenOptions={{
-        headerStyle: { backgroundColor: colors.primary },
-        headerTintColor: colors.textOnColor,
-        headerTitleStyle: { fontFamily: fonts.bold },
-      }}
-    >
-      <Stack.Screen
-        name="index"
-        options={{
-          title: 'Sistema de Orçamentos',
-          headerShown: true,
-          headerRight: () => (
-            <TouchableOpacity
-              onPress={() => router.push('/perfil')}
-              hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-              accessibilityRole="button"
-              accessibilityLabel="Meus dados"
-            >
-              <Text style={{ color: colors.textOnColor, fontSize: 15, fontFamily: fonts.bold }}>Perfil</Text>
-            </TouchableOpacity>
-          ),
-        }}
-      />
-      <Stack.Screen
-        name="perfil"
-        options={{
-          title: 'Meus Dados',
-          headerShown: true,
-        }}
-      />
-      <Stack.Screen
-        name="clientes/index"
-        options={{
-          title: 'Clientes',
-          headerShown: true,
-        }}
-      />
-      <Stack.Screen
-        name="clientes/novo"
-        options={{
-          title: 'Novo Cliente',
-          headerShown: true,
-        }}
-      />
-      <Stack.Screen
-        name="clientes/[id]"
-        options={{
-          title: 'Detalhes do Cliente',
-          headerShown: true,
-        }}
-      />
-      <Stack.Screen
-        name="clientes/editar"
-        options={{
-          title: 'Editar Cliente',
-          headerShown: true,
-        }}
-      />
-      <Stack.Screen
-        name="servicos/index"
-        options={{
-          title: 'Serviços',
-          headerShown: true,
-        }}
-      />
-      <Stack.Screen
-        name="servicos/novo"
-        options={{
-          title: 'Novo Serviço',
-          headerShown: true,
-        }}
-      />
-      <Stack.Screen
-        name="servicos/[id]"
-        options={{
-          title: 'Detalhes do Serviço',
-          headerShown: true,
-        }}
-      />
-      <Stack.Screen
-        name="servicos/editar"
-        options={{
-          title: 'Editar Serviço',
-          headerShown: true,
-        }}
-      />
-      <Stack.Screen
-        name="produtos/index"
-        options={{
-          title: 'Produtos',
-          headerShown: true,
-        }}
-      />
-      <Stack.Screen
-        name="produtos/novo"
-        options={{
-          title: 'Novo Produto',
-          headerShown: true,
-        }}
-      />
-      <Stack.Screen
-        name="produtos/[id]"
-        options={{
-          title: 'Detalhes do Produto',
-          headerShown: true,
-        }}
-      />
-      <Stack.Screen
-        name="produtos/editar"
-        options={{
-          title: 'Editar Produto',
-          headerShown: true,
-        }}
-      />
-      <Stack.Screen
-        name="orcamentos/index"
-        options={{
-          title: 'Orçamentos',
-          headerShown: true,
-        }}
-      />
-      <Stack.Screen
-        name="orcamentos/novo"
-        options={{
-          title: 'Novo Orçamento',
-          headerShown: true,
-        }}
-      />
-      <Stack.Screen
-        name="orcamentos/[id]"
-        options={{
-          title: 'Detalhes do Orçamento',
-          headerShown: true,
-        }}
-      />
-      <Stack.Screen
-        name="orcamentos/editar"
-        options={{
-          title: 'Editar Orçamento',
-          headerShown: true,
-        }}
-      />
-      <Stack.Screen
-        name="orcamentos/areas"
-        options={{
-          title: 'Áreas do Item',
-          headerShown: true,
-        }}
-      />
-      <Stack.Screen
-        name="orcamentos/mapa"
-        options={{
-          title: 'Delimitação no Mapa',
-          headerShown: false,
-        }}
-      />
-    </Stack>
+function iconeDaAba(nome: IconName) {
+  return ({ focused }: { focused: boolean }) => (
+    <View style={[styles.iconeAba, focused && styles.iconeAbaAtivo]}>
+      <Icon name={nome} size={20} color={focused ? colors.primaryDark : colors.textMuted} />
+    </View>
   );
 }
+
+export default function AppLayout() {
+  const pathname = usePathname();
+  const mostrarBarra = ROTAS_COM_BARRA.includes(pathname);
+
+  return (
+    <Tabs
+      backBehavior="history"
+      screenOptions={{
+        ...opcoesCabecalho,
+        tabBarActiveTintColor: colors.primaryDark,
+        tabBarInactiveTintColor: colors.textMuted,
+        tabBarLabelStyle: styles.rotuloAba,
+        tabBarStyle: mostrarBarra ? styles.barra : { display: 'none' },
+      }}
+    >
+      <Tabs.Screen
+        name="index"
+        options={{ title: 'Sistema de Orçamentos', tabBarLabel: 'Início', tabBarIcon: iconeDaAba('home') }}
+      />
+      <Tabs.Screen
+        name="orcamentos"
+        options={{ headerShown: false, tabBarLabel: 'Orçamentos', tabBarIcon: iconeDaAba('file') }}
+      />
+      <Tabs.Screen
+        name="clientes"
+        options={{ headerShown: false, tabBarLabel: 'Clientes', tabBarIcon: iconeDaAba('users') }}
+      />
+      <Tabs.Screen
+        name="catalogo"
+        options={{ title: 'Catálogo', tabBarLabel: 'Catálogo', tabBarIcon: iconeDaAba('leaf') }}
+      />
+      <Tabs.Screen
+        name="perfil"
+        options={{ title: 'Meus Dados', tabBarLabel: 'Perfil', tabBarIcon: iconeDaAba('user') }}
+      />
+
+      {/* Rotas sem aba própria: acessadas pelo Catálogo */}
+      <Tabs.Screen name="servicos" options={{ href: null, headerShown: false }} />
+      <Tabs.Screen name="produtos" options={{ href: null, headerShown: false }} />
+    </Tabs>
+  );
+}
+
+const styles = StyleSheet.create({
+  barra: {
+    backgroundColor: colors.surface,
+    borderTopColor: colors.border,
+  },
+  rotuloAba: {
+    fontSize: 11,
+    fontFamily: fonts.semibold,
+  },
+  iconeAba: {
+    width: 56,
+    height: 30,
+    borderRadius: 15,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  iconeAbaAtivo: {
+    backgroundColor: colors.primarySoft,
+  },
+});
