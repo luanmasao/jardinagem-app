@@ -14,7 +14,7 @@ import { ActivityIndicator, View, StyleSheet } from 'react-native';
 import { colors } from '../src/presentation/theme';
 
 function RootNavigation({ fontesProntas }: { fontesProntas: boolean }) {
-  const { isAuthenticated, isLoading, perfil } = useAuth();
+  const { isAuthenticated, isLoading, perfil, falhaPerfil } = useAuth();
   const segments = useSegments();
   const router = useRouter();
 
@@ -34,15 +34,19 @@ function RootNavigation({ fontesProntas }: { fontesProntas: boolean }) {
 
     const inAuthGroup = segments[0] === '(auth)';
     const inConcluirPerfil = segments[0] === 'concluir-perfil';
+    const inErroPerfil = segments[0] === 'erro-perfil';
 
     if (!isAuthenticated && !inAuthGroup) {
       router.replace('/(auth)/login');
-    } else if (isAuthenticated && !perfil && !inConcluirPerfil) {
+    } else if (isAuthenticated && !perfil && falhaPerfil && !inErroPerfil) {
+      // A consulta do perfil falhou (ex.: sem conexão): não é caso de concluir o perfil.
+      router.replace('/erro-perfil');
+    } else if (isAuthenticated && !perfil && !falhaPerfil && !inConcluirPerfil) {
       router.replace('/concluir-perfil');
-    } else if (isAuthenticated && perfil && (inAuthGroup || inConcluirPerfil)) {
+    } else if (isAuthenticated && perfil && (inAuthGroup || inConcluirPerfil || inErroPerfil)) {
       router.replace('/(app)');
     }
-  }, [isAuthenticated, isLoading, sessaoVerificada, perfil, segments, router, fontesProntas]);
+  }, [isAuthenticated, isLoading, sessaoVerificada, perfil, falhaPerfil, segments, router, fontesProntas]);
 
   if (!sessaoVerificada || !fontesProntas) {
     return (
@@ -57,6 +61,7 @@ function RootNavigation({ fontesProntas }: { fontesProntas: boolean }) {
       <Stack.Screen name="(auth)" options={{ headerShown: false }} />
       <Stack.Screen name="(app)" options={{ headerShown: false }} />
       <Stack.Screen name="concluir-perfil" options={{ headerShown: false }} />
+      <Stack.Screen name="erro-perfil" options={{ headerShown: false }} />
       <Stack.Screen name="index" options={{ headerShown: false }} />
     </Stack>
   );

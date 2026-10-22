@@ -195,8 +195,19 @@ export class AuthService {
    * Utiliza a RLS homologada (usuario_select_policy) garantindo isolamento sem permissão administrativa.
    */
   async getPerfilUsuario(usuarioId: string): Promise<Usuario | null> {
+    const { perfil } = await this.buscarPerfilUsuario(usuarioId);
+    return perfil;
+  }
+
+  /**
+   * Igual a getPerfilUsuario, mas distingue os dois motivos de não haver perfil:
+   * - perfil inexistente: { perfil: null, error: null };
+   * - falha ao consultar (sem conexão, banco indisponível): { perfil: null, error }.
+   * Usado na sessão para não tratar uma falha de rede como "perfil a concluir".
+   */
+  async buscarPerfilUsuario(usuarioId: string): Promise<{ perfil: Usuario | null; error: Error | null }> {
     if (!usuarioId || usuarioId.trim() === '') {
-      return null;
+      return { perfil: null, error: null };
     }
 
     try {
@@ -206,19 +217,25 @@ export class AuthService {
         .eq('id', usuarioId)
         .maybeSingle();
 
-      if (error || !data) {
-        return null;
+      if (error) {
+        return { perfil: null, error: new Error(error.message) };
+      }
+      if (!data) {
+        return { perfil: null, error: null };
       }
 
-      return new Usuario({
-        id: data.id,
-        nome: data.nome,
-        telefone: data.telefone,
-        dataCadastro: data.data_cadastro ? new Date(data.data_cadastro) : undefined,
-        ativo: data.ativo ?? true,
-      });
-    } catch {
-      return null;
+      return {
+        perfil: new Usuario({
+          id: data.id,
+          nome: data.nome,
+          telefone: data.telefone,
+          dataCadastro: data.data_cadastro ? new Date(data.data_cadastro) : undefined,
+          ativo: data.ativo ?? true,
+        }),
+        error: null,
+      };
+    } catch (err) {
+      return { perfil: null, error: err instanceof Error ? err : new Error(String(err)) };
     }
   }
 

@@ -5,7 +5,7 @@ import { View, ActivityIndicator, StyleSheet } from 'react-native';
 import { colors } from '../src/presentation/theme';
 
 export default function Index() {
-  const { isAuthenticated, isLoading, perfil } = useAuth();
+  const { isAuthenticated, isLoading, perfil, falhaPerfil } = useAuth();
 
   if (isLoading) {
     return (
@@ -17,7 +17,7 @@ export default function Index() {
 
   if (isAuthenticated) {
     if (!perfil) {
-      return <Redirect href="/concluir-perfil" />;
+      return <Redirect href={falhaPerfil ? '/erro-perfil' : '/concluir-perfil'} />;
     }
     return <Redirect href="/(app)" />;
   }

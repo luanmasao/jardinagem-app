@@ -15,6 +15,8 @@ export interface AuthContextData {
   user: AuthUser | null;
   session: Session | null;
   perfil: Usuario | null;
+  /** true quando a última consulta do perfil falhou (ex.: sem conexão), e não por perfil inexistente. */
+  falhaPerfil: boolean;
   isLoading: boolean;
   isAuthenticated: boolean;
   signIn: (params: SignInParams) => Promise<{ success: boolean; error?: string }>;
@@ -30,15 +32,20 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [session, setSession] = useState<Session | null>(null);
   const [user, setUser] = useState<AuthUser | null>(null);
   const [perfil, setPerfil] = useState<Usuario | null>(null);
+  const [falhaPerfil, setFalhaPerfil] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
   const fetchPerfil = useCallback(async (userId: string) => {
-    try {
-      const perfilCarregado = await authService.getPerfilUsuario(userId);
-      setPerfil(perfilCarregado);
-    } catch {
-      setPerfil(null);
+    const { perfil: perfilCarregado, error } = await authService.buscarPerfilUsuario(userId);
+    if (error) {
+      // Falha de consulta não significa perfil inexistente: mantém o perfil já carregado
+      // deste usuário, se houver, em vez de mandá-lo para a conclusão de perfil.
+      setPerfil((atual) => (atual?.id === userId ? atual : null));
+      setFalhaPerfil(true);
+      return;
     }
+    setPerfil(perfilCarregado);
+    setFalhaPerfil(false);
   }, []);
 
   const userId = user?.id;
@@ -71,6 +78,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           setSession(null);
           setUser(null);
           setPerfil(null);
+          setFalhaPerfil(false);
         }
       } catch (err) {
         console.error('[AuthProvider] Erro ao recuperar sessão inicial:', err);
@@ -101,6 +109,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         setSession(null);
         setUser(null);
         setPerfil(null);
+        setFalhaPerfil(false);
       }
       setIsLoading(false);
     });
@@ -168,6 +177,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setSession(null);
       setUser(null);
       setPerfil(null);
+      setFalhaPerfil(false);
     } finally {
       setIsLoading(false);
     }
@@ -186,6 +196,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         }
         if (response.perfil) {
           setPerfil(response.perfil);
+          setFalhaPerfil(false);
         }
         return { success: true };
       } catch (err) {
@@ -202,6 +213,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       user,
       session,
       perfil,
+      falhaPerfil,
       isLoading,
       isAuthenticated: !!session && !!user,
       signIn,
@@ -210,7 +222,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       refreshPerfil,
       concluirPerfil,
     }),
-    [user, session, perfil, isLoading, signIn, signUp, signOut, refreshPerfil, concluirPerfil]
+    [user, session, perfil, falhaPerfil, isLoading, signIn, signUp, signOut, refreshPerfil, concluirPerfil]
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
