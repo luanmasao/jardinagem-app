@@ -2,10 +2,8 @@ import React, { useState } from 'react';
 import {
   View,
   Text,
-  TextInput,
   TouchableOpacity,
   StyleSheet,
-  ActivityIndicator,
   KeyboardAvoidingView,
   Platform,
   ScrollView,
@@ -13,6 +11,7 @@ import {
 import { useRouter } from 'expo-router';
 import { useAuth } from '../../src/presentation/contexts/auth-context';
 import { colors } from '../../src/presentation/theme';
+import { Button, Card, TextField } from '../../src/presentation/components/ui';
 
 export default function LoginScreen() {
   const router = useRouter();
@@ -46,7 +45,7 @@ export default function LoginScreen() {
           <Text style={styles.subtitle}>Gestão de Orçamentos e Serviços</Text>
         </View>
 
-        <View style={styles.card}>
+        <Card>
           <Text style={styles.cardTitle}>Acesse sua conta</Text>
 
           {errorMessage && (
@@ -55,46 +54,32 @@ export default function LoginScreen() {
             </View>
           )}
 
-          <View style={styles.inputGroup}>
-            <Text style={styles.label}>E-mail</Text>
-            <TextInput
-              style={styles.input}
-              placeholder="seu.email@exemplo.com"
-              placeholderTextColor={colors.textPlaceholder}
-              value={email}
-              onChangeText={setEmail}
-              keyboardType="email-address"
-              autoCapitalize="none"
-              autoCorrect={false}
-              editable={!isLoading}
-            />
-          </View>
+          <TextField
+            label="E-mail"
+            placeholder="seu.email@exemplo.com"
+            value={email}
+            onChangeText={setEmail}
+            keyboardType="email-address"
+            autoCapitalize="none"
+            autoCorrect={false}
+            editable={!isLoading}
+          />
 
-          <View style={styles.inputGroup}>
-            <Text style={styles.label}>Senha</Text>
-            <TextInput
-              style={styles.input}
-              placeholder="Digite sua senha"
-              placeholderTextColor={colors.textPlaceholder}
-              value={password}
-              onChangeText={setPassword}
-              secureTextEntry
-              editable={!isLoading}
-            />
-          </View>
+          <TextField
+            label="Senha"
+            placeholder="Digite sua senha"
+            value={password}
+            onChangeText={setPassword}
+            secureTextEntry
+            editable={!isLoading}
+          />
 
-          <TouchableOpacity
-            style={[styles.button, isLoading && styles.buttonDisabled]}
+          <Button
+            title="Entrar"
             onPress={handleLogin}
-            disabled={isLoading}
-            activeOpacity={0.8}
-          >
-            {isLoading ? (
-              <ActivityIndicator color={colors.surface} />
-            ) : (
-              <Text style={styles.buttonText}>Entrar</Text>
-            )}
-          </TouchableOpacity>
+            loading={isLoading}
+            style={styles.button}
+          />
 
           <View style={styles.footer}>
             <Text style={styles.footerText}>Ainda não tem uma conta? </Text>
@@ -108,7 +93,7 @@ export default function LoginScreen() {
               <Text style={styles.linkText}>Cadastre-se</Text>
             </TouchableOpacity>
           </View>
-        </View>
+        </Card>
       </ScrollView>
     </KeyboardAvoidingView>
   );
@@ -117,7 +102,7 @@ export default function LoginScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.surfaceMuted,
+    backgroundColor: colors.background,
   },
   scrollContent: {
     flexGrow: 1,
@@ -139,16 +124,6 @@ const styles = StyleSheet.create({
     color: colors.textMuted,
     textAlign: 'center',
   },
-  card: {
-    backgroundColor: colors.surface,
-    borderRadius: 16,
-    padding: 24,
-    shadowColor: colors.shadow,
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.08,
-    shadowRadius: 12,
-    elevation: 3,
-  },
   cardTitle: {
     fontSize: 20,
     fontWeight: '700',
@@ -159,7 +134,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.dangerSoft,
     borderWidth: 1,
     borderColor: colors.dangerBorder,
-    borderRadius: 8,
+    borderRadius: 12,
     padding: 12,
     marginBottom: 16,
   },
@@ -168,40 +143,8 @@ const styles = StyleSheet.create({
     fontSize: 13,
     lineHeight: 18,
   },
-  inputGroup: {
-    marginBottom: 16,
-  },
-  label: {
-    fontSize: 13,
-    fontWeight: '600',
-    color: colors.textSecondary,
-    marginBottom: 6,
-  },
-  input: {
-    borderWidth: 1,
-    borderColor: colors.borderStrong,
-    borderRadius: 8,
-    paddingHorizontal: 14,
-    paddingVertical: 12,
-    fontSize: 15,
-    color: colors.text,
-    backgroundColor: colors.background,
-  },
   button: {
-    backgroundColor: colors.primary,
-    borderRadius: 8,
-    paddingVertical: 14,
-    alignItems: 'center',
-    justifyContent: 'center',
     marginTop: 8,
-  },
-  buttonDisabled: {
-    opacity: 0.6,
-  },
-  buttonText: {
-    color: colors.textOnColor,
-    fontSize: 16,
-    fontWeight: 'bold',
   },
   footer: {
     flexDirection: 'row',

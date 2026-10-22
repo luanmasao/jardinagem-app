@@ -14,11 +14,9 @@ import { useGerarPdf } from '../../../src/presentation/hooks/use-gerar-pdf';
 import { useCompartilharPdf } from '../../../src/presentation/hooks/use-compartilhar-pdf';
 import { StatusOrcamento } from '../../../src/domain/enums/status-orcamento';
 import { formatarDataCivil } from '../../../src/presentation/utils/data-formatters';
-import {
-  obterBadgeStatusOrcamento,
-  formatarStatusOrcamento,
-} from '../../../src/presentation/utils/status-orcamento.utils';
+import { formatarStatusOrcamento } from '../../../src/presentation/utils/status-orcamento.utils';
 import { colors } from '../../../src/presentation/theme';
+import { Button, Card, StatusBadge } from '../../../src/presentation/components/ui';
 
 export default function OrcamentoDetalheScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -144,40 +142,35 @@ export default function OrcamentoDetalheScreen() {
     return (
       <View style={styles.centerContainer}>
         <Text style={styles.errorText}>{error || 'Orçamento não encontrado.'}</Text>
-        <TouchableOpacity style={styles.btnVoltarErro} onPress={() => router.replace('/orcamentos' as any)}>
-          <Text style={styles.btnVoltarErroText}>Voltar para Orçamentos</Text>
-        </TouchableOpacity>
+        <Button title="Voltar para Orçamentos" size="compact" onPress={() => router.replace('/orcamentos' as any)} />
       </View>
     );
   }
 
-  const badge = obterBadgeStatusOrcamento(orcamento.status);
   const isRascunho = orcamento.status === StatusOrcamento.RASCUNHO;
 
   return (
     <View style={styles.container}>
       <ScrollView contentContainerStyle={styles.scrollContent}>
         {/* Cabeçalho do Orçamento */}
-        <View style={styles.cardHeaderPrincipal}>
+        <Card style={styles.cardHeaderPrincipal}>
           <View style={styles.headerLeft}>
             <Text style={styles.numeroOrcamento}>{orcamento.numero}</Text>
             <Text style={styles.dataCriacaoSub}>Criado em {formatarData(orcamento.dataCriacao)}</Text>
           </View>
-          <View style={[styles.statusBadge, { backgroundColor: badge.bg, borderColor: badge.border }]}>
-            <Text style={[styles.statusBadgeText, { color: badge.text }]}>{badge.label}</Text>
-          </View>
-        </View>
+          <StatusBadge status={orcamento.status} />
+        </Card>
 
         {/* Card do Cliente */}
-        <View style={styles.cardSection}>
+        <Card style={styles.cardSection}>
           <Text style={styles.cardSectionTitle}>Cliente</Text>
           <Text style={styles.clienteNome}>{clienteNome || 'Cliente não identificado'}</Text>
           {clienteTelefone ? <Text style={styles.clienteInfoText}>Telefone: {clienteTelefone}</Text> : null}
           {clienteEmail ? <Text style={styles.clienteInfoText}>E-mail: {clienteEmail}</Text> : null}
-        </View>
+        </Card>
 
         {/* Card de Itens */}
-        <View style={styles.cardSection}>
+        <Card style={styles.cardSection}>
           <View style={styles.itensSectionHeader}>
             <Text style={styles.cardSectionTitle}>Itens ({itens.length})</Text>
             {isRascunho ? (
@@ -232,10 +225,10 @@ export default function OrcamentoDetalheScreen() {
               </View>
             ))
           )}
-        </View>
+        </Card>
 
         {/* Card de Resumo Financeiro */}
-        <View style={styles.cardSection}>
+        <Card style={styles.cardSection}>
           <Text style={styles.cardSectionTitle}>Resumo Financeiro</Text>
           <View style={styles.financeiroRow}>
             <Text style={styles.financeiroLabel}>Subtotal:</Text>
@@ -262,10 +255,10 @@ export default function OrcamentoDetalheScreen() {
             <Text style={styles.financeiroTotalLabel}>Total:</Text>
             <Text style={styles.financeiroTotalValor}>{formatarMoeda(orcamento.total)}</Text>
           </View>
-        </View>
+        </Card>
 
         {/* Card de Condições e Validade */}
-        <View style={styles.cardSection}>
+        <Card style={styles.cardSection}>
           <Text style={styles.cardSectionTitle}>Prazos e Condições</Text>
           <View style={styles.infoCampoRow}>
             <Text style={styles.infoCampoLabel}>Data de Validade:</Text>
@@ -287,7 +280,7 @@ export default function OrcamentoDetalheScreen() {
               <Text style={styles.infoCampoValor}>{orcamento.observacoes}</Text>
             </View>
           ) : null}
-        </View>
+        </Card>
 
         {/* Seção de Ações de Ciclo de Vida e Gestão */}
         <View style={styles.acoesContainer}>
@@ -357,123 +350,108 @@ export default function OrcamentoDetalheScreen() {
               {/* Ações para RASCUNHO */}
               {isRascunho ? (
                 <>
-                  <TouchableOpacity
-                    style={styles.btnAcaoPrimaria}
+                  <Button
+                    title="Enviar Proposta"
                     onPress={() =>
                       handleTransitarStatus(
                         StatusOrcamento.ENVIADO,
                         'Deseja enviar esta proposta? Ela sairá do status de rascunho.'
                       )
                     }
-                  >
-                    <Text style={styles.btnAcaoPrimariaText}>Enviar Proposta</Text>
-                  </TouchableOpacity>
+                  />
 
-                  <TouchableOpacity
-                    style={styles.btnAcaoSecundaria}
+                  <Button
+                    title="Editar Dados (Rascunho)"
+                    variant="secondary"
                     onPress={() => router.push(`/orcamentos/editar?id=${orcamento.id}` as any)}
-                  >
-                    <Text style={styles.btnAcaoSecundariaText}>Editar Dados (Rascunho)</Text>
-                  </TouchableOpacity>
+                  />
 
-                  <TouchableOpacity
-                    style={styles.btnAcaoExcluir}
+                  <Button
+                    title="Excluir Rascunho"
+                    variant="danger"
                     onPress={handleExcluir}
-                  >
-                    <Text style={styles.btnAcaoExcluirText}>Excluir Rascunho</Text>
-                  </TouchableOpacity>
+                  />
                 </>
               ) : null}
 
               {/* Ações para ENVIADO */}
               {orcamento.status === StatusOrcamento.ENVIADO ? (
                 <>
-                  <TouchableOpacity
-                    style={styles.btnAcaoPrimaria}
+                  <Button
+                    title={'Marcar "Em análise"'}
                     onPress={() =>
                       handleTransitarStatus(
                         StatusOrcamento.EM_ANALISE,
                         'Marcar orçamento como "Em análise" pelo cliente?'
                       )
                     }
-                  >
-                    <Text style={styles.btnAcaoPrimariaText}>Marcar "Em análise"</Text>
-                  </TouchableOpacity>
+                  />
 
-                  <TouchableOpacity
-                    style={styles.btnAcaoPerigo}
+                  <Button
+                    title="Cancelar Proposta"
+                    variant="danger"
                     onPress={() =>
                       handleTransitarStatus(
                         StatusOrcamento.CANCELADO,
                         'Tem certeza que deseja cancelar esta proposta enviada?'
                       )
                     }
-                  >
-                    <Text style={styles.btnAcaoPerigoText}>Cancelar Proposta</Text>
-                  </TouchableOpacity>
+                  />
                 </>
               ) : null}
 
               {/* Ações para EM_ANALISE */}
               {orcamento.status === StatusOrcamento.EM_ANALISE ? (
                 <>
-                  <TouchableOpacity
-                    style={styles.btnAcaoAprovar}
+                  <Button
+                    title="Aprovar Orçamento"
                     onPress={() =>
                       handleTransitarStatus(
                         StatusOrcamento.APROVADO,
                         'Confirmar aprovação do orçamento pelo cliente?'
                       )
                     }
-                  >
-                    <Text style={styles.btnAcaoAprovarText}>Aprovar Orçamento</Text>
-                  </TouchableOpacity>
+                  />
 
-                  <TouchableOpacity
-                    style={styles.btnAcaoRecusar}
+                  <Button
+                    title="Recusar Orçamento"
+                    variant="danger"
                     onPress={() =>
                       handleTransitarStatus(
                         StatusOrcamento.RECUSADO,
                         'Confirmar recusa do orçamento pelo cliente?'
                       )
                     }
-                  >
-                    <Text style={styles.btnAcaoRecusarText}>Recusar Orçamento</Text>
-                  </TouchableOpacity>
+                  />
 
-                  <TouchableOpacity
-                    style={styles.btnAcaoPerigo}
+                  <Button
+                    title="Cancelar Proposta"
+                    variant="danger"
                     onPress={() =>
                       handleTransitarStatus(
                         StatusOrcamento.CANCELADO,
                         'Tem certeza que deseja cancelar esta proposta em análise?'
                       )
                     }
-                  >
-                    <Text style={styles.btnAcaoPerigoText}>Cancelar Proposta</Text>
-                  </TouchableOpacity>
+                  />
                 </>
               ) : null}
 
               {/* Ações para APROVADO */}
               {orcamento.status === StatusOrcamento.APROVADO ? (
-                <TouchableOpacity
-                  style={styles.btnAcaoConcluir}
+                <Button
+                  title="Concluir Orçamento"
                   onPress={() =>
                     handleTransitarStatus(
                       StatusOrcamento.CONCLUIDO,
                       'Finalizar e marcar serviços deste orçamento como Concluídos?'
                     )
                   }
-                >
-                  <Text style={styles.btnAcaoConcluirText}>Concluir Orçamento</Text>
-                </TouchableOpacity>
+                />
               ) : null}
 
               {/* Ação universal: Duplicar Orçamento (sempre disponível) */}
-              <TouchableOpacity style={styles.btnAcaoDuplicar} onPress={handleDuplicar}>
-                <Text style={styles.btnAcaoDuplicarText}>Duplicar Orçamento</Text>
-              </TouchableOpacity>
+              <Button title="Duplicar Orçamento" variant="neutral" onPress={handleDuplicar} />
             </>
           )}
         </View>
@@ -495,11 +473,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'flex-start',
-    backgroundColor: colors.surface,
-    padding: 16,
-    borderRadius: 12,
-    borderWidth: 1,
-    borderColor: colors.border,
     marginBottom: 12,
   },
   headerLeft: {
@@ -515,22 +488,7 @@ const styles = StyleSheet.create({
     color: colors.textMuted,
     marginTop: 2,
   },
-  statusBadge: {
-    paddingHorizontal: 12,
-    paddingVertical: 5,
-    borderRadius: 16,
-    borderWidth: 1,
-  },
-  statusBadgeText: {
-    fontSize: 13,
-    fontWeight: '700',
-  },
   cardSection: {
-    backgroundColor: colors.surface,
-    borderRadius: 12,
-    padding: 16,
-    borderWidth: 1,
-    borderColor: colors.border,
     marginBottom: 12,
   },
   cardSectionTitle: {
@@ -683,100 +641,6 @@ const styles = StyleSheet.create({
     gap: 10,
     marginTop: 8,
   },
-  btnAcaoPrimaria: {
-    backgroundColor: colors.primary,
-    paddingVertical: 14,
-    borderRadius: 8,
-    alignItems: 'center',
-  },
-  btnAcaoPrimariaText: {
-    color: colors.textOnColor,
-    fontSize: 15,
-    fontWeight: '700',
-  },
-  btnAcaoSecundaria: {
-    backgroundColor: colors.surface,
-    borderWidth: 1,
-    borderColor: colors.primary,
-    paddingVertical: 12,
-    borderRadius: 8,
-    alignItems: 'center',
-  },
-  btnAcaoSecundariaText: {
-    color: colors.primary,
-    fontSize: 14,
-    fontWeight: '600',
-  },
-  btnAcaoDuplicar: {
-    backgroundColor: colors.surfaceMuted,
-    paddingVertical: 12,
-    borderRadius: 8,
-    alignItems: 'center',
-  },
-  btnAcaoDuplicarText: {
-    color: colors.textSecondary,
-    fontSize: 14,
-    fontWeight: '600',
-  },
-  btnAcaoAprovar: {
-    backgroundColor: colors.primary,
-    paddingVertical: 14,
-    borderRadius: 8,
-    alignItems: 'center',
-  },
-  btnAcaoAprovarText: {
-    color: colors.textOnColor,
-    fontSize: 15,
-    fontWeight: '700',
-  },
-  btnAcaoRecusar: {
-    backgroundColor: colors.danger,
-    paddingVertical: 12,
-    borderRadius: 8,
-    alignItems: 'center',
-  },
-  btnAcaoRecusarText: {
-    color: colors.textOnColor,
-    fontSize: 14,
-    fontWeight: '700',
-  },
-  btnAcaoConcluir: {
-    backgroundColor: colors.teal,
-    paddingVertical: 14,
-    borderRadius: 8,
-    alignItems: 'center',
-  },
-  btnAcaoConcluirText: {
-    color: colors.textOnColor,
-    fontSize: 15,
-    fontWeight: '700',
-  },
-  btnAcaoPerigo: {
-    backgroundColor: colors.dangerSoft,
-    borderWidth: 1,
-    borderColor: colors.dangerBorder,
-    paddingVertical: 12,
-    borderRadius: 8,
-    alignItems: 'center',
-  },
-  btnAcaoPerigoText: {
-    color: colors.danger,
-    fontSize: 14,
-    fontWeight: '600',
-  },
-  btnAcaoExcluir: {
-    backgroundColor: colors.dangerSoft,
-    borderWidth: 1,
-    borderColor: colors.dangerBorder,
-    paddingVertical: 12,
-    borderRadius: 8,
-    alignItems: 'center',
-  },
-  btnAcaoExcluirText: {
-    color: colors.danger,
-    fontSize: 14,
-    fontWeight: '600',
-  },
   centerContainer: {
     flex: 1,
     justifyContent: 'center',
@@ -794,16 +658,6 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginBottom: 16,
   },
-  btnVoltarErro: {
-    backgroundColor: colors.primary,
-    paddingHorizontal: 20,
-    paddingVertical: 10,
-    borderRadius: 8,
-  },
-  btnVoltarErroText: {
-    color: colors.textOnColor,
-    fontWeight: '600',
-  },
   pdfBotoesRow: {
     flexDirection: 'row',
     gap: 10,
@@ -813,7 +667,7 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: colors.primaryDark,
     paddingVertical: 14,
-    borderRadius: 8,
+    borderRadius: 14,
     alignItems: 'center',
     justifyContent: 'center',
     shadowColor: colors.primaryDark,
@@ -826,7 +680,7 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: colors.primary,
     paddingVertical: 14,
-    borderRadius: 8,
+    borderRadius: 14,
     alignItems: 'center',
     justifyContent: 'center',
     shadowColor: colors.primary,

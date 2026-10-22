@@ -19,6 +19,7 @@ import { useMapaDelimitacao } from '../../hooks/use-mapa-delimitacao';
 import { usePesquisaEndereco } from '../../hooks/use-pesquisa-endereco';
 import { GeometriaPoligono } from '../../../domain/types/geometria';
 import { colors } from '../../theme';
+import { Button, TextField } from '../ui';
 
 interface MapaDelimitacaoProps {
   regiaoInicial?: RegiaoMapa;
@@ -247,7 +248,7 @@ export const MapaDelimitacao: React.FC<MapaDelimitacaoProps> = ({
       </View>
 
       {/* Modal para Definir Nome e Observações da Área */}
-      <Modal visible={modalVisible} transparent animationType="fade">
+      <Modal visible={modalVisible} transparent animationType="slide">
         <KeyboardAvoidingView
           style={styles.modalOverlay}
           behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
@@ -265,50 +266,38 @@ export const MapaDelimitacao: React.FC<MapaDelimitacaoProps> = ({
                 <Text style={styles.modalDestaque}>{areaEstimada.toFixed(2)} m²</Text>
               </Text>
 
-              <View style={styles.inputGroup}>
-                <Text style={styles.inputLabel}>Nome da Área *</Text>
-                <TextInput
-                  style={styles.textInput}
-                  placeholder="Ex: Gramado Frontal, Jardim Lateral"
-                  placeholderTextColor={colors.textPlaceholder}
-                  value={nome}
-                  onChangeText={setNome}
-                />
-              </View>
+              <TextField
+                label="Nome da Área *"
+                placeholder="Ex: Gramado Frontal, Jardim Lateral"
+                value={nome}
+                onChangeText={setNome}
+              />
 
-              <View style={styles.inputGroup}>
-                <Text style={styles.inputLabel}>Observações (opcional)</Text>
-                <TextInput
-                  style={[styles.textInput, styles.textArea]}
-                  placeholder="Ex: Terreno plano, terra boa"
-                  placeholderTextColor={colors.textPlaceholder}
-                  value={observacoes}
-                  onChangeText={setObservacoes}
-                  multiline
-                  numberOfLines={3}
-                />
-              </View>
+              <TextField
+                label="Observações (opcional)"
+                style={styles.textArea}
+                placeholder="Ex: Terreno plano, terra boa"
+                value={observacoes}
+                onChangeText={setObservacoes}
+                multiline
+                numberOfLines={3}
+              />
 
               <View style={styles.modalActions}>
-                <TouchableOpacity
-                  style={styles.modalBtnCancelar}
+                <Button
+                  title="Voltar"
+                  variant="neutral"
                   onPress={() => setModalVisible(false)}
                   disabled={salvando}
-                >
-                  <Text style={styles.modalBtnCancelarText}>Voltar</Text>
-                </TouchableOpacity>
+                  style={styles.modalBtnAcao}
+                />
 
-                <TouchableOpacity
-                  style={[styles.modalBtnSalvar, salvando && styles.btnConcluirDisabled]}
+                <Button
+                  title="Salvar Área"
                   onPress={handleConfirmarSalvar}
-                  disabled={salvando}
-                >
-                  {salvando ? (
-                    <ActivityIndicator color={colors.surface} />
-                  ) : (
-                    <Text style={styles.modalBtnSalvarText}>Salvar Área</Text>
-                  )}
-                </TouchableOpacity>
+                  loading={salvando}
+                  style={styles.modalBtnAcao}
+                />
               </View>
             </ScrollView>
           </View>
@@ -513,23 +502,21 @@ const styles = StyleSheet.create({
   btnConcluirTextDisabled: {
     color: colors.border,
   },
+  // Painel inferior (mesmo layout dos modais de orçamento): o modal centralizado com
+  // altura percentual oscilava verticalmente ao abrir o teclado no Android.
   modalOverlay: {
     flex: 1,
     backgroundColor: 'rgba(0, 0, 0, 0.65)',
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: 20,
+    justifyContent: 'flex-end',
   },
   modalContent: {
     backgroundColor: colors.surface,
-    borderRadius: 16,
+    borderTopLeftRadius: 24,
+    borderTopRightRadius: 24,
     padding: 20,
-    width: '100%',
-    maxWidth: 400,
-    maxHeight: '90%',
     shadowColor: colors.shadow,
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
+    shadowOffset: { width: 0, height: -4 },
+    shadowOpacity: 0.2,
     shadowRadius: 6,
     elevation: 8,
   },
@@ -551,25 +538,6 @@ const styles = StyleSheet.create({
     color: colors.primary,
     fontWeight: 'bold',
   },
-  inputGroup: {
-    marginBottom: 14,
-  },
-  inputLabel: {
-    fontSize: 13,
-    fontWeight: '600',
-    color: colors.textSecondary,
-    marginBottom: 6,
-  },
-  textInput: {
-    borderWidth: 1,
-    borderColor: colors.border,
-    borderRadius: 8,
-    paddingHorizontal: 12,
-    paddingVertical: 10,
-    fontSize: 14,
-    color: colors.text,
-    backgroundColor: colors.surfaceSubtle,
-  },
   textArea: {
     height: 70,
     textAlignVertical: 'top',
@@ -580,25 +548,7 @@ const styles = StyleSheet.create({
     gap: 12,
     marginTop: 10,
   },
-  modalBtnCancelar: {
-    paddingVertical: 10,
-    paddingHorizontal: 16,
-    borderRadius: 8,
-  },
-  modalBtnCancelarText: {
-    color: colors.textMuted,
-    fontWeight: 'bold',
-    fontSize: 14,
-  },
-  modalBtnSalvar: {
-    backgroundColor: colors.primary,
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    borderRadius: 8,
-  },
-  modalBtnSalvarText: {
-    color: colors.textOnColor,
-    fontWeight: 'bold',
-    fontSize: 14,
+  modalBtnAcao: {
+    flex: 1,
   },
 });

@@ -4,7 +4,6 @@ import {
   Text,
   StyleSheet,
   ScrollView,
-  TextInput,
   TouchableOpacity,
   ActivityIndicator,
   Alert,
@@ -28,6 +27,7 @@ import {
   parseDataCivil,
 } from '../../../src/presentation/utils/data-formatters';
 import { colors } from '../../../src/presentation/theme';
+import { Button, Card, TextField } from '../../../src/presentation/components/ui';
 
 interface ItemTemporario {
   tempId: string;
@@ -379,7 +379,7 @@ export default function NovoOrcamentoScreen() {
     >
       <ScrollView contentContainerStyle={styles.scrollContent} keyboardShouldPersistTaps="handled">
         {/* Card do Cliente */}
-        <View style={styles.sectionCard}>
+        <Card style={styles.sectionCard}>
           <Text style={styles.sectionTitle}>1. Cliente *</Text>
           <TouchableOpacity
             style={styles.selectButton}
@@ -393,49 +393,40 @@ export default function NovoOrcamentoScreen() {
           {clienteSelecionado?.telefone ? (
             <Text style={styles.clienteSubtext}>Telefone: {clienteSelecionado.telefone}</Text>
           ) : null}
-        </View>
+        </Card>
 
         {/* Card de Identificação e Validade */}
-        <View style={styles.sectionCard}>
+        <Card style={styles.sectionCard}>
           <Text style={styles.sectionTitle}>2. Identificação e Validade</Text>
-          <View style={styles.inputGroup}>
-            <Text style={styles.inputLabel}>Número do Orçamento (opcional)</Text>
-            <TextInput
-              style={styles.textInput}
-              placeholder="Automático (ex: ORC-2026-001)"
-              placeholderTextColor={colors.textPlaceholder}
-              value={numero}
-              onChangeText={setNumero}
-            />
-          </View>
-          <View style={styles.inputGroup}>
-            <Text style={styles.inputLabel}>Data de Validade (opcional no Rascunho)</Text>
-            <TextInput
-              style={styles.textInput}
-              placeholder="DD/MM/AAAA (ex: 07/10/2026)"
-              placeholderTextColor={colors.textPlaceholder}
-              value={dataValidade}
-              onChangeText={(val) => setDataValidade(aplicarMascaraData(val))}
-              keyboardType="numeric"
-              maxLength={10}
-            />
-          </View>
-        </View>
+          <TextField
+            label="Número do Orçamento (opcional)"
+            placeholder="Automático (ex: ORC-2026-001)"
+            value={numero}
+            onChangeText={setNumero}
+          />
+          <TextField
+            label="Data de Validade (opcional no Rascunho)"
+            placeholder="DD/MM/AAAA (ex: 07/10/2026)"
+            value={dataValidade}
+            onChangeText={(val) => setDataValidade(aplicarMascaraData(val))}
+            keyboardType="numeric"
+            maxLength={10}
+          />
+        </Card>
 
         {/* Card de Itens */}
-        <View style={styles.sectionCard}>
+        <Card style={styles.sectionCard}>
           <View style={styles.sectionHeaderRow}>
             <Text style={styles.sectionTitle}>3. Itens do Orçamento</Text>
-            <TouchableOpacity
-              style={styles.btnAddItem}
+            <Button
+              title="+ Adicionar Item"
+              variant="secondary"
+              size="compact"
               onPress={() => {
                 setItemSelecionado(null);
                 setModalItemVisible(true);
               }}
-              activeOpacity={0.7}
-            >
-              <Text style={styles.btnAddItemText}>+ Adicionar Item</Text>
-            </TouchableOpacity>
+            />
           </View>
 
           {itens.length === 0 ? (
@@ -486,10 +477,10 @@ export default function NovoOrcamentoScreen() {
               </View>
             ))
           )}
-        </View>
+        </Card>
 
         {/* Card de Desconto e Totais */}
-        <View style={styles.sectionCard}>
+        <Card style={styles.sectionCard}>
           <Text style={styles.sectionTitle}>4. Desconto e Resumo</Text>
 
           <View style={styles.descontoTipoRow}>
@@ -520,19 +511,13 @@ export default function NovoOrcamentoScreen() {
           </View>
 
           {tipoDesconto !== 'NENHUM' ? (
-            <View style={styles.inputGroup}>
-              <Text style={styles.inputLabel}>
-                {tipoDesconto === 'PERCENTUAL' ? 'Percentual de Desconto (0% a 100%)' : 'Valor do Desconto (R$)'}
-              </Text>
-              <TextInput
-                style={styles.textInput}
-                keyboardType="numeric"
-                placeholder={tipoDesconto === 'PERCENTUAL' ? 'Ex: 10' : 'Ex: 50,00'}
-                placeholderTextColor={colors.textPlaceholder}
-                value={valorDescontoStr}
-                onChangeText={setValorDescontoStr}
-              />
-            </View>
+            <TextField
+              label={tipoDesconto === 'PERCENTUAL' ? 'Percentual de Desconto (0% a 100%)' : 'Valor do Desconto (R$)'}
+              keyboardType="numeric"
+              placeholder={tipoDesconto === 'PERCENTUAL' ? 'Ex: 10' : 'Ex: 50,00'}
+              value={valorDescontoStr}
+              onChangeText={setValorDescontoStr}
+            />
           ) : null}
 
           <View style={styles.divider} />
@@ -551,50 +536,38 @@ export default function NovoOrcamentoScreen() {
             <Text style={styles.totalLabel}>Total:</Text>
             <Text style={styles.totalFinalValor}>{formatarMoeda(totalFinal)}</Text>
           </View>
-        </View>
+        </Card>
 
         {/* Card de Observações e Condições */}
-        <View style={styles.sectionCard}>
+        <Card style={styles.sectionCard}>
           <Text style={styles.sectionTitle}>5. Informações Complementares</Text>
-          <View style={styles.inputGroup}>
-            <Text style={styles.inputLabel}>Observações</Text>
-            <TextInput
-              style={[styles.textInput, styles.textArea]}
-              multiline
-              numberOfLines={3}
-              placeholder="Instruções de serviço, detalhes do local, etc."
-              placeholderTextColor={colors.textPlaceholder}
-              value={observacoes}
-              onChangeText={setObservacoes}
-            />
-          </View>
-          <View style={styles.inputGroup}>
-            <Text style={styles.inputLabel}>Condições de Pagamento</Text>
-            <TextInput
-              style={[styles.textInput, styles.textArea]}
-              multiline
-              numberOfLines={2}
-              placeholder="Ex: 50% de entrada e restante na conclusão via Pix"
-              placeholderTextColor={colors.textPlaceholder}
-              value={condicoesPagamento}
-              onChangeText={setCondicoesPagamento}
-            />
-          </View>
-        </View>
+          <TextField
+            label="Observações"
+            style={styles.textArea}
+            multiline
+            numberOfLines={3}
+            placeholder="Instruções de serviço, detalhes do local, etc."
+            value={observacoes}
+            onChangeText={setObservacoes}
+          />
+          <TextField
+            label="Condições de Pagamento"
+            style={styles.textArea}
+            multiline
+            numberOfLines={2}
+            placeholder="Ex: 50% de entrada e restante na conclusão via Pix"
+            value={condicoesPagamento}
+            onChangeText={setCondicoesPagamento}
+          />
+        </Card>
 
         {/* Botão de Criação */}
-        <TouchableOpacity
-          style={[styles.btnSalvar, isSaving && styles.btnSalvarDisabled]}
+        <Button
+          title="Salvar Orçamento (Rascunho)"
           onPress={handleSalvarOrcamento}
-          disabled={isSaving}
-          activeOpacity={0.8}
-        >
-          {isSaving ? (
-            <ActivityIndicator color={colors.surface} />
-          ) : (
-            <Text style={styles.btnSalvarText}>Salvar Orçamento (Rascunho)</Text>
-          )}
-        </TouchableOpacity>
+          loading={isSaving}
+          style={styles.btnSalvar}
+        />
       </ScrollView>
 
       {/* Modal de Seleção de Cliente */}
@@ -620,9 +593,12 @@ export default function NovoOrcamentoScreen() {
               )}
               ListEmptyComponent={<Text style={styles.emptyListModal}>Nenhum cliente ativo cadastrado.</Text>}
             />
-            <TouchableOpacity style={styles.modalBtnFechar} onPress={() => setModalClienteVisible(false)}>
-              <Text style={styles.modalBtnFecharText}>Cancelar</Text>
-            </TouchableOpacity>
+            <Button
+              title="Cancelar"
+              variant="neutral"
+              onPress={() => setModalClienteVisible(false)}
+              style={styles.modalBtnFechar}
+            />
           </View>
         </View>
       </Modal>
@@ -721,25 +697,23 @@ export default function NovoOrcamentoScreen() {
                     </Text>
                   </View>
                 ) : (
-                  <View style={styles.inputGroup}>
-                    <Text style={styles.inputLabel}>Quantidade ({itemSelecionado.unidade})</Text>
-                    <TextInput
-                      style={styles.textInput}
-                      keyboardType="numeric"
-                      value={qtdDigitada}
-                      onChangeText={setQtdDigitada}
-                    />
-                  </View>
+                  <TextField
+                    label={`Quantidade (${itemSelecionado.unidade})`}
+                    keyboardType="numeric"
+                    value={qtdDigitada}
+                    onChangeText={setQtdDigitada}
+                  />
                 )}
-                <TouchableOpacity style={styles.btnConfirmarItem} onPress={handleConfirmarAdicionarItem}>
-                  <Text style={styles.btnConfirmarItemText}>Confirmar Inclusão</Text>
-                </TouchableOpacity>
+                <Button title="Confirmar Inclusão" onPress={handleConfirmarAdicionarItem} />
               </View>
             ) : null}
 
-            <TouchableOpacity style={styles.modalBtnFechar} onPress={() => setModalItemVisible(false)}>
-              <Text style={styles.modalBtnFecharText}>Cancelar</Text>
-            </TouchableOpacity>
+            <Button
+              title="Cancelar"
+              variant="neutral"
+              onPress={() => setModalItemVisible(false)}
+              style={styles.modalBtnFechar}
+            />
           </View>
         </KeyboardAvoidingView>
       </Modal>
@@ -757,12 +731,7 @@ const styles = StyleSheet.create({
     paddingBottom: 100,
   },
   sectionCard: {
-    backgroundColor: colors.surface,
-    borderRadius: 12,
-    padding: 16,
     marginBottom: 14,
-    borderWidth: 1,
-    borderColor: colors.border,
   },
   sectionTitle: {
     fontSize: 16,
@@ -779,7 +748,7 @@ const styles = StyleSheet.create({
   selectButton: {
     backgroundColor: colors.surfaceMuted,
     padding: 14,
-    borderRadius: 8,
+    borderRadius: 12,
     borderWidth: 1,
     borderColor: colors.border,
   },
@@ -798,39 +767,9 @@ const styles = StyleSheet.create({
     marginTop: 6,
     marginLeft: 2,
   },
-  inputGroup: {
-    marginBottom: 12,
-  },
-  inputLabel: {
-    fontSize: 13,
-    fontWeight: '600',
-    color: colors.textSecondary,
-    marginBottom: 6,
-  },
-  textInput: {
-    backgroundColor: colors.background,
-    borderWidth: 1,
-    borderColor: colors.border,
-    borderRadius: 8,
-    paddingHorizontal: 12,
-    paddingVertical: 10,
-    fontSize: 14,
-    color: colors.text,
-  },
   textArea: {
     minHeight: 64,
     textAlignVertical: 'top',
-  },
-  btnAddItem: {
-    backgroundColor: colors.primarySoft,
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 6,
-  },
-  btnAddItemText: {
-    color: colors.primary,
-    fontSize: 13,
-    fontWeight: '700',
   },
   emptyItensBox: {
     padding: 20,
@@ -938,7 +877,7 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingVertical: 8,
     alignItems: 'center',
-    borderRadius: 6,
+    borderRadius: 10,
     backgroundColor: colors.surfaceMuted,
   },
   tipoDescButtonActive: {
@@ -997,19 +936,7 @@ const styles = StyleSheet.create({
     color: colors.primary,
   },
   btnSalvar: {
-    backgroundColor: colors.primary,
-    paddingVertical: 14,
-    borderRadius: 8,
-    alignItems: 'center',
     marginTop: 8,
-  },
-  btnSalvarDisabled: {
-    backgroundColor: colors.primaryBorder,
-  },
-  btnSalvarText: {
-    color: colors.textOnColor,
-    fontSize: 16,
-    fontWeight: '700',
   },
   centerContainer: {
     flex: 1,
@@ -1029,8 +956,8 @@ const styles = StyleSheet.create({
   },
   modalContainer: {
     backgroundColor: colors.surface,
-    borderTopLeftRadius: 16,
-    borderTopRightRadius: 16,
+    borderTopLeftRadius: 24,
+    borderTopRightRadius: 24,
     padding: 20,
     maxHeight: '80%',
   },
@@ -1086,7 +1013,7 @@ const styles = StyleSheet.create({
   itemConfigBox: {
     backgroundColor: colors.surfaceSubtle,
     padding: 12,
-    borderRadius: 8,
+    borderRadius: 12,
     marginTop: 12,
     borderWidth: 1,
     borderColor: colors.border,
@@ -1108,17 +1035,6 @@ const styles = StyleSheet.create({
     color: colors.warning,
     lineHeight: 16,
   },
-  btnConfirmarItem: {
-    backgroundColor: colors.primary,
-    paddingVertical: 10,
-    borderRadius: 6,
-    alignItems: 'center',
-  },
-  btnConfirmarItemText: {
-    color: colors.textOnColor,
-    fontWeight: '600',
-    fontSize: 14,
-  },
   emptyListModal: {
     padding: 20,
     textAlign: 'center',
@@ -1126,14 +1042,5 @@ const styles = StyleSheet.create({
   },
   modalBtnFechar: {
     marginTop: 14,
-    paddingVertical: 12,
-    alignItems: 'center',
-    backgroundColor: colors.surfaceMuted,
-    borderRadius: 8,
-  },
-  modalBtnFecharText: {
-    color: colors.textSecondary,
-    fontWeight: '600',
-    fontSize: 14,
   },
 });

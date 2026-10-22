@@ -3,13 +3,13 @@ import {
   View,
   Text,
   StyleSheet,
-  TouchableOpacity,
   ScrollView,
   ActivityIndicator,
 } from 'react-native';
 import { useAuth } from '../../src/presentation/contexts/auth-context';
 import { useRouter } from 'expo-router';
 import { colors } from '../../src/presentation/theme';
+import { Button, Card } from '../../src/presentation/components/ui';
 
 export default function PerfilScreen() {
   const router = useRouter();
@@ -17,7 +17,7 @@ export default function PerfilScreen() {
 
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.content}>
-      <View style={styles.card}>
+      <Card style={styles.card}>
         {isLoading ? (
           <View style={styles.loadingContainer}>
             <ActivityIndicator color={colors.primary} />
@@ -50,36 +50,29 @@ export default function PerfilScreen() {
         ) : (
           <View style={styles.emptyContainer}>
             <Text style={styles.emptyText}>Não foi possível carregar seus dados.</Text>
-            <TouchableOpacity
-              style={[styles.secondaryButton, { backgroundColor: colors.primary, marginBottom: 8 }]}
+            <Button
+              title="Concluir Meu Perfil"
               onPress={() => router.push('/concluir-perfil')}
-            >
-              <Text style={[styles.secondaryButtonText, { color: colors.textOnColor, fontWeight: 'bold' }]}>
-                Concluir Meu Perfil
-              </Text>
-            </TouchableOpacity>
+            />
           </View>
         )}
-      </View>
+      </Card>
 
       <View style={styles.actions}>
-        <TouchableOpacity
-          style={styles.refreshButton}
+        <Button
+          title="Recarregar Dados"
+          variant="neutral"
           onPress={refreshPerfil}
           disabled={isLoading}
-          activeOpacity={0.8}
-        >
-          <Text style={styles.refreshButtonText}>Recarregar Dados</Text>
-        </TouchableOpacity>
+          style={styles.refreshButton}
+        />
 
-        <TouchableOpacity
-          style={styles.logoutButton}
+        <Button
+          title="Sair da Conta"
+          variant="danger"
           onPress={signOut}
           disabled={isLoading}
-          activeOpacity={0.8}
-        >
-          <Text style={styles.logoutButtonText}>Sair da Conta</Text>
-        </TouchableOpacity>
+        />
       </View>
     </ScrollView>
   );
@@ -94,21 +87,14 @@ const styles = StyleSheet.create({
     padding: 20,
   },
   card: {
-    backgroundColor: colors.surface,
-    borderRadius: 12,
-    padding: 18,
+    paddingVertical: 8,
     marginBottom: 16,
-    shadowColor: colors.shadow,
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.05,
-    shadowRadius: 6,
-    elevation: 2,
   },
   row: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingVertical: 10,
+    paddingVertical: 12,
     borderBottomWidth: 1,
     borderBottomColor: colors.surfaceMuted,
   },
@@ -139,7 +125,7 @@ const styles = StyleSheet.create({
   },
   emptyContainer: {
     paddingVertical: 16,
-    alignItems: 'center',
+    alignItems: 'stretch',
   },
   emptyText: {
     fontSize: 13,
@@ -147,44 +133,11 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginBottom: 12,
   },
-  secondaryButton: {
-    paddingHorizontal: 14,
-    paddingVertical: 8,
-    backgroundColor: colors.border,
-    borderRadius: 6,
-  },
-  secondaryButtonText: {
-    fontSize: 13,
-    color: colors.textSecondary,
-    fontWeight: '600',
-  },
   actions: {
     marginTop: 10,
     marginBottom: 30,
   },
   refreshButton: {
-    backgroundColor: colors.border,
-    borderRadius: 8,
-    paddingVertical: 14,
-    alignItems: 'center',
     marginBottom: 10,
-  },
-  refreshButtonText: {
-    color: colors.text,
-    fontSize: 15,
-    fontWeight: '600',
-  },
-  logoutButton: {
-    backgroundColor: colors.dangerSoft,
-    borderColor: colors.dangerBorder,
-    borderWidth: 1,
-    borderRadius: 8,
-    paddingVertical: 14,
-    alignItems: 'center',
-  },
-  logoutButtonText: {
-    color: colors.danger,
-    fontSize: 15,
-    fontWeight: 'bold',
   },
 });

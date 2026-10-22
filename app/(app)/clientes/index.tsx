@@ -14,6 +14,7 @@ import { useRouter } from 'expo-router';
 import { useClientes } from '../../../src/presentation/hooks/use-clientes';
 import { Cliente } from '../../../src/domain/entities/cliente';
 import { colors } from '../../../src/presentation/theme';
+import { Badge, Button } from '../../../src/presentation/components/ui';
 
 export default function ClientesListScreen() {
   const router = useRouter();
@@ -37,21 +38,7 @@ export default function ClientesListScreen() {
           <Text style={styles.clienteNome} numberOfLines={1}>
             {item.nome}
           </Text>
-          <View
-            style={[
-              styles.statusBadge,
-              item.ativo ? styles.badgeAtivo : styles.badgeInativo,
-            ]}
-          >
-            <Text
-              style={[
-                styles.statusText,
-                item.ativo ? styles.statusTextAtivo : styles.statusTextInativo,
-              ]}
-            >
-              {item.ativo ? 'Ativo' : 'Inativo'}
-            </Text>
-          </View>
+          <Badge label={item.ativo ? 'Ativo' : 'Inativo'} tone={item.ativo ? 'success' : 'danger'} />
         </View>
 
         {item.documento ? (
@@ -106,13 +93,12 @@ export default function ClientesListScreen() {
           ) : null}
         </View>
 
-        <TouchableOpacity
-          style={styles.novoButton}
-          activeOpacity={0.8}
+        <Button
+          title="+ Novo"
+          size="compact"
           onPress={() => router.push('/clientes/novo' as any)}
-        >
-          <Text style={styles.novoButtonText}>+ Novo</Text>
-        </TouchableOpacity>
+          accessibilityLabel="Novo cliente"
+        />
       </View>
 
       {/* Conteúdo Principal: Loading, Erro, Vazio ou Lista */}
@@ -126,9 +112,7 @@ export default function ClientesListScreen() {
           <Text style={styles.errorIcon}>⚠️</Text>
           <Text style={styles.errorTitle}>Erro ao carregar clientes</Text>
           <Text style={styles.errorMessage}>{error}</Text>
-          <TouchableOpacity style={styles.retryButton} onPress={reload} activeOpacity={0.8}>
-            <Text style={styles.retryButtonText}>Tentar Novamente</Text>
-          </TouchableOpacity>
+          <Button title="Tentar Novamente" size="compact" onPress={reload} />
         </View>
       ) : filteredClientes.length === 0 ? (
         <View style={styles.centerContainer}>
@@ -142,13 +126,11 @@ export default function ClientesListScreen() {
               : 'Cadastre seu primeiro cliente para gerenciar orçamentos e serviços.'}
           </Text>
           {!searchQuery && (
-            <TouchableOpacity
-              style={styles.cadastrarButton}
-              activeOpacity={0.8}
+            <Button
+              title="Cadastrar Primeiro Cliente"
+              size="compact"
               onPress={() => router.push('/clientes/novo' as any)}
-            >
-              <Text style={styles.cadastrarButtonText}>Cadastrar Primeiro Cliente</Text>
-            </TouchableOpacity>
+            />
           )}
         </View>
       ) : (
@@ -193,7 +175,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: colors.surfaceMuted,
-    borderRadius: 8,
+    borderRadius: 12,
     paddingHorizontal: 12,
     height: 42,
   },
@@ -212,25 +194,12 @@ const styles = StyleSheet.create({
     color: colors.textMuted,
     paddingHorizontal: 4,
   },
-  novoButton: {
-    backgroundColor: colors.primary,
-    paddingHorizontal: 14,
-    height: 42,
-    borderRadius: 8,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  novoButtonText: {
-    color: colors.textOnColor,
-    fontSize: 14,
-    fontWeight: 'bold',
-  },
   listContent: {
     padding: 16,
   },
   card: {
     backgroundColor: colors.surface,
-    borderRadius: 10,
+    borderRadius: 18,
     padding: 16,
     marginBottom: 12,
     shadowColor: colors.shadow,
@@ -253,27 +222,6 @@ const styles = StyleSheet.create({
     color: colors.text,
     flex: 1,
     marginRight: 8,
-  },
-  statusBadge: {
-    paddingHorizontal: 8,
-    paddingVertical: 2,
-    borderRadius: 6,
-  },
-  badgeAtivo: {
-    backgroundColor: colors.primarySoft,
-  },
-  badgeInativo: {
-    backgroundColor: colors.dangerSoft,
-  },
-  statusText: {
-    fontSize: 11,
-    fontWeight: '600',
-  },
-  statusTextAtivo: {
-    color: colors.primaryDark,
-  },
-  statusTextInativo: {
-    color: colors.danger,
   },
   clienteInfo: {
     fontSize: 13,
@@ -317,17 +265,6 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginBottom: 16,
   },
-  retryButton: {
-    backgroundColor: colors.primary,
-    paddingHorizontal: 16,
-    paddingVertical: 10,
-    borderRadius: 8,
-  },
-  retryButtonText: {
-    color: colors.textOnColor,
-    fontSize: 14,
-    fontWeight: '600',
-  },
   emptyIcon: {
     fontSize: 48,
     marginBottom: 12,
@@ -345,16 +282,5 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginBottom: 20,
     maxWidth: 280,
-  },
-  cadastrarButton: {
-    backgroundColor: colors.primary,
-    paddingHorizontal: 20,
-    paddingVertical: 12,
-    borderRadius: 8,
-  },
-  cadastrarButtonText: {
-    color: colors.textOnColor,
-    fontSize: 14,
-    fontWeight: 'bold',
   },
 });

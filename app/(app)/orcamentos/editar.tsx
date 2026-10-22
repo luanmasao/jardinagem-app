@@ -4,7 +4,6 @@ import {
   Text,
   StyleSheet,
   ScrollView,
-  TextInput,
   TouchableOpacity,
   ActivityIndicator,
   Alert,
@@ -32,6 +31,7 @@ import {
 } from '../../../src/presentation/utils/data-formatters';
 import { formatarStatusOrcamento } from '../../../src/presentation/utils/status-orcamento.utils';
 import { colors } from '../../../src/presentation/theme';
+import { Button, Card, TextField } from '../../../src/presentation/components/ui';
 
 export default function EditarOrcamentoScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -252,9 +252,7 @@ export default function EditarOrcamentoScreen() {
     return (
       <View style={styles.centerContainer}>
         <Text style={styles.errorText}>Orçamento não encontrado.</Text>
-        <TouchableOpacity style={styles.btnVoltar} onPress={() => router.replace('/orcamentos' as any)}>
-          <Text style={styles.btnVoltarText}>Voltar</Text>
-        </TouchableOpacity>
+        <Button title="Voltar" size="compact" onPress={() => router.replace('/orcamentos' as any)} />
       </View>
     );
   }
@@ -263,7 +261,7 @@ export default function EditarOrcamentoScreen() {
   if (orcamento.status !== StatusOrcamento.RASCUNHO) {
     return (
       <View style={styles.centerContainer}>
-        <View style={styles.bloqueioCard}>
+        <Card style={styles.bloqueioCard}>
           <Text style={styles.bloqueioTitulo}>Edição Direta Não Permitida</Text>
           <Text style={styles.bloqueioMensagem}>
             Este orçamento está no status "{formatarStatusOrcamento(orcamento.status)}". Conforme as regras de negócio homologadas
@@ -274,13 +272,11 @@ export default function EditarOrcamentoScreen() {
             Para alterar valores ou itens desta proposta, utilize a opção "Duplicar Orçamento" na tela de
             detalhes.
           </Text>
-          <TouchableOpacity
-            style={styles.btnVoltarAoDetalhe}
+          <Button
+            title="Voltar para Detalhes"
             onPress={() => router.replace(`/orcamentos/${orcamento.id}` as any)}
-          >
-            <Text style={styles.btnVoltarAoDetalheText}>Voltar para Detalhes</Text>
-          </TouchableOpacity>
-        </View>
+          />
+        </Card>
       </View>
     );
   }
@@ -291,13 +287,13 @@ export default function EditarOrcamentoScreen() {
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
     >
       <ScrollView contentContainerStyle={styles.scrollContent} keyboardShouldPersistTaps="handled">
-        <View style={styles.headerEdicao}>
+        <Card style={styles.headerEdicao}>
           <Text style={styles.headerEdicaoNumero}>{orcamento.numero}</Text>
           <Text style={styles.headerEdicaoStatus}>Status: Rascunho (Editável)</Text>
-        </View>
+        </Card>
 
         {/* Cliente */}
-        <View style={styles.sectionCard}>
+        <Card style={styles.sectionCard}>
           <Text style={styles.sectionTitle}>Cliente</Text>
           <TouchableOpacity
             style={styles.selectButton}
@@ -308,38 +304,34 @@ export default function EditarOrcamentoScreen() {
               {clienteSelecionado ? clienteSelecionado.nome : 'Selecione o cliente...'}
             </Text>
           </TouchableOpacity>
-        </View>
+        </Card>
 
         {/* Validade */}
-        <View style={styles.sectionCard}>
+        <Card style={styles.sectionCard}>
           <Text style={styles.sectionTitle}>Prazos</Text>
-          <View style={styles.inputGroup}>
-            <Text style={styles.inputLabel}>Data de Validade (DD/MM/AAAA)</Text>
-            <TextInput
-              style={styles.textInput}
-              placeholder="DD/MM/AAAA (ex: 07/10/2026)"
-              placeholderTextColor={colors.textPlaceholder}
-              value={dataValidade}
-              onChangeText={(val) => setDataValidade(aplicarMascaraData(val))}
-              keyboardType="numeric"
-              maxLength={10}
-            />
-          </View>
-        </View>
+          <TextField
+            label="Data de Validade (DD/MM/AAAA)"
+            placeholder="DD/MM/AAAA (ex: 07/10/2026)"
+            value={dataValidade}
+            onChangeText={(val) => setDataValidade(aplicarMascaraData(val))}
+            keyboardType="numeric"
+            maxLength={10}
+          />
+        </Card>
 
         {/* Itens */}
-        <View style={styles.sectionCard}>
+        <Card style={styles.sectionCard}>
           <View style={styles.sectionHeaderRow}>
             <Text style={styles.sectionTitle}>Itens ({itens.length})</Text>
-            <TouchableOpacity
-              style={styles.btnAddItem}
+            <Button
+              title="+ Adicionar Item"
+              variant="secondary"
+              size="compact"
               onPress={() => {
                 setItemSelecionado(null);
                 setModalItemVisible(true);
               }}
-            >
-              <Text style={styles.btnAddItemText}>+ Adicionar Item</Text>
-            </TouchableOpacity>
+            />
           </View>
 
           {itens.length === 0 ? (
@@ -394,10 +386,10 @@ export default function EditarOrcamentoScreen() {
               </View>
             ))
           )}
-        </View>
+        </Card>
 
         {/* Desconto */}
-        <View style={styles.sectionCard}>
+        <Card style={styles.sectionCard}>
           <Text style={styles.sectionTitle}>Desconto</Text>
           <View style={styles.descontoTipoRow}>
             <TouchableOpacity
@@ -427,17 +419,12 @@ export default function EditarOrcamentoScreen() {
           </View>
 
           {tipoDesconto !== 'NENHUM' ? (
-            <View style={styles.inputGroup}>
-              <Text style={styles.inputLabel}>
-                {tipoDesconto === 'PERCENTUAL' ? 'Percentual (%)' : 'Valor (R$)'}
-              </Text>
-              <TextInput
-                style={styles.textInput}
-                keyboardType="numeric"
-                value={valorDescontoStr}
-                onChangeText={setValorDescontoStr}
-              />
-            </View>
+            <TextField
+              label={tipoDesconto === 'PERCENTUAL' ? 'Percentual (%)' : 'Valor (R$)'}
+              keyboardType="numeric"
+              value={valorDescontoStr}
+              onChangeText={setValorDescontoStr}
+            />
           ) : null}
 
           <View style={styles.divider} />
@@ -449,41 +436,35 @@ export default function EditarOrcamentoScreen() {
             <Text style={styles.totalLabel}>Total Atual:</Text>
             <Text style={styles.totalFinalValor}>{formatarMoeda(orcamento.total)}</Text>
           </View>
-        </View>
+        </Card>
 
         {/* Observações e Condições */}
-        <View style={styles.sectionCard}>
+        <Card style={styles.sectionCard}>
           <Text style={styles.sectionTitle}>Observações e Condições</Text>
-          <View style={styles.inputGroup}>
-            <Text style={styles.inputLabel}>Observações</Text>
-            <TextInput
-              style={[styles.textInput, styles.textArea]}
-              multiline
-              numberOfLines={3}
-              value={observacoes}
-              onChangeText={setObservacoes}
-            />
-          </View>
-          <View style={styles.inputGroup}>
-            <Text style={styles.inputLabel}>Condições de Pagamento</Text>
-            <TextInput
-              style={[styles.textInput, styles.textArea]}
-              multiline
-              numberOfLines={2}
-              value={condicoesPagamento}
-              onChangeText={setCondicoesPagamento}
-            />
-          </View>
-        </View>
+          <TextField
+            label="Observações"
+            style={styles.textArea}
+            multiline
+            numberOfLines={3}
+            value={observacoes}
+            onChangeText={setObservacoes}
+          />
+          <TextField
+            label="Condições de Pagamento"
+            style={styles.textArea}
+            multiline
+            numberOfLines={2}
+            value={condicoesPagamento}
+            onChangeText={setCondicoesPagamento}
+          />
+        </Card>
 
-        <TouchableOpacity
-          style={[styles.btnSalvar, isSaving && styles.btnSalvarDisabled]}
+        <Button
+          title="Salvar Alterações"
           onPress={handleSalvarEdicao}
-          disabled={isSaving}
-          activeOpacity={0.8}
-        >
-          {isSaving ? <ActivityIndicator color={colors.surface} /> : <Text style={styles.btnSalvarText}>Salvar Alterações</Text>}
-        </TouchableOpacity>
+          loading={isSaving}
+          style={styles.btnSalvar}
+        />
       </ScrollView>
 
       {/* Modal Seleção Cliente */}
@@ -508,9 +489,12 @@ export default function EditarOrcamentoScreen() {
                 </TouchableOpacity>
               )}
             />
-            <TouchableOpacity style={styles.modalBtnFechar} onPress={() => setModalClienteVisible(false)}>
-              <Text style={styles.modalBtnFecharText}>Cancelar</Text>
-            </TouchableOpacity>
+            <Button
+              title="Cancelar"
+              variant="neutral"
+              onPress={() => setModalClienteVisible(false)}
+              style={styles.modalBtnFechar}
+            />
           </View>
         </View>
       </Modal>
@@ -595,25 +579,23 @@ export default function EditarOrcamentoScreen() {
                     </Text>
                   </View>
                 ) : (
-                  <View style={styles.inputGroup}>
-                    <Text style={styles.inputLabel}>Quantidade ({itemSelecionado.unidade})</Text>
-                    <TextInput
-                      style={styles.textInput}
-                      keyboardType="numeric"
-                      value={qtdDigitada}
-                      onChangeText={setQtdDigitada}
-                    />
-                  </View>
+                  <TextField
+                    label={`Quantidade (${itemSelecionado.unidade})`}
+                    keyboardType="numeric"
+                    value={qtdDigitada}
+                    onChangeText={setQtdDigitada}
+                  />
                 )}
-                <TouchableOpacity style={styles.btnConfirmarItem} onPress={handleConfirmarAdicionarItem}>
-                  <Text style={styles.btnConfirmarItemText}>Confirmar Inclusão</Text>
-                </TouchableOpacity>
+                <Button title="Confirmar Inclusão" onPress={handleConfirmarAdicionarItem} />
               </View>
             ) : null}
 
-            <TouchableOpacity style={styles.modalBtnFechar} onPress={() => setModalItemVisible(false)}>
-              <Text style={styles.modalBtnFecharText}>Cancelar</Text>
-            </TouchableOpacity>
+            <Button
+              title="Cancelar"
+              variant="neutral"
+              onPress={() => setModalItemVisible(false)}
+              style={styles.modalBtnFechar}
+            />
           </View>
         </KeyboardAvoidingView>
       </Modal>
@@ -631,11 +613,6 @@ const styles = StyleSheet.create({
     paddingBottom: 100,
   },
   headerEdicao: {
-    backgroundColor: colors.surface,
-    padding: 16,
-    borderRadius: 12,
-    borderWidth: 1,
-    borderColor: colors.border,
     marginBottom: 12,
   },
   headerEdicaoNumero: {
@@ -650,12 +627,7 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   sectionCard: {
-    backgroundColor: colors.surface,
-    borderRadius: 12,
-    padding: 16,
     marginBottom: 12,
-    borderWidth: 1,
-    borderColor: colors.border,
   },
   sectionTitle: {
     fontSize: 15,
@@ -672,7 +644,7 @@ const styles = StyleSheet.create({
   selectButton: {
     backgroundColor: colors.surfaceMuted,
     padding: 14,
-    borderRadius: 8,
+    borderRadius: 12,
     borderWidth: 1,
     borderColor: colors.border,
   },
@@ -685,39 +657,9 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: colors.textMuted,
   },
-  inputGroup: {
-    marginBottom: 12,
-  },
-  inputLabel: {
-    fontSize: 13,
-    fontWeight: '600',
-    color: colors.textSecondary,
-    marginBottom: 6,
-  },
-  textInput: {
-    backgroundColor: colors.background,
-    borderWidth: 1,
-    borderColor: colors.border,
-    borderRadius: 8,
-    paddingHorizontal: 12,
-    paddingVertical: 10,
-    fontSize: 14,
-    color: colors.text,
-  },
   textArea: {
     minHeight: 64,
     textAlignVertical: 'top',
-  },
-  btnAddItem: {
-    backgroundColor: colors.primarySoft,
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-    borderRadius: 6,
-  },
-  btnAddItemText: {
-    color: colors.primary,
-    fontSize: 12,
-    fontWeight: '700',
   },
   emptyItensTexto: {
     fontSize: 13,
@@ -804,7 +746,7 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingVertical: 8,
     alignItems: 'center',
-    borderRadius: 6,
+    borderRadius: 10,
     backgroundColor: colors.surfaceMuted,
   },
   tipoDescButtonActive: {
@@ -854,19 +796,7 @@ const styles = StyleSheet.create({
     color: colors.primary,
   },
   btnSalvar: {
-    backgroundColor: colors.primary,
-    paddingVertical: 14,
-    borderRadius: 8,
-    alignItems: 'center',
     marginTop: 8,
-  },
-  btnSalvarDisabled: {
-    backgroundColor: colors.primaryBorder,
-  },
-  btnSalvarText: {
-    color: colors.textOnColor,
-    fontSize: 16,
-    fontWeight: '700',
   },
   centerContainer: {
     flex: 1,
@@ -885,21 +815,8 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginBottom: 16,
   },
-  btnVoltar: {
-    backgroundColor: colors.primary,
-    paddingHorizontal: 20,
-    paddingVertical: 10,
-    borderRadius: 8,
-  },
-  btnVoltarText: {
-    color: colors.textOnColor,
-    fontWeight: '600',
-  },
   bloqueioCard: {
-    backgroundColor: colors.surface,
     padding: 24,
-    borderRadius: 12,
-    borderWidth: 1,
     borderColor: colors.dangerBorder,
     alignItems: 'center',
   },
@@ -923,17 +840,6 @@ const styles = StyleSheet.create({
     lineHeight: 18,
     marginBottom: 20,
   },
-  btnVoltarAoDetalhe: {
-    backgroundColor: colors.primary,
-    paddingHorizontal: 20,
-    paddingVertical: 12,
-    borderRadius: 8,
-  },
-  btnVoltarAoDetalheText: {
-    color: colors.textOnColor,
-    fontWeight: '600',
-    fontSize: 14,
-  },
   modalOverlay: {
     flex: 1,
     backgroundColor: colors.overlay,
@@ -941,8 +847,8 @@ const styles = StyleSheet.create({
   },
   modalContainer: {
     backgroundColor: colors.surface,
-    borderTopLeftRadius: 16,
-    borderTopRightRadius: 16,
+    borderTopLeftRadius: 24,
+    borderTopRightRadius: 24,
     padding: 20,
     maxHeight: '80%',
   },
@@ -998,7 +904,7 @@ const styles = StyleSheet.create({
   itemConfigBox: {
     backgroundColor: colors.surfaceSubtle,
     padding: 12,
-    borderRadius: 8,
+    borderRadius: 12,
     marginTop: 12,
     borderWidth: 1,
     borderColor: colors.border,
@@ -1020,27 +926,7 @@ const styles = StyleSheet.create({
     color: colors.warning,
     lineHeight: 16,
   },
-  btnConfirmarItem: {
-    backgroundColor: colors.primary,
-    paddingVertical: 10,
-    borderRadius: 6,
-    alignItems: 'center',
-  },
-  btnConfirmarItemText: {
-    color: colors.textOnColor,
-    fontWeight: '600',
-    fontSize: 14,
-  },
   modalBtnFechar: {
     marginTop: 14,
-    paddingVertical: 12,
-    alignItems: 'center',
-    backgroundColor: colors.surfaceMuted,
-    borderRadius: 8,
-  },
-  modalBtnFecharText: {
-    color: colors.textSecondary,
-    fontWeight: '600',
-    fontSize: 14,
   },
 });

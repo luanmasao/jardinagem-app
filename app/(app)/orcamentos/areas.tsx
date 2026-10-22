@@ -16,6 +16,7 @@ import { clienteService } from '../../../src/application/services/cliente.servic
 import { StatusOrcamento } from '../../../src/domain/enums/status-orcamento';
 import { ItemOrcamento } from '../../../src/domain/entities/item-orcamento';
 import { colors } from '../../../src/presentation/theme';
+import { Button, Card } from '../../../src/presentation/components/ui';
 
 const formatarMoeda = (valor: number): string => `R$ ${valor.toFixed(2).replace('.', ',')}`;
 
@@ -173,7 +174,7 @@ export default function AreasItemScreen() {
   return (
     <View style={styles.container}>
       {/* Card Informativo do Item e Metragem */}
-      <View style={styles.headerCard}>
+      <Card style={styles.headerCard}>
         <View style={styles.tipoBadge}>
           <Text style={styles.tipoBadgeText}>SERVIÇO COM MEDIÇÃO DE ÁREA</Text>
         </View>
@@ -194,7 +195,7 @@ export default function AreasItemScreen() {
             <Text style={styles.resumoValorFinanceiro}>{formatarMoeda(valorTotalItem)}</Text>
           </View>
         </View>
-      </View>
+      </Card>
 
       {/* Lista de Áreas */}
       <View style={styles.listaSection}>
@@ -260,15 +261,11 @@ export default function AreasItemScreen() {
       {/* Botão de Destaque: Delimitar Nova Área no Mapa */}
       {isRascunho ? (
         <View style={styles.footerContainer}>
-          <TouchableOpacity
-            style={styles.btnDelimitarMapa}
+          <Button
+            title="🛰️ Delimitar Nova Área no Mapa"
             onPress={handleAbrirMapa}
-            activeOpacity={0.8}
-          >
-            <Text style={styles.btnDelimitarMapaText}>
-              🛰️ Delimitar Nova Área no Mapa
-            </Text>
-          </TouchableOpacity>
+            style={styles.btnDelimitarMapa}
+          />
         </View>
       ) : null}
     </View>
@@ -293,17 +290,7 @@ const styles = StyleSheet.create({
     color: colors.textMuted,
   },
   headerCard: {
-    backgroundColor: colors.surface,
     margin: 16,
-    padding: 16,
-    borderRadius: 12,
-    borderWidth: 1,
-    borderColor: colors.border,
-    elevation: 2,
-    shadowColor: colors.shadow,
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.1,
-    shadowRadius: 3,
   },
   tipoBadge: {
     alignSelf: 'flex-start',
@@ -384,7 +371,7 @@ const styles = StyleSheet.create({
   },
   areaCard: {
     backgroundColor: colors.surface,
-    borderRadius: 10,
+    borderRadius: 18,
     padding: 14,
     marginBottom: 10,
     borderWidth: 1,
@@ -446,7 +433,7 @@ const styles = StyleSheet.create({
     padding: 30,
     marginTop: 20,
     backgroundColor: colors.surface,
-    borderRadius: 12,
+    borderRadius: 18,
     borderWidth: 1,
     borderColor: colors.border,
   },
@@ -479,19 +466,10 @@ const styles = StyleSheet.create({
     right: 16,
   },
   btnDelimitarMapa: {
-    backgroundColor: colors.primary,
-    paddingVertical: 14,
-    borderRadius: 10,
-    alignItems: 'center',
     elevation: 4,
     shadowColor: colors.shadow,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.3,
     shadowRadius: 3,
-  },
-  btnDelimitarMapaText: {
-    color: colors.textOnColor,
-    fontSize: 15,
-    fontWeight: 'bold',
   },
 });

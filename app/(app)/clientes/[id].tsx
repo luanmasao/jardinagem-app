@@ -4,7 +4,6 @@ import {
   Text,
   StyleSheet,
   ScrollView,
-  TouchableOpacity,
   ActivityIndicator,
   Platform,
   Alert,
@@ -12,6 +11,7 @@ import {
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useClienteDetalhe } from '../../../src/presentation/hooks/use-cliente-detalhe';
 import { colors } from '../../../src/presentation/theme';
+import { Badge, Button, Card } from '../../../src/presentation/components/ui';
 
 export default function ClienteDetalheScreen() {
   const router = useRouter();
@@ -67,9 +67,7 @@ export default function ClienteDetalheScreen() {
         <Text style={styles.errorMessage}>
           {error || 'O cliente solicitado não pôde ser localizado ou você não possui permissão para acessá-lo.'}
         </Text>
-        <TouchableOpacity style={styles.backButton} onPress={() => router.replace('/clientes' as any)}>
-          <Text style={styles.backButtonText}>Voltar para Lista</Text>
-        </TouchableOpacity>
+        <Button title="Voltar para Lista" size="compact" onPress={() => router.replace('/clientes' as any)} />
       </View>
     );
   }
@@ -77,29 +75,15 @@ export default function ClienteDetalheScreen() {
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.content}>
       {/* Banner de Identificação */}
-      <View style={styles.headerCard}>
+      <Card style={styles.card}>
         <View style={styles.headerTop}>
           <Text style={styles.headerNome}>{cliente.nome}</Text>
-          <View
-            style={[
-              styles.statusBadge,
-              cliente.ativo ? styles.badgeAtivo : styles.badgeInativo,
-            ]}
-          >
-            <Text
-              style={[
-                styles.statusText,
-                cliente.ativo ? styles.statusTextAtivo : styles.statusTextInativo,
-              ]}
-            >
-              {cliente.ativo ? 'Ativo' : 'Inativo'}
-            </Text>
-          </View>
+          <Badge label={cliente.ativo ? 'Ativo' : 'Inativo'} tone={cliente.ativo ? 'success' : 'danger'} />
         </View>
-      </View>
+      </Card>
 
       {/* Card 1: Informações de Contato e Documento */}
-      <View style={styles.card}>
+      <Card style={styles.card}>
         <Text style={styles.cardTitle}>Dados Cadastrais</Text>
 
         <View style={styles.row}>
@@ -123,10 +107,10 @@ export default function ClienteDetalheScreen() {
             <Text style={styles.observacoesText}>{cliente.observacoes}</Text>
           </View>
         ) : null}
-      </View>
+      </Card>
 
       {/* Card 2: Endereço do Cliente */}
-      <View style={styles.card}>
+      <Card style={styles.card}>
         <Text style={styles.cardTitle}>Endereço</Text>
 
         {cliente.endereco ? (
@@ -187,48 +171,27 @@ export default function ClienteDetalheScreen() {
             </Text>
           </View>
         )}
-      </View>
+      </Card>
 
       {/* Ações */}
       <View style={styles.actionsContainer}>
-        <TouchableOpacity
-          style={styles.editButton}
-          activeOpacity={0.8}
+        <Button
+          title="Editar Dados do Cliente"
           onPress={() => router.push(`/clientes/editar?id=${cliente.id}` as any)}
-        >
-          <Text style={styles.editButtonText}>Editar Dados do Cliente</Text>
-        </TouchableOpacity>
+        />
 
-        <TouchableOpacity
-          style={[
-            styles.toggleStatusButton,
-            cliente.ativo ? styles.toggleInativarButton : styles.toggleAtivarButton,
-          ]}
-          activeOpacity={0.8}
-          disabled={isTogglingAtivo}
+        <Button
+          title={cliente.ativo ? 'Inativar Cliente' : 'Ativar Cliente'}
+          variant={cliente.ativo ? 'danger' : 'secondary'}
+          loading={isTogglingAtivo}
           onPress={handleToggleAtivo}
-        >
-          {isTogglingAtivo ? (
-            <ActivityIndicator color={cliente.ativo ? colors.danger : colors.primary} />
-          ) : (
-            <Text
-              style={[
-                styles.toggleStatusButtonText,
-                cliente.ativo ? styles.toggleInativarText : styles.toggleAtivarText,
-              ]}
-            >
-              {cliente.ativo ? 'Inativar Cliente' : 'Ativar Cliente'}
-            </Text>
-          )}
-        </TouchableOpacity>
+        />
 
-        <TouchableOpacity
-          style={styles.voltarButton}
-          activeOpacity={0.8}
+        <Button
+          title="Voltar para Lista"
+          variant="neutral"
           onPress={() => router.push('/clientes' as any)}
-        >
-          <Text style={styles.voltarButtonText}>Voltar para Lista</Text>
-        </TouchableOpacity>
+        />
       </View>
     </ScrollView>
   );
@@ -272,35 +235,10 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     maxWidth: 280,
   },
-  backButton: {
-    backgroundColor: colors.primary,
-    paddingHorizontal: 18,
-    paddingVertical: 10,
-    borderRadius: 8,
-  },
-  backButtonText: {
-    color: colors.textOnColor,
-    fontSize: 14,
-    fontWeight: 'bold',
-  },
-  headerCard: {
-    backgroundColor: colors.surface,
-    borderRadius: 12,
-    padding: 18,
-    marginBottom: 16,
-    borderWidth: 1,
-    borderColor: colors.border,
-    shadowColor: colors.shadow,
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.05,
-    shadowRadius: 3,
-    elevation: 2,
-  },
   headerTop: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 6,
   },
   headerNome: {
     fontSize: 20,
@@ -309,39 +247,8 @@ const styles = StyleSheet.create({
     flex: 1,
     marginRight: 10,
   },
-  statusBadge: {
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-    borderRadius: 6,
-  },
-  badgeAtivo: {
-    backgroundColor: colors.primarySoft,
-  },
-  badgeInativo: {
-    backgroundColor: colors.dangerSoft,
-  },
-  statusText: {
-    fontSize: 12,
-    fontWeight: '700',
-  },
-  statusTextAtivo: {
-    color: colors.primaryDark,
-  },
-  statusTextInativo: {
-    color: colors.danger,
-  },
   card: {
-    backgroundColor: colors.surface,
-    borderRadius: 12,
-    padding: 18,
     marginBottom: 16,
-    borderWidth: 1,
-    borderColor: colors.border,
-    shadowColor: colors.shadow,
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.05,
-    shadowRadius: 3,
-    elevation: 2,
   },
   cardTitle: {
     fontSize: 16,
@@ -404,51 +311,5 @@ const styles = StyleSheet.create({
     marginTop: 8,
     marginBottom: 20,
     gap: 10,
-  },
-  editButton: {
-    backgroundColor: colors.primary,
-    borderRadius: 8,
-    paddingVertical: 14,
-    alignItems: 'center',
-  },
-  editButtonText: {
-    color: colors.textOnColor,
-    fontSize: 15,
-    fontWeight: 'bold',
-  },
-  toggleStatusButton: {
-    borderRadius: 8,
-    paddingVertical: 12,
-    alignItems: 'center',
-    borderWidth: 1,
-  },
-  toggleInativarButton: {
-    backgroundColor: colors.dangerSoft,
-    borderColor: colors.dangerBorder,
-  },
-  toggleAtivarButton: {
-    backgroundColor: colors.primarySubtle,
-    borderColor: colors.primaryBorder,
-  },
-  toggleStatusButtonText: {
-    fontSize: 14,
-    fontWeight: 'bold',
-  },
-  toggleInativarText: {
-    color: colors.danger,
-  },
-  toggleAtivarText: {
-    color: colors.primary,
-  },
-  voltarButton: {
-    backgroundColor: colors.border,
-    borderRadius: 8,
-    paddingVertical: 12,
-    alignItems: 'center',
-  },
-  voltarButtonText: {
-    color: colors.textSecondary,
-    fontSize: 14,
-    fontWeight: '600',
   },
 });

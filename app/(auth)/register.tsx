@@ -2,10 +2,8 @@ import React, { useState } from 'react';
 import {
   View,
   Text,
-  TextInput,
   TouchableOpacity,
   StyleSheet,
-  ActivityIndicator,
   KeyboardAvoidingView,
   Platform,
   ScrollView,
@@ -14,6 +12,7 @@ import { useRouter } from 'expo-router';
 import { useAuth } from '../../src/presentation/contexts/auth-context';
 import { validarFormularioCadastro } from '../../src/presentation/utils/auth-form.utils';
 import { colors } from '../../src/presentation/theme';
+import { Button, Card, TextField } from '../../src/presentation/components/ui';
 
 export default function RegisterScreen() {
   const router = useRouter();
@@ -60,7 +59,7 @@ export default function RegisterScreen() {
           <Text style={styles.subtitle}>Criação de Perfil Profissional</Text>
         </View>
 
-        <View style={styles.card}>
+        <Card>
           <Text style={styles.cardTitle}>Criar nova conta</Text>
 
           {errorMessage && (
@@ -70,89 +69,63 @@ export default function RegisterScreen() {
           )}
 
           {/* 1. Nome Completo */}
-          <View style={styles.inputGroup}>
-            <Text style={styles.label}>Nome Completo *</Text>
-            <TextInput
-              style={styles.input}
-              placeholder="Ex: João da Silva"
-              placeholderTextColor={colors.textPlaceholder}
-              value={nome}
-              onChangeText={setNome}
-              autoCapitalize="words"
-              editable={!isLoading}
-            />
-          </View>
+          <TextField
+            label="Nome Completo *"
+            placeholder="Ex: João da Silva"
+            value={nome}
+            onChangeText={setNome}
+            autoCapitalize="words"
+            editable={!isLoading}
+          />
 
           {/* 2. E-mail */}
-          <View style={styles.inputGroup}>
-            <Text style={styles.label}>E-mail *</Text>
-            <TextInput
-              style={styles.input}
-              placeholder="seu.email@exemplo.com"
-              placeholderTextColor={colors.textPlaceholder}
-              value={email}
-              onChangeText={setEmail}
-              keyboardType="email-address"
-              autoCapitalize="none"
-              autoCorrect={false}
-              editable={!isLoading}
-            />
-          </View>
+          <TextField
+            label="E-mail *"
+            placeholder="seu.email@exemplo.com"
+            value={email}
+            onChangeText={setEmail}
+            keyboardType="email-address"
+            autoCapitalize="none"
+            autoCorrect={false}
+            editable={!isLoading}
+          />
 
           {/* 3. Senha */}
-          <View style={styles.inputGroup}>
-            <Text style={styles.label}>Senha * (mínimo 6 caracteres)</Text>
-            <TextInput
-              style={styles.input}
-              placeholder="Digite sua senha segura"
-              placeholderTextColor={colors.textPlaceholder}
-              value={password}
-              onChangeText={setPassword}
-              secureTextEntry
-              editable={!isLoading}
-            />
-          </View>
+          <TextField
+            label="Senha * (mínimo 6 caracteres)"
+            placeholder="Digite sua senha segura"
+            value={password}
+            onChangeText={setPassword}
+            secureTextEntry
+            editable={!isLoading}
+          />
 
           {/* 4. Confirmar senha (ACH-UX-04) */}
-          <View style={styles.inputGroup}>
-            <Text style={styles.label}>Confirmar senha *</Text>
-            <TextInput
-              style={styles.input}
-              placeholder="Repita sua senha segura"
-              placeholderTextColor={colors.textPlaceholder}
-              value={confirmPassword}
-              onChangeText={setConfirmPassword}
-              secureTextEntry
-              editable={!isLoading}
-            />
-          </View>
+          <TextField
+            label="Confirmar senha *"
+            placeholder="Repita sua senha segura"
+            value={confirmPassword}
+            onChangeText={setConfirmPassword}
+            secureTextEntry
+            editable={!isLoading}
+          />
 
           {/* 5. Telefone / WhatsApp */}
-          <View style={styles.inputGroup}>
-            <Text style={styles.label}>Telefone / WhatsApp</Text>
-            <TextInput
-              style={styles.input}
-              placeholder="Ex: (11) 99999-9999"
-              placeholderTextColor={colors.textPlaceholder}
-              value={telefone}
-              onChangeText={setTelefone}
-              keyboardType="phone-pad"
-              editable={!isLoading}
-            />
-          </View>
+          <TextField
+            label="Telefone / WhatsApp"
+            placeholder="Ex: (11) 99999-9999"
+            value={telefone}
+            onChangeText={setTelefone}
+            keyboardType="phone-pad"
+            editable={!isLoading}
+          />
 
-          <TouchableOpacity
-            style={[styles.button, isLoading && styles.buttonDisabled]}
+          <Button
+            title="Cadastrar"
             onPress={handleRegister}
-            disabled={isLoading}
-            activeOpacity={0.8}
-          >
-            {isLoading ? (
-              <ActivityIndicator color={colors.surface} />
-            ) : (
-              <Text style={styles.buttonText}>Cadastrar</Text>
-            )}
-          </TouchableOpacity>
+            loading={isLoading}
+            style={styles.button}
+          />
 
           <View style={styles.footer}>
             <Text style={styles.footerText}>Já possui uma conta? </Text>
@@ -166,7 +139,7 @@ export default function RegisterScreen() {
               <Text style={styles.linkText}>Fazer Login</Text>
             </TouchableOpacity>
           </View>
-        </View>
+        </Card>
       </ScrollView>
     </KeyboardAvoidingView>
   );
@@ -175,7 +148,7 @@ export default function RegisterScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.surfaceMuted,
+    backgroundColor: colors.background,
   },
   scrollContent: {
     flexGrow: 1,
@@ -197,16 +170,6 @@ const styles = StyleSheet.create({
     color: colors.textMuted,
     textAlign: 'center',
   },
-  card: {
-    backgroundColor: colors.surface,
-    borderRadius: 16,
-    padding: 24,
-    shadowColor: colors.shadow,
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.08,
-    shadowRadius: 12,
-    elevation: 3,
-  },
   cardTitle: {
     fontSize: 20,
     fontWeight: '700',
@@ -217,7 +180,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.dangerSoft,
     borderWidth: 1,
     borderColor: colors.dangerBorder,
-    borderRadius: 8,
+    borderRadius: 12,
     padding: 12,
     marginBottom: 16,
   },
@@ -226,40 +189,8 @@ const styles = StyleSheet.create({
     fontSize: 13,
     lineHeight: 18,
   },
-  inputGroup: {
-    marginBottom: 14,
-  },
-  label: {
-    fontSize: 13,
-    fontWeight: '600',
-    color: colors.textSecondary,
-    marginBottom: 6,
-  },
-  input: {
-    borderWidth: 1,
-    borderColor: colors.borderStrong,
-    borderRadius: 8,
-    paddingHorizontal: 14,
-    paddingVertical: 12,
-    fontSize: 15,
-    color: colors.text,
-    backgroundColor: colors.background,
-  },
   button: {
-    backgroundColor: colors.primary,
-    borderRadius: 8,
-    paddingVertical: 14,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginTop: 10,
-  },
-  buttonDisabled: {
-    opacity: 0.6,
-  },
-  buttonText: {
-    color: colors.textOnColor,
-    fontSize: 16,
-    fontWeight: 'bold',
+    marginTop: 8,
   },
   footer: {
     flexDirection: 'row',

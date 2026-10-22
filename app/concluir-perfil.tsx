@@ -2,16 +2,14 @@ import React, { useState } from 'react';
 import {
   View,
   Text,
-  TextInput,
-  TouchableOpacity,
   StyleSheet,
-  ActivityIndicator,
   KeyboardAvoidingView,
   Platform,
   ScrollView,
 } from 'react-native';
 import { useAuth } from '../src/presentation/contexts/auth-context';
 import { colors } from '../src/presentation/theme';
+import { Button, Card, TextField } from '../src/presentation/components/ui';
 
 export default function ConcluirPerfilScreen() {
   const { user, concluirPerfil, signOut, isLoading } = useAuth();
@@ -49,7 +47,7 @@ export default function ConcluirPerfilScreen() {
           <Text style={styles.subtitle}>Conclusão Defensiva de Perfil</Text>
         </View>
 
-        <View style={styles.card}>
+        <Card>
           <Text style={styles.cardTitle}>Complete seu cadastro</Text>
           <Text style={styles.cardDescription}>
             Sua conta de acesso está ativa, mas precisamos dos seus dados profissionais para habilitar a criação de orçamentos e serviços.
@@ -61,63 +59,45 @@ export default function ConcluirPerfilScreen() {
             </View>
           )}
 
-          <View style={styles.inputGroup}>
-            <Text style={styles.label}>E-mail da Conta</Text>
-            <TextInput
-              style={[styles.input, styles.inputDisabled]}
-              value={user?.email || '—'}
-              editable={false}
-            />
-          </View>
+          <TextField
+            label="E-mail da Conta"
+            value={user?.email || '—'}
+            editable={false}
+          />
 
-          <View style={styles.inputGroup}>
-            <Text style={styles.label}>Nome Completo *</Text>
-            <TextInput
-              style={styles.input}
-              placeholder="Ex: Carlos Jardineiro"
-              placeholderTextColor={colors.textPlaceholder}
-              value={nome}
-              onChangeText={setNome}
-              autoCapitalize="words"
-              editable={!isLoading}
-            />
-          </View>
+          <TextField
+            label="Nome Completo *"
+            placeholder="Ex: Carlos Jardineiro"
+            value={nome}
+            onChangeText={setNome}
+            autoCapitalize="words"
+            editable={!isLoading}
+          />
 
-          <View style={styles.inputGroup}>
-            <Text style={styles.label}>Telefone / WhatsApp (opcional)</Text>
-            <TextInput
-              style={styles.input}
-              placeholder="Ex: (11) 99999-9999"
-              placeholderTextColor={colors.textPlaceholder}
-              value={telefone}
-              onChangeText={setTelefone}
-              keyboardType="phone-pad"
-              editable={!isLoading}
-            />
-          </View>
+          <TextField
+            label="Telefone / WhatsApp (opcional)"
+            placeholder="Ex: (11) 99999-9999"
+            value={telefone}
+            onChangeText={setTelefone}
+            keyboardType="phone-pad"
+            editable={!isLoading}
+          />
 
-          <TouchableOpacity
-            style={[styles.button, isLoading && styles.buttonDisabled]}
+          <Button
+            title="Concluir Perfil e Acessar"
             onPress={handleSalvarPerfil}
-            disabled={isLoading}
-            activeOpacity={0.8}
-          >
-            {isLoading ? (
-              <ActivityIndicator color={colors.surface} />
-            ) : (
-              <Text style={styles.buttonText}>Concluir Perfil e Acessar</Text>
-            )}
-          </TouchableOpacity>
+            loading={isLoading}
+            style={styles.button}
+          />
 
-          <TouchableOpacity
-            style={[styles.logoutButton, isLoading && styles.buttonDisabled]}
+          <Button
+            title="Sair da Conta (Logout)"
+            variant="neutral"
             onPress={signOut}
             disabled={isLoading}
-            activeOpacity={0.8}
-          >
-            <Text style={styles.logoutButtonText}>Sair da Conta (Logout)</Text>
-          </TouchableOpacity>
-        </View>
+            style={styles.logoutButton}
+          />
+        </Card>
       </ScrollView>
     </KeyboardAvoidingView>
   );
@@ -126,7 +106,7 @@ export default function ConcluirPerfilScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.surfaceMuted,
+    backgroundColor: colors.background,
   },
   scrollContent: {
     flexGrow: 1,
@@ -148,16 +128,6 @@ const styles = StyleSheet.create({
     color: colors.textMuted,
     textAlign: 'center',
   },
-  card: {
-    backgroundColor: colors.surface,
-    borderRadius: 16,
-    padding: 24,
-    shadowColor: colors.shadow,
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.08,
-    shadowRadius: 12,
-    elevation: 3,
-  },
   cardTitle: {
     fontSize: 20,
     fontWeight: '700',
@@ -174,7 +144,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.dangerSoft,
     borderWidth: 1,
     borderColor: colors.dangerBorder,
-    borderRadius: 8,
+    borderRadius: 12,
     padding: 12,
     marginBottom: 16,
   },
@@ -183,58 +153,10 @@ const styles = StyleSheet.create({
     fontSize: 13,
     lineHeight: 18,
   },
-  inputGroup: {
-    marginBottom: 16,
-  },
-  label: {
-    fontSize: 13,
-    fontWeight: '600',
-    color: colors.textSecondary,
-    marginBottom: 6,
-  },
-  input: {
-    borderWidth: 1,
-    borderColor: colors.borderStrong,
-    borderRadius: 8,
-    paddingHorizontal: 14,
-    paddingVertical: 12,
-    fontSize: 15,
-    color: colors.text,
-    backgroundColor: colors.background,
-  },
-  inputDisabled: {
-    backgroundColor: colors.border,
-    color: colors.textMuted,
-  },
   button: {
-    backgroundColor: colors.primary,
-    borderRadius: 8,
-    paddingVertical: 14,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginTop: 10,
-  },
-  buttonDisabled: {
-    opacity: 0.6,
-  },
-  buttonText: {
-    color: colors.textOnColor,
-    fontSize: 16,
-    fontWeight: 'bold',
+    marginTop: 8,
   },
   logoutButton: {
-    backgroundColor: colors.background,
-    borderColor: colors.borderStrong,
-    borderWidth: 1,
-    borderRadius: 8,
-    paddingVertical: 12,
-    alignItems: 'center',
-    justifyContent: 'center',
     marginTop: 12,
-  },
-  logoutButtonText: {
-    color: colors.textMuted,
-    fontSize: 14,
-    fontWeight: '600',
   },
 });

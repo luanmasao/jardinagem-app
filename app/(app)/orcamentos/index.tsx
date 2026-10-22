@@ -15,11 +15,9 @@ import { useOrcamentos } from '../../../src/presentation/hooks/use-orcamentos';
 import { OrcamentoResumo } from '../../../src/domain/repositories/orcamento.repository.interface';
 import { StatusOrcamento } from '../../../src/domain/enums/status-orcamento';
 import { formatarDataCivil } from '../../../src/presentation/utils/data-formatters';
-import {
-  STATUS_FILTROS_ORCAMENTO,
-  obterBadgeStatusOrcamento,
-} from '../../../src/presentation/utils/status-orcamento.utils';
+import { STATUS_FILTROS_ORCAMENTO } from '../../../src/presentation/utils/status-orcamento.utils';
 import { colors } from '../../../src/presentation/theme';
+import { Button, StatusBadge } from '../../../src/presentation/components/ui';
 
 export default function OrcamentosListScreen() {
   const router = useRouter();
@@ -43,7 +41,6 @@ export default function OrcamentosListScreen() {
   };
 
   const renderOrcamentoItem = ({ item }: { item: OrcamentoResumo }) => {
-    const badge = obterBadgeStatusOrcamento(item.status);
     return (
       <TouchableOpacity
         style={styles.card}
@@ -57,11 +54,7 @@ export default function OrcamentosListScreen() {
               {item.clienteNome || 'Cliente não identificado'}
             </Text>
           </View>
-          <View style={[styles.statusBadge, { backgroundColor: badge.bg, borderColor: badge.border }]}>
-            <Text style={[styles.statusBadgeText, { color: badge.text }]}>
-              {badge.label}
-            </Text>
-          </View>
+          <StatusBadge status={item.status} />
         </View>
 
         <View style={styles.cardDivider} />
@@ -95,13 +88,12 @@ export default function OrcamentosListScreen() {
           <Text style={styles.headerTitle}>Orçamentos</Text>
           <Text style={styles.headerSubtitle}>Gerencie propostas e itens de orçamento</Text>
         </View>
-        <TouchableOpacity
-          style={styles.btnNovo}
-          activeOpacity={0.8}
+        <Button
+          title="+ Novo"
+          size="compact"
           onPress={() => router.push('/orcamentos/novo' as any)}
-        >
-          <Text style={styles.btnNovoText}>+ Novo</Text>
-        </TouchableOpacity>
+          accessibilityLabel="Novo orçamento"
+        />
       </View>
 
       <View style={styles.searchContainer}>
@@ -147,9 +139,7 @@ export default function OrcamentosListScreen() {
       ) : error ? (
         <View style={styles.centerContainer}>
           <Text style={styles.errorText}>{error}</Text>
-          <TouchableOpacity style={styles.retryButton} onPress={reload}>
-            <Text style={styles.retryButtonText}>Tentar Novamente</Text>
-          </TouchableOpacity>
+          <Button title="Tentar Novamente" size="compact" onPress={reload} />
         </View>
       ) : (
         <FlatList
@@ -171,12 +161,11 @@ export default function OrcamentosListScreen() {
                   : 'Crie seu primeiro orçamento para começar.'}
               </Text>
               {!searchQuery && filtroStatus === 'TODOS' ? (
-                <TouchableOpacity
-                  style={styles.emptyButton}
+                <Button
+                  title="Criar Orçamento"
+                  size="compact"
                   onPress={() => router.push('/orcamentos/novo' as any)}
-                >
-                  <Text style={styles.emptyButtonText}>Criar Orçamento</Text>
-                </TouchableOpacity>
+                />
               ) : null}
             </View>
           }
@@ -231,7 +220,7 @@ const styles = StyleSheet.create({
   },
   searchInput: {
     backgroundColor: colors.surfaceMuted,
-    borderRadius: 8,
+    borderRadius: 12,
     paddingHorizontal: 14,
     paddingVertical: 10,
     fontSize: 14,
@@ -272,7 +261,7 @@ const styles = StyleSheet.create({
   },
   card: {
     backgroundColor: colors.surface,
-    borderRadius: 12,
+    borderRadius: 18,
     padding: 16,
     marginBottom: 12,
     borderWidth: 1,

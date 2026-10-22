@@ -3,10 +3,7 @@ import {
   View,
   Text,
   StyleSheet,
-  TextInput,
-  TouchableOpacity,
   ScrollView,
-  ActivityIndicator,
   KeyboardAvoidingView,
   Platform,
   Switch,
@@ -14,6 +11,7 @@ import {
 import { useRouter } from 'expo-router';
 import { servicoService } from '../../../src/application/services/servico.service';
 import { colors } from '../../../src/presentation/theme';
+import { Button, Card, TextField } from '../../../src/presentation/components/ui';
 
 export default function NovoServicoScreen() {
   const router = useRouter();
@@ -96,36 +94,28 @@ export default function NovoServicoScreen() {
           </View>
         ) : null}
 
-        <View style={styles.sectionCard}>
+        <Card style={styles.sectionCard}>
           <Text style={styles.sectionTitle}>Dados do Serviço</Text>
 
-          <View style={styles.inputGroup}>
-            <Text style={styles.label}>
-              Nome do Serviço <Text style={styles.requiredAsterisk}>*</Text>
-            </Text>
-            <TextInput
-              style={styles.input}
-              placeholder="Ex: Corte e Poda de Grama"
-              placeholderTextColor={colors.textPlaceholder}
-              value={nome}
-              onChangeText={setNome}
-              maxLength={150}
-            />
-          </View>
+          <TextField
+            label="Nome do Serviço"
+            required
+            placeholder="Ex: Corte e Poda de Grama"
+            value={nome}
+            onChangeText={setNome}
+            maxLength={150}
+          />
 
-          <View style={styles.inputGroup}>
-            <Text style={styles.label}>Descrição Detalhada</Text>
-            <TextInput
-              style={[styles.input, styles.textArea]}
-              placeholder="Descreva o escopo e detalhes técnicos do serviço..."
-              placeholderTextColor={colors.textPlaceholder}
-              value={descricao}
-              onChangeText={setDescricao}
-              multiline
-              numberOfLines={3}
-              textAlignVertical="top"
-            />
-          </View>
+          <TextField
+            label="Descrição Detalhada"
+            style={styles.textArea}
+            placeholder="Descreva o escopo e detalhes técnicos do serviço..."
+            value={descricao}
+            onChangeText={setDescricao}
+            multiline
+            numberOfLines={3}
+            textAlignVertical="top"
+          />
 
           {/* Toggle Usa Medição de Área */}
           <View style={styles.toggleCard}>
@@ -146,49 +136,35 @@ export default function NovoServicoScreen() {
           </View>
 
           <View style={styles.row}>
-            <View style={[styles.inputGroup, { flex: 1, marginRight: 8 }]}>
-              <Text style={styles.label}>
-                Unidade <Text style={styles.requiredAsterisk}>*</Text>
-              </Text>
-              <TextInput
-                style={[styles.input, usaMedicaoArea && styles.inputDisabled]}
-                placeholder="Ex: m², un, h"
-                placeholderTextColor={colors.textPlaceholder}
-                value={unidade}
-                onChangeText={setUnidade}
-                editable={!usaMedicaoArea}
-                maxLength={20}
-              />
-            </View>
+            <TextField
+              label="Unidade"
+              required
+              containerStyle={{ flex: 1, marginRight: 8 }}
+              placeholder="Ex: m², un, h"
+              value={unidade}
+              onChangeText={setUnidade}
+              editable={!usaMedicaoArea}
+              maxLength={20}
+            />
 
-            <View style={[styles.inputGroup, { flex: 1 }]}>
-              <Text style={styles.label}>
-                Preço Base (R$) <Text style={styles.requiredAsterisk}>*</Text>
-              </Text>
-              <TextInput
-                style={styles.input}
-                placeholder="Ex: 15,50"
-                placeholderTextColor={colors.textPlaceholder}
-                value={precoBase}
-                onChangeText={setPrecoBase}
-                keyboardType="numeric"
-              />
-            </View>
+            <TextField
+              label="Preço Base (R$)"
+              required
+              containerStyle={{ flex: 1 }}
+              placeholder="Ex: 15,50"
+              value={precoBase}
+              onChangeText={setPrecoBase}
+              keyboardType="numeric"
+            />
           </View>
-        </View>
+        </Card>
 
-        <TouchableOpacity
-          style={[styles.submitButton, isSubmitting && styles.submitButtonDisabled]}
+        <Button
+          title="Cadastrar Serviço"
           onPress={handleSubmit}
-          disabled={isSubmitting}
-          activeOpacity={0.8}
-        >
-          {isSubmitting ? (
-            <ActivityIndicator color={colors.surface} />
-          ) : (
-            <Text style={styles.submitButtonText}>Cadastrar Serviço</Text>
-          )}
-        </TouchableOpacity>
+          loading={isSubmitting}
+          style={styles.submitButton}
+        />
       </ScrollView>
     </KeyboardAvoidingView>
   );
@@ -212,7 +188,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.dangerSoft,
     borderColor: colors.dangerBorder,
     borderWidth: 1,
-    borderRadius: 8,
+    borderRadius: 12,
     padding: 12,
     marginBottom: 16,
   },
@@ -226,17 +202,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   sectionCard: {
-    backgroundColor: colors.surface,
-    borderRadius: 12,
-    padding: 18,
     marginBottom: 16,
-    borderWidth: 1,
-    borderColor: colors.border,
-    shadowColor: colors.shadow,
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.05,
-    shadowRadius: 3,
-    elevation: 2,
   },
   sectionTitle: {
     fontSize: 16,
@@ -244,34 +210,8 @@ const styles = StyleSheet.create({
     color: colors.text,
     marginBottom: 14,
   },
-  inputGroup: {
-    marginBottom: 14,
-  },
-  label: {
-    fontSize: 13,
-    fontWeight: '600',
-    color: colors.textSecondary,
-    marginBottom: 6,
-  },
-  requiredAsterisk: {
-    color: colors.danger,
-  },
-  input: {
-    backgroundColor: colors.background,
-    borderWidth: 1,
-    borderColor: colors.borderStrong,
-    borderRadius: 8,
-    paddingHorizontal: 12,
-    paddingVertical: 10,
-    fontSize: 14,
-    color: colors.text,
-  },
-  inputDisabled: {
-    backgroundColor: colors.surfaceMuted,
-    color: colors.textMuted,
-  },
   textArea: {
-    minHeight: 70,
+    minHeight: 80,
   },
   row: {
     flexDirection: 'row',
@@ -281,7 +221,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     backgroundColor: colors.background,
-    borderRadius: 8,
+    borderRadius: 12,
     padding: 12,
     marginBottom: 14,
     borderWidth: 1,
@@ -303,19 +243,6 @@ const styles = StyleSheet.create({
     lineHeight: 16,
   },
   submitButton: {
-    backgroundColor: colors.primary,
-    borderRadius: 8,
-    paddingVertical: 14,
-    alignItems: 'center',
-    justifyContent: 'center',
     marginTop: 8,
-  },
-  submitButtonDisabled: {
-    opacity: 0.7,
-  },
-  submitButtonText: {
-    color: colors.textOnColor,
-    fontSize: 16,
-    fontWeight: 'bold',
   },
 });

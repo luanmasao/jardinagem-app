@@ -3,10 +3,7 @@ import {
   View,
   Text,
   StyleSheet,
-  TextInput,
-  TouchableOpacity,
   ScrollView,
-  ActivityIndicator,
   KeyboardAvoidingView,
   Platform,
   Alert,
@@ -14,6 +11,7 @@ import {
 import { useRouter } from 'expo-router';
 import { clienteService } from '../../../src/application/services/cliente.service';
 import { colors } from '../../../src/presentation/theme';
+import { Button, Card, TextField } from '../../../src/presentation/components/ui';
 
 export default function NovoClienteScreen() {
   const router = useRouter();
@@ -125,189 +123,139 @@ export default function NovoClienteScreen() {
         ) : null}
 
         {/* Seção 1: Dados Pessoais */}
-        <View style={styles.sectionCard}>
+        <Card style={styles.sectionCard}>
           <Text style={styles.sectionTitle}>Dados Principais</Text>
 
-          <View style={styles.inputGroup}>
-            <Text style={styles.label}>
-              Nome Completo <Text style={styles.requiredAsterisk}>*</Text>
-            </Text>
-            <TextInput
-              style={styles.input}
-              placeholder="Ex: Maria da Silva"
-              placeholderTextColor={colors.textPlaceholder}
-              value={nome}
-              onChangeText={setNome}
-              maxLength={150}
-              autoCapitalize="words"
-            />
-          </View>
+          <TextField
+            label="Nome Completo"
+            required
+            placeholder="Ex: Maria da Silva"
+            value={nome}
+            onChangeText={setNome}
+            maxLength={150}
+            autoCapitalize="words"
+          />
 
-          <View style={styles.inputGroup}>
-            <Text style={styles.label}>Telefone / WhatsApp</Text>
-            <TextInput
-              style={styles.input}
-              placeholder="Ex: (11) 98888-7777"
-              placeholderTextColor={colors.textPlaceholder}
-              value={telefone}
-              onChangeText={setTelefone}
-              maxLength={30}
-              keyboardType="phone-pad"
-            />
-          </View>
+          <TextField
+            label="Telefone / WhatsApp"
+            placeholder="Ex: (11) 98888-7777"
+            value={telefone}
+            onChangeText={setTelefone}
+            maxLength={30}
+            keyboardType="phone-pad"
+          />
 
-          <View style={styles.inputGroup}>
-            <Text style={styles.label}>E-mail</Text>
-            <TextInput
-              style={styles.input}
-              placeholder="Ex: cliente@email.com"
-              placeholderTextColor={colors.textPlaceholder}
-              value={email}
-              onChangeText={setEmail}
-              maxLength={255}
-              keyboardType="email-address"
-              autoCapitalize="none"
-            />
-          </View>
+          <TextField
+            label="E-mail"
+            placeholder="Ex: cliente@email.com"
+            value={email}
+            onChangeText={setEmail}
+            maxLength={255}
+            keyboardType="email-address"
+            autoCapitalize="none"
+          />
 
-          <View style={styles.inputGroup}>
-            <Text style={styles.label}>Documento (CPF / CNPJ)</Text>
-            <TextInput
-              style={styles.input}
-              placeholder="Ex: 123.456.789-00"
-              placeholderTextColor={colors.textPlaceholder}
-              value={documento}
-              onChangeText={setDocumento}
-              maxLength={30}
-            />
-          </View>
+          <TextField
+            label="Documento (CPF / CNPJ)"
+            placeholder="Ex: 123.456.789-00"
+            value={documento}
+            onChangeText={setDocumento}
+            maxLength={30}
+          />
 
-          <View style={styles.inputGroup}>
-            <Text style={styles.label}>Observações</Text>
-            <TextInput
-              style={[styles.input, styles.textArea]}
-              placeholder="Notas gerais sobre o cliente ou preferências..."
-              placeholderTextColor={colors.textPlaceholder}
-              value={observacoes}
-              onChangeText={setObservacoes}
-              multiline
-              numberOfLines={3}
-              textAlignVertical="top"
-            />
-          </View>
-        </View>
+          <TextField
+            label="Observações"
+            style={styles.textArea}
+            placeholder="Notas gerais sobre o cliente ou preferências..."
+            value={observacoes}
+            onChangeText={setObservacoes}
+            multiline
+            numberOfLines={3}
+            textAlignVertical="top"
+          />
+        </Card>
 
         {/* Seção 2: Endereço (Opcional) */}
-        <View style={styles.sectionCard}>
+        <Card style={styles.sectionCard}>
           <Text style={styles.sectionTitle}>Endereço (Opcional)</Text>
           <Text style={styles.sectionSubtitle}>
             Localização física para referência e atendimento do cliente.
           </Text>
 
           <View style={styles.row}>
-            <View style={[styles.inputGroup, { flex: 1, marginRight: 8 }]}>
-              <Text style={styles.label}>CEP</Text>
-              <TextInput
-                style={styles.input}
-                placeholder="00000-000"
-                placeholderTextColor={colors.textPlaceholder}
-                value={cep}
-                onChangeText={setCep}
-                maxLength={10}
-                keyboardType="numeric"
-              />
-            </View>
+            <TextField
+              label="CEP"
+              containerStyle={{ flex: 1, marginRight: 8 }}
+              placeholder="00000-000"
+              value={cep}
+              onChangeText={setCep}
+              maxLength={10}
+              keyboardType="numeric"
+            />
 
-            <View style={[styles.inputGroup, { flex: 1 }]}>
-              <Text style={styles.label}>Estado (UF)</Text>
-              <TextInput
-                style={styles.input}
-                placeholder="SP"
-                placeholderTextColor={colors.textPlaceholder}
-                value={estado}
-                onChangeText={setEstado}
-                maxLength={2}
-                autoCapitalize="characters"
-              />
-            </View>
-          </View>
-
-          <View style={styles.inputGroup}>
-            <Text style={styles.label}>Cidade</Text>
-            <TextInput
-              style={styles.input}
-              placeholder="Ex: São Paulo"
-              placeholderTextColor={colors.textPlaceholder}
-              value={cidade}
-              onChangeText={setCidade}
-              maxLength={100}
+            <TextField
+              label="Estado (UF)"
+              containerStyle={{ flex: 1 }}
+              placeholder="SP"
+              value={estado}
+              onChangeText={setEstado}
+              maxLength={2}
+              autoCapitalize="characters"
             />
           </View>
 
-          <View style={styles.inputGroup}>
-            <Text style={styles.label}>Bairro</Text>
-            <TextInput
-              style={styles.input}
-              placeholder="Ex: Jardim Paulista"
-              placeholderTextColor={colors.textPlaceholder}
-              value={bairro}
-              onChangeText={setBairro}
-              maxLength={100}
-            />
-          </View>
+          <TextField
+            label="Cidade"
+            placeholder="Ex: São Paulo"
+            value={cidade}
+            onChangeText={setCidade}
+            maxLength={100}
+          />
+
+          <TextField
+            label="Bairro"
+            placeholder="Ex: Jardim Paulista"
+            value={bairro}
+            onChangeText={setBairro}
+            maxLength={100}
+          />
 
           <View style={styles.row}>
-            <View style={[styles.inputGroup, { flex: 2, marginRight: 8 }]}>
-              <Text style={styles.label}>Logradouro (Rua / Av.)</Text>
-              <TextInput
-                style={styles.input}
-                placeholder="Ex: Rua das Flores"
-                placeholderTextColor={colors.textPlaceholder}
-                value={logradouro}
-                onChangeText={setLogradouro}
-                maxLength={200}
-              />
-            </View>
+            <TextField
+              label="Logradouro (Rua / Av.)"
+              containerStyle={{ flex: 2, marginRight: 8 }}
+              placeholder="Ex: Rua das Flores"
+              value={logradouro}
+              onChangeText={setLogradouro}
+              maxLength={200}
+            />
 
-            <View style={[styles.inputGroup, { flex: 1 }]}>
-              <Text style={styles.label}>Número</Text>
-              <TextInput
-                style={styles.input}
-                placeholder="123"
-                placeholderTextColor={colors.textPlaceholder}
-                value={numero}
-                onChangeText={setNumero}
-                maxLength={20}
-              />
-            </View>
-          </View>
-
-          <View style={styles.inputGroup}>
-            <Text style={styles.label}>Complemento</Text>
-            <TextInput
-              style={styles.input}
-              placeholder="Ex: Casa 2 / Bloco B"
-              placeholderTextColor={colors.textPlaceholder}
-              value={complemento}
-              onChangeText={setComplemento}
-              maxLength={100}
+            <TextField
+              label="Número"
+              containerStyle={{ flex: 1 }}
+              placeholder="123"
+              value={numero}
+              onChangeText={setNumero}
+              maxLength={20}
             />
           </View>
-        </View>
+
+          <TextField
+            label="Complemento"
+            placeholder="Ex: Casa 2 / Bloco B"
+            value={complemento}
+            onChangeText={setComplemento}
+            maxLength={100}
+          />
+        </Card>
 
         {/* Botão de Envio */}
-        <TouchableOpacity
-          style={[styles.submitButton, isSubmitting && styles.submitButtonDisabled]}
+        <Button
+          title="Cadastrar Cliente"
           onPress={handleSubmit}
-          disabled={isSubmitting}
-          activeOpacity={0.8}
-        >
-          {isSubmitting ? (
-            <ActivityIndicator color={colors.surface} />
-          ) : (
-            <Text style={styles.submitButtonText}>Cadastrar Cliente</Text>
-          )}
-        </TouchableOpacity>
+          loading={isSubmitting}
+          style={styles.submitButton}
+        />
       </ScrollView>
     </KeyboardAvoidingView>
   );
@@ -331,7 +279,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.dangerSoft,
     borderColor: colors.dangerBorder,
     borderWidth: 1,
-    borderRadius: 8,
+    borderRadius: 12,
     padding: 12,
     marginBottom: 16,
   },
@@ -345,17 +293,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   sectionCard: {
-    backgroundColor: colors.surface,
-    borderRadius: 12,
-    padding: 18,
     marginBottom: 16,
-    borderWidth: 1,
-    borderColor: colors.border,
-    shadowColor: colors.shadow,
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.05,
-    shadowRadius: 3,
-    elevation: 2,
   },
   sectionTitle: {
     fontSize: 16,
@@ -368,48 +306,13 @@ const styles = StyleSheet.create({
     color: colors.textMuted,
     marginBottom: 14,
   },
-  inputGroup: {
-    marginBottom: 14,
-  },
-  label: {
-    fontSize: 13,
-    fontWeight: '600',
-    color: colors.textSecondary,
-    marginBottom: 6,
-  },
-  requiredAsterisk: {
-    color: colors.danger,
-  },
-  input: {
-    backgroundColor: colors.background,
-    borderWidth: 1,
-    borderColor: colors.borderStrong,
-    borderRadius: 8,
-    paddingHorizontal: 12,
-    paddingVertical: 10,
-    fontSize: 14,
-    color: colors.text,
-  },
   textArea: {
-    minHeight: 70,
+    minHeight: 80,
   },
   row: {
     flexDirection: 'row',
   },
   submitButton: {
-    backgroundColor: colors.primary,
-    borderRadius: 8,
-    paddingVertical: 14,
-    alignItems: 'center',
-    justifyContent: 'center',
     marginTop: 8,
-  },
-  submitButtonDisabled: {
-    opacity: 0.7,
-  },
-  submitButtonText: {
-    color: colors.textOnColor,
-    fontSize: 16,
-    fontWeight: 'bold',
   },
 });
