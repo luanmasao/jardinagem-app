@@ -2,6 +2,7 @@ import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
 import { useAuth } from '../../src/presentation/contexts/auth-context';
 import { useRouter } from 'expo-router';
+import { colors } from '../../src/presentation/theme';
 
 const MODULOS = [
   {
@@ -46,10 +47,10 @@ export default function HomeScreen() {
           </Text>
           <View style={styles.warningActions}>
             <TouchableOpacity
-              style={[styles.secondaryButton, { backgroundColor: '#15803d', marginRight: 8 }]}
+              style={[styles.secondaryButton, { backgroundColor: colors.primary, marginRight: 8 }]}
               onPress={() => router.push('/concluir-perfil')}
             >
-              <Text style={[styles.secondaryButtonText, { color: '#ffffff', fontWeight: 'bold' }]}>
+              <Text style={[styles.secondaryButtonText, { color: colors.textOnColor, fontWeight: 'bold' }]}>
                 Concluir Meu Perfil
               </Text>
             </TouchableOpacity>
@@ -82,15 +83,15 @@ export default function HomeScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f8fafc',
+    backgroundColor: colors.background,
   },
   content: {
     padding: 20,
     paddingBottom: 30,
   },
   welcomeBanner: {
-    backgroundColor: '#ecfdf5',
-    borderColor: '#a7f3d0',
+    backgroundColor: colors.primarySubtle,
+    borderColor: colors.primaryBorder,
     borderWidth: 1,
     borderRadius: 12,
     padding: 16,
@@ -99,11 +100,11 @@ const styles = StyleSheet.create({
   welcomeTitle: {
     fontSize: 20,
     fontWeight: 'bold',
-    color: '#065f46',
+    color: colors.primaryDark,
   },
   warningCard: {
-    backgroundColor: '#fffbeb',
-    borderColor: '#fcd34d',
+    backgroundColor: colors.warningSoft,
+    borderColor: colors.warningBorder,
     borderWidth: 1,
     borderRadius: 12,
     padding: 16,
@@ -111,7 +112,7 @@ const styles = StyleSheet.create({
   },
   warningText: {
     fontSize: 13,
-    color: '#92400e',
+    color: colors.warning,
     marginBottom: 12,
   },
   warningActions: {
@@ -119,11 +120,11 @@ const styles = StyleSheet.create({
     flexWrap: 'wrap',
   },
   card: {
-    backgroundColor: '#ffffff',
+    backgroundColor: colors.surface,
     borderRadius: 12,
     padding: 18,
     marginBottom: 16,
-    shadowColor: '#000',
+    shadowColor: colors.shadow,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.05,
     shadowRadius: 6,
@@ -132,16 +133,16 @@ const styles = StyleSheet.create({
   cardTitle: {
     fontSize: 16,
     fontWeight: '700',
-    color: '#1e293b',
+    color: colors.text,
     marginBottom: 6,
   },
   cardDescription: {
     fontSize: 13,
-    color: '#475569',
+    color: colors.textSecondary,
     marginBottom: 14,
   },
   primaryButton: {
-    backgroundColor: '#15803d',
+    backgroundColor: colors.primary,
     borderRadius: 8,
     paddingVertical: 12,
     paddingHorizontal: 16,
@@ -150,24 +151,24 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   primaryButtonText: {
-    color: '#ffffff',
+    color: colors.textOnColor,
     fontSize: 15,
     fontWeight: 'bold',
   },
   primaryButtonArrow: {
-    color: '#ffffff',
+    color: colors.textOnColor,
     fontSize: 18,
     fontWeight: 'bold',
   },
   secondaryButton: {
     paddingHorizontal: 14,
     paddingVertical: 8,
-    backgroundColor: '#e2e8f0',
+    backgroundColor: colors.border,
     borderRadius: 6,
   },
   secondaryButtonText: {
     fontSize: 13,
-    color: '#334155',
+    color: colors.textSecondary,
     fontWeight: '600',
   },
 });

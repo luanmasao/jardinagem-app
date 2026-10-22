@@ -12,6 +12,7 @@ import {
 import { useRouter } from 'expo-router';
 import { useServicos } from '../../../src/presentation/hooks/use-servicos';
 import { Servico } from '../../../src/domain/entities/servico';
+import { colors } from '../../../src/presentation/theme';
 
 export default function ServicosListScreen() {
   const router = useRouter();
@@ -88,7 +89,7 @@ export default function ServicosListScreen() {
           <TextInput
             style={styles.searchInput}
             placeholder="Buscar por nome ou descrição..."
-            placeholderTextColor="#94a3b8"
+            placeholderTextColor={colors.textPlaceholder}
             value={searchQuery}
             onChangeText={setSearchQuery}
             clearButtonMode="while-editing"
@@ -112,7 +113,7 @@ export default function ServicosListScreen() {
       {/* Conteúdo Principal: Loading, Erro, Vazio ou Lista */}
       {isLoading && filteredServicos.length === 0 ? (
         <View style={styles.centerContainer}>
-          <ActivityIndicator size="large" color="#15803d" />
+          <ActivityIndicator size="large" color={colors.primary} />
           <Text style={styles.loadingText}>Carregando serviços...</Text>
         </View>
       ) : error ? (
@@ -157,8 +158,8 @@ export default function ServicosListScreen() {
             <RefreshControl
               refreshing={isLoading}
               onRefresh={reload}
-              colors={['#15803d']}
-              tintColor="#15803d"
+              colors={[colors.primary]}
+              tintColor={colors.primary}
             />
           }
         />
@@ -170,23 +171,23 @@ export default function ServicosListScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f8fafc',
+    backgroundColor: colors.background,
   },
   headerContainer: {
     flexDirection: 'row',
     alignItems: 'center',
     paddingHorizontal: 16,
     paddingVertical: 12,
-    backgroundColor: '#ffffff',
+    backgroundColor: colors.surface,
     borderBottomWidth: 1,
-    borderBottomColor: '#e2e8f0',
+    borderBottomColor: colors.border,
     gap: 10,
   },
   searchBar: {
     flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#f1f5f9',
+    backgroundColor: colors.surfaceMuted,
     borderRadius: 8,
     paddingHorizontal: 12,
     height: 42,
@@ -198,16 +199,16 @@ const styles = StyleSheet.create({
   searchInput: {
     flex: 1,
     fontSize: 14,
-    color: '#1e293b',
+    color: colors.text,
     paddingVertical: 0,
   },
   clearSearchText: {
     fontSize: 14,
-    color: '#64748b',
+    color: colors.textMuted,
     paddingHorizontal: 4,
   },
   novoButton: {
-    backgroundColor: '#15803d',
+    backgroundColor: colors.primary,
     paddingHorizontal: 14,
     height: 42,
     borderRadius: 8,
@@ -215,7 +216,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   novoButtonText: {
-    color: '#ffffff',
+    color: colors.textOnColor,
     fontSize: 14,
     fontWeight: 'bold',
   },
@@ -223,17 +224,17 @@ const styles = StyleSheet.create({
     padding: 16,
   },
   card: {
-    backgroundColor: '#ffffff',
+    backgroundColor: colors.surface,
     borderRadius: 10,
     padding: 16,
     marginBottom: 12,
-    shadowColor: '#000',
+    shadowColor: colors.shadow,
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.05,
     shadowRadius: 3,
     elevation: 2,
     borderWidth: 1,
-    borderColor: '#e2e8f0',
+    borderColor: colors.border,
   },
   cardHeader: {
     flexDirection: 'row',
@@ -244,7 +245,7 @@ const styles = StyleSheet.create({
   servicoNome: {
     fontSize: 16,
     fontWeight: '700',
-    color: '#1e293b',
+    color: colors.text,
     flex: 1,
     marginRight: 8,
   },
@@ -254,24 +255,24 @@ const styles = StyleSheet.create({
     borderRadius: 6,
   },
   badgeAtivo: {
-    backgroundColor: '#dcfce7',
+    backgroundColor: colors.primarySoft,
   },
   badgeInativo: {
-    backgroundColor: '#fee2e2',
+    backgroundColor: colors.dangerSoft,
   },
   statusText: {
     fontSize: 11,
     fontWeight: '600',
   },
   statusTextAtivo: {
-    color: '#166534',
+    color: colors.primaryDark,
   },
   statusTextInativo: {
-    color: '#b91c1c',
+    color: colors.danger,
   },
   servicoDescricao: {
     fontSize: 13,
-    color: '#475569',
+    color: colors.textSecondary,
     marginBottom: 10,
     lineHeight: 18,
   },
@@ -282,7 +283,7 @@ const styles = StyleSheet.create({
     marginTop: 4,
   },
   badgeUnidade: {
-    backgroundColor: '#e0f2fe',
+    backgroundColor: colors.infoSoft,
     paddingHorizontal: 8,
     paddingVertical: 3,
     borderRadius: 4,
@@ -290,10 +291,10 @@ const styles = StyleSheet.create({
   unidadeText: {
     fontSize: 12,
     fontWeight: '600',
-    color: '#0369a1',
+    color: colors.info,
   },
   badgeArea: {
-    backgroundColor: '#fef3c7',
+    backgroundColor: colors.warningSoft,
     paddingHorizontal: 8,
     paddingVertical: 3,
     borderRadius: 4,
@@ -302,12 +303,12 @@ const styles = StyleSheet.create({
   areaText: {
     fontSize: 11,
     fontWeight: '600',
-    color: '#b45309',
+    color: colors.warning,
   },
   precoText: {
     fontSize: 15,
     fontWeight: '700',
-    color: '#15803d',
+    color: colors.primary,
     marginLeft: 'auto',
   },
   centerContainer: {
@@ -319,7 +320,7 @@ const styles = StyleSheet.create({
   loadingText: {
     marginTop: 12,
     fontSize: 14,
-    color: '#64748b',
+    color: colors.textMuted,
   },
   errorIcon: {
     fontSize: 36,
@@ -328,23 +329,23 @@ const styles = StyleSheet.create({
   errorTitle: {
     fontSize: 16,
     fontWeight: 'bold',
-    color: '#b91c1c',
+    color: colors.danger,
     marginBottom: 4,
   },
   errorMessage: {
     fontSize: 13,
-    color: '#64748b',
+    color: colors.textMuted,
     textAlign: 'center',
     marginBottom: 16,
   },
   retryButton: {
-    backgroundColor: '#15803d',
+    backgroundColor: colors.primary,
     paddingHorizontal: 16,
     paddingVertical: 10,
     borderRadius: 8,
   },
   retryButtonText: {
-    color: '#ffffff',
+    color: colors.textOnColor,
     fontSize: 14,
     fontWeight: '600',
   },
@@ -355,25 +356,25 @@ const styles = StyleSheet.create({
   emptyTitle: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: '#334155',
+    color: colors.textSecondary,
     marginBottom: 6,
     textAlign: 'center',
   },
   emptySubtitle: {
     fontSize: 13,
-    color: '#64748b',
+    color: colors.textMuted,
     textAlign: 'center',
     marginBottom: 20,
     maxWidth: 280,
   },
   cadastrarButton: {
-    backgroundColor: '#15803d',
+    backgroundColor: colors.primary,
     paddingHorizontal: 20,
     paddingVertical: 12,
     borderRadius: 8,
   },
   cadastrarButtonText: {
-    color: '#ffffff',
+    color: colors.textOnColor,
     fontSize: 14,
     fontWeight: 'bold',
   },

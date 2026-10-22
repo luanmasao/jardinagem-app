@@ -9,6 +9,7 @@ import {
 } from 'react-native';
 import { useAuth } from '../../src/presentation/contexts/auth-context';
 import { useRouter } from 'expo-router';
+import { colors } from '../../src/presentation/theme';
 
 export default function PerfilScreen() {
   const router = useRouter();
@@ -19,7 +20,7 @@ export default function PerfilScreen() {
       <View style={styles.card}>
         {isLoading ? (
           <View style={styles.loadingContainer}>
-            <ActivityIndicator color="#15803d" />
+            <ActivityIndicator color={colors.primary} />
             <Text style={styles.loadingText}>Carregando seus dados...</Text>
           </View>
         ) : perfil ? (
@@ -50,10 +51,10 @@ export default function PerfilScreen() {
           <View style={styles.emptyContainer}>
             <Text style={styles.emptyText}>Não foi possível carregar seus dados.</Text>
             <TouchableOpacity
-              style={[styles.secondaryButton, { backgroundColor: '#15803d', marginBottom: 8 }]}
+              style={[styles.secondaryButton, { backgroundColor: colors.primary, marginBottom: 8 }]}
               onPress={() => router.push('/concluir-perfil')}
             >
-              <Text style={[styles.secondaryButtonText, { color: '#ffffff', fontWeight: 'bold' }]}>
+              <Text style={[styles.secondaryButtonText, { color: colors.textOnColor, fontWeight: 'bold' }]}>
                 Concluir Meu Perfil
               </Text>
             </TouchableOpacity>
@@ -87,17 +88,17 @@ export default function PerfilScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f8fafc',
+    backgroundColor: colors.background,
   },
   content: {
     padding: 20,
   },
   card: {
-    backgroundColor: '#ffffff',
+    backgroundColor: colors.surface,
     borderRadius: 12,
     padding: 18,
     marginBottom: 16,
-    shadowColor: '#000',
+    shadowColor: colors.shadow,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.05,
     shadowRadius: 6,
@@ -109,19 +110,19 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingVertical: 10,
     borderBottomWidth: 1,
-    borderBottomColor: '#f1f5f9',
+    borderBottomColor: colors.surfaceMuted,
   },
   lastRow: {
     borderBottomWidth: 0,
   },
   label: {
     fontSize: 13,
-    color: '#64748b',
+    color: colors.textMuted,
     fontWeight: '500',
   },
   value: {
     fontSize: 13,
-    color: '#0f172a',
+    color: colors.text,
     fontWeight: '600',
     flexShrink: 1,
     textAlign: 'right',
@@ -134,7 +135,7 @@ const styles = StyleSheet.create({
   loadingText: {
     marginTop: 8,
     fontSize: 12,
-    color: '#64748b',
+    color: colors.textMuted,
   },
   emptyContainer: {
     paddingVertical: 16,
@@ -142,19 +143,19 @@ const styles = StyleSheet.create({
   },
   emptyText: {
     fontSize: 13,
-    color: '#64748b',
+    color: colors.textMuted,
     textAlign: 'center',
     marginBottom: 12,
   },
   secondaryButton: {
     paddingHorizontal: 14,
     paddingVertical: 8,
-    backgroundColor: '#e2e8f0',
+    backgroundColor: colors.border,
     borderRadius: 6,
   },
   secondaryButtonText: {
     fontSize: 13,
-    color: '#334155',
+    color: colors.textSecondary,
     fontWeight: '600',
   },
   actions: {
@@ -162,27 +163,27 @@ const styles = StyleSheet.create({
     marginBottom: 30,
   },
   refreshButton: {
-    backgroundColor: '#e2e8f0',
+    backgroundColor: colors.border,
     borderRadius: 8,
     paddingVertical: 14,
     alignItems: 'center',
     marginBottom: 10,
   },
   refreshButtonText: {
-    color: '#1e293b',
+    color: colors.text,
     fontSize: 15,
     fontWeight: '600',
   },
   logoutButton: {
-    backgroundColor: '#fee2e2',
-    borderColor: '#fca5a5',
+    backgroundColor: colors.dangerSoft,
+    borderColor: colors.dangerBorder,
     borderWidth: 1,
     borderRadius: 8,
     paddingVertical: 14,
     alignItems: 'center',
   },
   logoutButtonText: {
-    color: '#b91c1c',
+    color: colors.danger,
     fontSize: 15,
     fontWeight: 'bold',
   },

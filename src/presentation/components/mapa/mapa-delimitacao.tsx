@@ -18,6 +18,7 @@ import { RegiaoMapa } from '../../../infrastructure/maps/map-provider.interface'
 import { useMapaDelimitacao } from '../../hooks/use-mapa-delimitacao';
 import { usePesquisaEndereco } from '../../hooks/use-pesquisa-endereco';
 import { GeometriaPoligono } from '../../../domain/types/geometria';
+import { colors } from '../../theme';
 
 interface MapaDelimitacaoProps {
   regiaoInicial?: RegiaoMapa;
@@ -146,7 +147,7 @@ export const MapaDelimitacao: React.FC<MapaDelimitacaoProps> = ({
           <TextInput
             style={styles.searchBarInput}
             placeholder="Buscar endereço, rua, bairro..."
-            placeholderTextColor="#9E9E9E"
+            placeholderTextColor={colors.textPlaceholder}
             value={textoBusca}
             onChangeText={setTextoBusca}
             returnKeyType="search"
@@ -174,7 +175,7 @@ export const MapaDelimitacao: React.FC<MapaDelimitacaoProps> = ({
             activeOpacity={0.7}
           >
             {pesquisandoEndereco ? (
-              <ActivityIndicator size="small" color="#FFFFFF" />
+              <ActivityIndicator size="small" color={colors.surface} />
             ) : (
               <Text style={styles.btnSearchText}>🔍</Text>
             )}
@@ -269,7 +270,7 @@ export const MapaDelimitacao: React.FC<MapaDelimitacaoProps> = ({
                 <TextInput
                   style={styles.textInput}
                   placeholder="Ex: Gramado Frontal, Jardim Lateral"
-                  placeholderTextColor="#9E9E9E"
+                  placeholderTextColor={colors.textPlaceholder}
                   value={nome}
                   onChangeText={setNome}
                 />
@@ -280,7 +281,7 @@ export const MapaDelimitacao: React.FC<MapaDelimitacaoProps> = ({
                 <TextInput
                   style={[styles.textInput, styles.textArea]}
                   placeholder="Ex: Terreno plano, terra boa"
-                  placeholderTextColor="#9E9E9E"
+                  placeholderTextColor={colors.textPlaceholder}
                   value={observacoes}
                   onChangeText={setObservacoes}
                   multiline
@@ -303,7 +304,7 @@ export const MapaDelimitacao: React.FC<MapaDelimitacaoProps> = ({
                   disabled={salvando}
                 >
                   {salvando ? (
-                    <ActivityIndicator color="#FFFFFF" />
+                    <ActivityIndicator color={colors.surface} />
                   ) : (
                     <Text style={styles.modalBtnSalvarText}>Salvar Área</Text>
                   )}
@@ -320,7 +321,7 @@ export const MapaDelimitacao: React.FC<MapaDelimitacaoProps> = ({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#000000',
+    backgroundColor: colors.black,
   },
   topOverlay: {
     position: 'absolute',
@@ -343,7 +344,7 @@ const styles = StyleSheet.create({
     borderColor: 'rgba(255, 255, 255, 0.3)',
   },
   btnVoltarTopText: {
-    color: '#FFFFFF',
+    color: colors.textOnColor,
     fontWeight: 'bold',
     fontSize: 13,
   },
@@ -356,7 +357,7 @@ const styles = StyleSheet.create({
     borderColor: 'rgba(255, 255, 255, 0.3)',
   },
   btnModoMapaText: {
-    color: '#FFFFFF',
+    color: colors.textOnColor,
     fontWeight: 'bold',
     fontSize: 13,
   },
@@ -368,7 +369,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     paddingVertical: Platform.OS === 'ios' ? 8 : 4,
     marginBottom: 8,
-    shadowColor: '#000',
+    shadowColor: colors.shadow,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.25,
     shadowRadius: 3,
@@ -377,7 +378,7 @@ const styles = StyleSheet.create({
   searchBarInput: {
     flex: 1,
     fontSize: 14,
-    color: '#212121',
+    color: colors.text,
     paddingVertical: 6,
     paddingHorizontal: 4,
   },
@@ -386,12 +387,12 @@ const styles = StyleSheet.create({
     paddingVertical: 4,
   },
   btnSearchClearText: {
-    color: '#757575',
+    color: colors.textMuted,
     fontSize: 14,
     fontWeight: 'bold',
   },
   btnSearch: {
-    backgroundColor: '#2E7D32',
+    backgroundColor: colors.primary,
     width: 36,
     height: 36,
     borderRadius: 8,
@@ -400,7 +401,7 @@ const styles = StyleSheet.create({
     marginLeft: 6,
   },
   btnSearchDisabled: {
-    backgroundColor: '#9E9E9E',
+    backgroundColor: colors.textPlaceholder,
     opacity: 0.6,
   },
   btnSearchText: {
@@ -410,7 +411,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(255, 255, 255, 0.95)',
     borderRadius: 12,
     padding: 14,
-    shadowColor: '#000',
+    shadowColor: colors.shadow,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.3,
     shadowRadius: 4,
@@ -424,35 +425,35 @@ const styles = StyleSheet.create({
   },
   feedbackLabel: {
     fontSize: 12,
-    color: '#616161',
+    color: colors.textMuted,
     fontWeight: '500',
   },
   feedbackValor: {
     fontSize: 22,
     fontWeight: 'bold',
-    color: '#2E7D32',
+    color: colors.primary,
   },
   verticeBadge: {
-    backgroundColor: '#E8F5E9',
+    backgroundColor: colors.primarySoft,
     paddingHorizontal: 10,
     paddingVertical: 4,
     borderRadius: 12,
     borderWidth: 1,
-    borderColor: '#A5D6A7',
+    borderColor: colors.primaryBorder,
   },
   verticeBadgeText: {
     fontSize: 12,
     fontWeight: 'bold',
-    color: '#2E7D32',
+    color: colors.primary,
   },
   dicaText: {
     fontSize: 12,
-    color: '#757575',
+    color: colors.textMuted,
     marginTop: 2,
   },
   dicaSucessoText: {
     fontSize: 12,
-    color: '#2E7D32',
+    color: colors.primary,
     fontWeight: '600',
     marginTop: 2,
   },
@@ -480,37 +481,37 @@ const styles = StyleSheet.create({
     opacity: 0.4,
   },
   btnToolText: {
-    color: '#FFFFFF',
+    color: colors.textOnColor,
     fontWeight: '600',
     fontSize: 13,
   },
   btnToolTextDisabled: {
-    color: '#BDBDBD',
+    color: colors.borderStrong,
   },
   btnConcluir: {
     flex: 1,
-    backgroundColor: '#2E7D32',
+    backgroundColor: colors.primary,
     paddingVertical: 14,
     paddingHorizontal: 16,
     borderRadius: 10,
     alignItems: 'center',
-    shadowColor: '#000',
+    shadowColor: colors.shadow,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.3,
     shadowRadius: 3,
     elevation: 4,
   },
   btnConcluirDisabled: {
-    backgroundColor: '#9E9E9E',
+    backgroundColor: colors.textPlaceholder,
     opacity: 0.6,
   },
   btnConcluirText: {
-    color: '#FFFFFF',
+    color: colors.textOnColor,
     fontWeight: 'bold',
     fontSize: 14,
   },
   btnConcluirTextDisabled: {
-    color: '#E0E0E0',
+    color: colors.border,
   },
   modalOverlay: {
     flex: 1,
@@ -520,13 +521,13 @@ const styles = StyleSheet.create({
     padding: 20,
   },
   modalContent: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: colors.surface,
     borderRadius: 16,
     padding: 20,
     width: '100%',
     maxWidth: 400,
     maxHeight: '90%',
-    shadowColor: '#000',
+    shadowColor: colors.shadow,
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.3,
     shadowRadius: 6,
@@ -538,16 +539,16 @@ const styles = StyleSheet.create({
   modalTitulo: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: '#212121',
+    color: colors.text,
     marginBottom: 4,
   },
   modalSubtitulo: {
     fontSize: 14,
-    color: '#616161',
+    color: colors.textMuted,
     marginBottom: 16,
   },
   modalDestaque: {
-    color: '#2E7D32',
+    color: colors.primary,
     fontWeight: 'bold',
   },
   inputGroup: {
@@ -556,18 +557,18 @@ const styles = StyleSheet.create({
   inputLabel: {
     fontSize: 13,
     fontWeight: '600',
-    color: '#424242',
+    color: colors.textSecondary,
     marginBottom: 6,
   },
   textInput: {
     borderWidth: 1,
-    borderColor: '#E0E0E0',
+    borderColor: colors.border,
     borderRadius: 8,
     paddingHorizontal: 12,
     paddingVertical: 10,
     fontSize: 14,
-    color: '#212121',
-    backgroundColor: '#FAFAFA',
+    color: colors.text,
+    backgroundColor: colors.surfaceSubtle,
   },
   textArea: {
     height: 70,
@@ -585,18 +586,18 @@ const styles = StyleSheet.create({
     borderRadius: 8,
   },
   modalBtnCancelarText: {
-    color: '#757575',
+    color: colors.textMuted,
     fontWeight: 'bold',
     fontSize: 14,
   },
   modalBtnSalvar: {
-    backgroundColor: '#2E7D32',
+    backgroundColor: colors.primary,
     paddingVertical: 10,
     paddingHorizontal: 20,
     borderRadius: 8,
   },
   modalBtnSalvarText: {
-    color: '#FFFFFF',
+    color: colors.textOnColor,
     fontWeight: 'bold',
     fontSize: 14,
   },

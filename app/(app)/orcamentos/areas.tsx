@@ -15,6 +15,7 @@ import { supabaseItemOrcamentoRepository } from '../../../src/infrastructure/rep
 import { clienteService } from '../../../src/application/services/cliente.service';
 import { StatusOrcamento } from '../../../src/domain/enums/status-orcamento';
 import { ItemOrcamento } from '../../../src/domain/entities/item-orcamento';
+import { colors } from '../../../src/presentation/theme';
 
 const formatarMoeda = (valor: number): string => `R$ ${valor.toFixed(2).replace('.', ',')}`;
 
@@ -160,7 +161,7 @@ export default function AreasItemScreen() {
   if (carregandoItem || loadingAreas) {
     return (
       <View style={styles.centerContainer}>
-        <ActivityIndicator size="large" color="#2E7D32" />
+        <ActivityIndicator size="large" color={colors.primary} />
         <Text style={styles.loadingText}>Carregando áreas do item...</Text>
       </View>
     );
@@ -277,59 +278,59 @@ export default function AreasItemScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F5F5F5',
+    backgroundColor: colors.surfaceMuted,
   },
   centerContainer: {
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
     padding: 20,
-    backgroundColor: '#F5F5F5',
+    backgroundColor: colors.surfaceMuted,
   },
   loadingText: {
     marginTop: 10,
     fontSize: 14,
-    color: '#616161',
+    color: colors.textMuted,
   },
   headerCard: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: colors.surface,
     margin: 16,
     padding: 16,
     borderRadius: 12,
     borderWidth: 1,
-    borderColor: '#E0E0E0',
+    borderColor: colors.border,
     elevation: 2,
-    shadowColor: '#000',
+    shadowColor: colors.shadow,
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.1,
     shadowRadius: 3,
   },
   tipoBadge: {
     alignSelf: 'flex-start',
-    backgroundColor: '#E8F5E9',
+    backgroundColor: colors.primarySoft,
     paddingHorizontal: 8,
     paddingVertical: 3,
     borderRadius: 6,
     marginBottom: 6,
   },
   tipoBadgeText: {
-    color: '#2E7D32',
+    color: colors.primary,
     fontSize: 11,
     fontWeight: 'bold',
   },
   itemDescricao: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: '#212121',
+    color: colors.text,
   },
   itemPrecoBase: {
     fontSize: 13,
-    color: '#757575',
+    color: colors.textMuted,
     marginTop: 2,
   },
   resumoDivider: {
     height: 1,
-    backgroundColor: '#EEEEEE',
+    backgroundColor: colors.border,
     marginVertical: 12,
   },
   resumoMetragemRow: {
@@ -339,18 +340,18 @@ const styles = StyleSheet.create({
   },
   resumoLabel: {
     fontSize: 12,
-    color: '#757575',
+    color: colors.textMuted,
     marginBottom: 2,
   },
   resumoValorMetragem: {
     fontSize: 20,
     fontWeight: 'bold',
-    color: '#2E7D32',
+    color: colors.primary,
   },
   resumoValorFinanceiro: {
     fontSize: 20,
     fontWeight: 'bold',
-    color: '#1565C0',
+    color: colors.info,
   },
   listaSection: {
     flex: 1,
@@ -365,29 +366,29 @@ const styles = StyleSheet.create({
   listaTitulo: {
     fontSize: 16,
     fontWeight: 'bold',
-    color: '#424242',
+    color: colors.textSecondary,
   },
   btnAtualizar: {
     paddingHorizontal: 10,
     paddingVertical: 4,
     borderRadius: 6,
-    backgroundColor: '#EEEEEE',
+    backgroundColor: colors.border,
   },
   btnAtualizarText: {
     fontSize: 12,
-    color: '#616161',
+    color: colors.textMuted,
     fontWeight: '600',
   },
   listContent: {
     paddingBottom: 80,
   },
   areaCard: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: colors.surface,
     borderRadius: 10,
     padding: 14,
     marginBottom: 10,
     borderWidth: 1,
-    borderColor: '#E0E0E0',
+    borderColor: colors.border,
   },
   areaCardHeader: {
     flexDirection: 'row',
@@ -397,29 +398,29 @@ const styles = StyleSheet.create({
     width: 24,
     height: 24,
     borderRadius: 12,
-    backgroundColor: '#2E7D32',
+    backgroundColor: colors.primary,
     alignItems: 'center',
     justifyContent: 'center',
   },
   areaNumeroText: {
-    color: '#FFFFFF',
+    color: colors.textOnColor,
     fontSize: 12,
     fontWeight: 'bold',
   },
   areaNome: {
     fontSize: 15,
     fontWeight: 'bold',
-    color: '#212121',
+    color: colors.text,
   },
   areaObs: {
     fontSize: 12,
-    color: '#757575',
+    color: colors.textMuted,
     marginTop: 2,
   },
   areaMetragem: {
     fontSize: 16,
     fontWeight: 'bold',
-    color: '#2E7D32',
+    color: colors.primary,
   },
   areaCardFooter: {
     flexDirection: 'row',
@@ -428,14 +429,14 @@ const styles = StyleSheet.create({
     marginTop: 10,
     paddingTop: 8,
     borderTopWidth: 1,
-    borderTopColor: '#F5F5F5',
+    borderTopColor: colors.surfaceMuted,
   },
   areaVertices: {
     fontSize: 11,
-    color: '#9E9E9E',
+    color: colors.textPlaceholder,
   },
   btnExcluirArea: {
-    color: '#D32F2F',
+    color: colors.danger,
     fontSize: 12,
     fontWeight: 'bold',
   },
@@ -444,10 +445,10 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     padding: 30,
     marginTop: 20,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: colors.surface,
     borderRadius: 12,
     borderWidth: 1,
-    borderColor: '#E0E0E0',
+    borderColor: colors.border,
   },
   emptyIcon: {
     fontSize: 40,
@@ -456,17 +457,17 @@ const styles = StyleSheet.create({
   emptyTitulo: {
     fontSize: 16,
     fontWeight: 'bold',
-    color: '#424242',
+    color: colors.textSecondary,
     marginBottom: 6,
   },
   emptySubtitulo: {
     fontSize: 13,
-    color: '#757575',
+    color: colors.textMuted,
     textAlign: 'center',
     lineHeight: 18,
   },
   erroText: {
-    color: '#D32F2F',
+    color: colors.danger,
     fontSize: 14,
     textAlign: 'center',
     marginTop: 20,
@@ -478,18 +479,18 @@ const styles = StyleSheet.create({
     right: 16,
   },
   btnDelimitarMapa: {
-    backgroundColor: '#2E7D32',
+    backgroundColor: colors.primary,
     paddingVertical: 14,
     borderRadius: 10,
     alignItems: 'center',
     elevation: 4,
-    shadowColor: '#000',
+    shadowColor: colors.shadow,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.3,
     shadowRadius: 3,
   },
   btnDelimitarMapaText: {
-    color: '#FFFFFF',
+    color: colors.textOnColor,
     fontSize: 15,
     fontWeight: 'bold',
   },

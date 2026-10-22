@@ -11,6 +11,7 @@ import {
 } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useProdutoDetalhe } from '../../../src/presentation/hooks/use-produto-detalhe';
+import { colors } from '../../../src/presentation/theme';
 
 export default function ProdutoDetalheScreen() {
   const router = useRouter();
@@ -56,7 +57,7 @@ export default function ProdutoDetalheScreen() {
   if (isLoading) {
     return (
       <View style={styles.centerContainer}>
-        <ActivityIndicator size="large" color="#15803d" />
+        <ActivityIndicator size="large" color={colors.primary} />
         <Text style={styles.loadingText}>Carregando dados do produto...</Text>
       </View>
     );
@@ -143,7 +144,7 @@ export default function ProdutoDetalheScreen() {
           onPress={handleToggleAtivo}
         >
           {isTogglingAtivo ? (
-            <ActivityIndicator color={produto.ativo ? '#b91c1c' : '#15803d'} />
+            <ActivityIndicator color={produto.ativo ? colors.danger : colors.primary} />
           ) : (
             <Text
               style={[
@@ -171,7 +172,7 @@ export default function ProdutoDetalheScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f8fafc',
+    backgroundColor: colors.background,
   },
   content: {
     padding: 16,
@@ -182,12 +183,12 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     padding: 24,
-    backgroundColor: '#f8fafc',
+    backgroundColor: colors.background,
   },
   loadingText: {
     marginTop: 12,
     fontSize: 14,
-    color: '#64748b',
+    color: colors.textMuted,
   },
   errorIcon: {
     fontSize: 40,
@@ -196,35 +197,35 @@ const styles = StyleSheet.create({
   errorTitle: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: '#b91c1c',
+    color: colors.danger,
     marginBottom: 6,
   },
   errorMessage: {
     fontSize: 13,
-    color: '#64748b',
+    color: colors.textMuted,
     textAlign: 'center',
     marginBottom: 20,
     maxWidth: 280,
   },
   backButton: {
-    backgroundColor: '#15803d',
+    backgroundColor: colors.primary,
     paddingHorizontal: 18,
     paddingVertical: 10,
     borderRadius: 8,
   },
   backButtonText: {
-    color: '#ffffff',
+    color: colors.textOnColor,
     fontSize: 14,
     fontWeight: 'bold',
   },
   headerCard: {
-    backgroundColor: '#ffffff',
+    backgroundColor: colors.surface,
     borderRadius: 12,
     padding: 18,
     marginBottom: 16,
     borderWidth: 1,
-    borderColor: '#e2e8f0',
-    shadowColor: '#000',
+    borderColor: colors.border,
+    shadowColor: colors.shadow,
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.05,
     shadowRadius: 3,
@@ -239,7 +240,7 @@ const styles = StyleSheet.create({
   headerNome: {
     fontSize: 20,
     fontWeight: 'bold',
-    color: '#0f172a',
+    color: colors.text,
     flex: 1,
     marginRight: 10,
   },
@@ -249,29 +250,29 @@ const styles = StyleSheet.create({
     borderRadius: 6,
   },
   badgeAtivo: {
-    backgroundColor: '#dcfce7',
+    backgroundColor: colors.primarySoft,
   },
   badgeInativo: {
-    backgroundColor: '#fee2e2',
+    backgroundColor: colors.dangerSoft,
   },
   statusText: {
     fontSize: 12,
     fontWeight: '700',
   },
   statusTextAtivo: {
-    color: '#166534',
+    color: colors.primaryDark,
   },
   statusTextInativo: {
-    color: '#b91c1c',
+    color: colors.danger,
   },
   card: {
-    backgroundColor: '#ffffff',
+    backgroundColor: colors.surface,
     borderRadius: 12,
     padding: 18,
     marginBottom: 16,
     borderWidth: 1,
-    borderColor: '#e2e8f0',
-    shadowColor: '#000',
+    borderColor: colors.border,
+    shadowColor: colors.shadow,
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.05,
     shadowRadius: 3,
@@ -280,10 +281,10 @@ const styles = StyleSheet.create({
   cardTitle: {
     fontSize: 16,
     fontWeight: '700',
-    color: '#1e293b',
+    color: colors.text,
     marginBottom: 12,
     borderBottomWidth: 1,
-    borderBottomColor: '#f1f5f9',
+    borderBottomColor: colors.surfaceMuted,
     paddingBottom: 8,
   },
   row: {
@@ -291,34 +292,34 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     paddingVertical: 8,
     borderBottomWidth: 1,
-    borderBottomColor: '#f8fafc',
+    borderBottomColor: colors.background,
   },
   label: {
     fontSize: 13,
-    color: '#64748b',
+    color: colors.textMuted,
     fontWeight: '500',
   },
   value: {
     fontSize: 13,
-    color: '#0f172a',
+    color: colors.text,
     fontWeight: '600',
     maxWidth: '65%',
     textAlign: 'right',
   },
   valuePreco: {
     fontSize: 15,
-    color: '#15803d',
+    color: colors.primary,
     fontWeight: '700',
   },
   descricaoContainer: {
     marginTop: 10,
-    backgroundColor: '#f8fafc',
+    backgroundColor: colors.background,
     borderRadius: 8,
     padding: 10,
   },
   descricaoText: {
     fontSize: 13,
-    color: '#334155',
+    color: colors.textSecondary,
     marginTop: 4,
     lineHeight: 18,
   },
@@ -328,13 +329,13 @@ const styles = StyleSheet.create({
     gap: 10,
   },
   editButton: {
-    backgroundColor: '#15803d',
+    backgroundColor: colors.primary,
     borderRadius: 8,
     paddingVertical: 14,
     alignItems: 'center',
   },
   editButtonText: {
-    color: '#ffffff',
+    color: colors.textOnColor,
     fontSize: 15,
     fontWeight: 'bold',
   },
@@ -345,31 +346,31 @@ const styles = StyleSheet.create({
     borderWidth: 1,
   },
   toggleInativarButton: {
-    backgroundColor: '#fef2f2',
-    borderColor: '#fca5a5',
+    backgroundColor: colors.dangerSoft,
+    borderColor: colors.dangerBorder,
   },
   toggleAtivarButton: {
-    backgroundColor: '#f0fdf4',
-    borderColor: '#86efac',
+    backgroundColor: colors.primarySubtle,
+    borderColor: colors.primaryBorder,
   },
   toggleStatusButtonText: {
     fontSize: 14,
     fontWeight: 'bold',
   },
   toggleInativarText: {
-    color: '#b91c1c',
+    color: colors.danger,
   },
   toggleAtivarText: {
-    color: '#15803d',
+    color: colors.primary,
   },
   voltarButton: {
-    backgroundColor: '#e2e8f0',
+    backgroundColor: colors.border,
     borderRadius: 8,
     paddingVertical: 12,
     alignItems: 'center',
   },
   voltarButtonText: {
-    color: '#334155',
+    color: colors.textSecondary,
     fontSize: 14,
     fontWeight: '600',
   },

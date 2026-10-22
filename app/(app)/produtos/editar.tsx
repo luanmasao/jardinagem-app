@@ -12,6 +12,7 @@ import {
 } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { produtoService } from '../../../src/application/services/produto.service';
+import { colors } from '../../../src/presentation/theme';
 
 export default function EditarProdutoScreen() {
   const router = useRouter();
@@ -98,7 +99,7 @@ export default function EditarProdutoScreen() {
   if (isLoading) {
     return (
       <View style={styles.centerContainer}>
-        <ActivityIndicator size="large" color="#15803d" />
+        <ActivityIndicator size="large" color={colors.primary} />
         <Text style={styles.loadingText}>Carregando dados para edição...</Text>
       </View>
     );
@@ -131,7 +132,7 @@ export default function EditarProdutoScreen() {
             <TextInput
               style={styles.input}
               placeholder="Ex: Terra Vegetal Adubada"
-              placeholderTextColor="#94a3b8"
+              placeholderTextColor={colors.textPlaceholder}
               value={nome}
               onChangeText={setNome}
               maxLength={150}
@@ -143,7 +144,7 @@ export default function EditarProdutoScreen() {
             <TextInput
               style={[styles.input, styles.textArea]}
               placeholder="Descreva as características, marca, composição..."
-              placeholderTextColor="#94a3b8"
+              placeholderTextColor={colors.textPlaceholder}
               value={descricao}
               onChangeText={setDescricao}
               multiline
@@ -160,7 +161,7 @@ export default function EditarProdutoScreen() {
               <TextInput
                 style={styles.input}
                 placeholder="Ex: un, kg, saco, m³"
-                placeholderTextColor="#94a3b8"
+                placeholderTextColor={colors.textPlaceholder}
                 value={unidade}
                 onChangeText={setUnidade}
                 maxLength={20}
@@ -174,7 +175,7 @@ export default function EditarProdutoScreen() {
               <TextInput
                 style={styles.input}
                 placeholder="Ex: 25,00"
-                placeholderTextColor="#94a3b8"
+                placeholderTextColor={colors.textPlaceholder}
                 value={precoBase}
                 onChangeText={setPrecoBase}
                 keyboardType="numeric"
@@ -190,7 +191,7 @@ export default function EditarProdutoScreen() {
           activeOpacity={0.8}
         >
           {isSubmitting ? (
-            <ActivityIndicator color="#ffffff" />
+            <ActivityIndicator color={colors.surface} />
           ) : (
             <Text style={styles.submitButtonText}>Salvar Alterações</Text>
           )}
@@ -212,7 +213,7 @@ export default function EditarProdutoScreen() {
 const styles = StyleSheet.create({
   keyboardContainer: {
     flex: 1,
-    backgroundColor: '#f8fafc',
+    backgroundColor: colors.background,
   },
   container: {
     flex: 1,
@@ -226,7 +227,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     padding: 24,
-    backgroundColor: '#f8fafc',
+    backgroundColor: colors.background,
   },
   loadingText: {
     marginTop: 12,
@@ -235,8 +236,8 @@ const styles = StyleSheet.create({
   errorBanner: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#fef2f2',
-    borderColor: '#fca5a5',
+    backgroundColor: colors.dangerSoft,
+    borderColor: colors.dangerBorder,
     borderWidth: 1,
     borderRadius: 8,
     padding: 12,
@@ -248,17 +249,17 @@ const styles = StyleSheet.create({
   },
   errorText: {
     fontSize: 13,
-    color: '#b91c1c',
+    color: colors.danger,
     flex: 1,
   },
   sectionCard: {
-    backgroundColor: '#ffffff',
+    backgroundColor: colors.surface,
     borderRadius: 12,
     padding: 18,
     marginBottom: 16,
     borderWidth: 1,
-    borderColor: '#e2e8f0',
-    shadowColor: '#000',
+    borderColor: colors.border,
+    shadowColor: colors.shadow,
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.05,
     shadowRadius: 3,
@@ -267,7 +268,7 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 16,
     fontWeight: '700',
-    color: '#1e293b',
+    color: colors.text,
     marginBottom: 14,
   },
   inputGroup: {
@@ -276,21 +277,21 @@ const styles = StyleSheet.create({
   label: {
     fontSize: 13,
     fontWeight: '600',
-    color: '#475569',
+    color: colors.textSecondary,
     marginBottom: 6,
   },
   requiredAsterisk: {
-    color: '#b91c1c',
+    color: colors.danger,
   },
   input: {
-    backgroundColor: '#f8fafc',
+    backgroundColor: colors.background,
     borderWidth: 1,
-    borderColor: '#cbd5e1',
+    borderColor: colors.borderStrong,
     borderRadius: 8,
     paddingHorizontal: 12,
     paddingVertical: 10,
     fontSize: 14,
-    color: '#0f172a',
+    color: colors.text,
   },
   textArea: {
     minHeight: 70,
@@ -299,7 +300,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
   },
   submitButton: {
-    backgroundColor: '#15803d',
+    backgroundColor: colors.primary,
     borderRadius: 8,
     paddingVertical: 14,
     alignItems: 'center',
@@ -311,19 +312,19 @@ const styles = StyleSheet.create({
     opacity: 0.7,
   },
   submitButtonText: {
-    color: '#ffffff',
+    color: colors.textOnColor,
     fontSize: 16,
     fontWeight: 'bold',
   },
   cancelButton: {
-    backgroundColor: '#e2e8f0',
+    backgroundColor: colors.border,
     borderRadius: 8,
     paddingVertical: 12,
     alignItems: 'center',
     marginBottom: 20,
   },
   cancelButtonText: {
-    color: '#475569',
+    color: colors.textSecondary,
     fontSize: 14,
     fontWeight: '600',
   },

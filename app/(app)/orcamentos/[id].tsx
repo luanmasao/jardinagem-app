@@ -18,6 +18,7 @@ import {
   obterBadgeStatusOrcamento,
   formatarStatusOrcamento,
 } from '../../../src/presentation/utils/status-orcamento.utils';
+import { colors } from '../../../src/presentation/theme';
 
 export default function OrcamentoDetalheScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -133,7 +134,7 @@ export default function OrcamentoDetalheScreen() {
   if (isLoading) {
     return (
       <View style={styles.centerContainer}>
-        <ActivityIndicator size="large" color="#2E7D32" />
+        <ActivityIndicator size="large" color={colors.primary} />
         <Text style={styles.loadingText}>Carregando orçamento...</Text>
       </View>
     );
@@ -317,7 +318,7 @@ export default function OrcamentoDetalheScreen() {
             >
               {isGeneratingPdf ? (
                 <View style={styles.loadingRow}>
-                  <ActivityIndicator size="small" color="#FFFFFF" />
+                  <ActivityIndicator size="small" color={colors.surface} />
                   <Text style={styles.btnGerarPdfText}>Abrindo...</Text>
                 </View>
               ) : (
@@ -337,7 +338,7 @@ export default function OrcamentoDetalheScreen() {
             >
               {isSharingPdf ? (
                 <View style={styles.loadingRow}>
-                  <ActivityIndicator size="small" color="#FFFFFF" />
+                  <ActivityIndicator size="small" color={colors.surface} />
                   <Text style={styles.btnCompartilharPdfText}>Preparando...</Text>
                 </View>
               ) : (
@@ -350,7 +351,7 @@ export default function OrcamentoDetalheScreen() {
           </View>
 
           {isSaving ? (
-            <ActivityIndicator size="small" color="#2E7D32" style={{ marginVertical: 12 }} />
+            <ActivityIndicator size="small" color={colors.primary} style={{ marginVertical: 12 }} />
           ) : (
             <>
               {/* Ações para RASCUNHO */}
@@ -484,7 +485,7 @@ export default function OrcamentoDetalheScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F8F9FA',
+    backgroundColor: colors.background,
   },
   scrollContent: {
     padding: 16,
@@ -494,11 +495,11 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'flex-start',
-    backgroundColor: '#FFFFFF',
+    backgroundColor: colors.surface,
     padding: 16,
     borderRadius: 12,
     borderWidth: 1,
-    borderColor: '#E8EAED',
+    borderColor: colors.border,
     marginBottom: 12,
   },
   headerLeft: {
@@ -507,11 +508,11 @@ const styles = StyleSheet.create({
   numeroOrcamento: {
     fontSize: 20,
     fontWeight: '700',
-    color: '#1B5E20',
+    color: colors.primaryDark,
   },
   dataCriacaoSub: {
     fontSize: 13,
-    color: '#616161',
+    color: colors.textMuted,
     marginTop: 2,
   },
   statusBadge: {
@@ -525,27 +526,27 @@ const styles = StyleSheet.create({
     fontWeight: '700',
   },
   cardSection: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: colors.surface,
     borderRadius: 12,
     padding: 16,
     borderWidth: 1,
-    borderColor: '#E8EAED',
+    borderColor: colors.border,
     marginBottom: 12,
   },
   cardSectionTitle: {
     fontSize: 15,
     fontWeight: '700',
-    color: '#1B5E20',
+    color: colors.primaryDark,
     marginBottom: 8,
   },
   clienteNome: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#212121',
+    color: colors.text,
   },
   clienteInfoText: {
     fontSize: 13,
-    color: '#616161',
+    color: colors.textMuted,
     marginTop: 2,
   },
   itensSectionHeader: {
@@ -555,7 +556,7 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   btnEditarItensHeader: {
-    backgroundColor: '#E8F5E9',
+    backgroundColor: colors.primarySoft,
     paddingHorizontal: 10,
     paddingVertical: 4,
     borderRadius: 6,
@@ -563,11 +564,11 @@ const styles = StyleSheet.create({
   btnEditarItensHeaderText: {
     fontSize: 12,
     fontWeight: '700',
-    color: '#2E7D32',
+    color: colors.primary,
   },
   emptyItensAviso: {
     fontSize: 13,
-    color: '#9E9E9E',
+    color: colors.textPlaceholder,
     fontStyle: 'italic',
     paddingVertical: 8,
   },
@@ -576,10 +577,10 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     paddingVertical: 10,
     borderBottomWidth: 1,
-    borderBottomColor: '#F5F5F5',
+    borderBottomColor: colors.surfaceMuted,
   },
   itemTipoBadge: {
-    backgroundColor: '#E0F2F1',
+    backgroundColor: colors.tealSoft,
     alignSelf: 'flex-start',
     paddingHorizontal: 6,
     paddingVertical: 2,
@@ -589,42 +590,42 @@ const styles = StyleSheet.create({
   itemTipoBadgeText: {
     fontSize: 10,
     fontWeight: '700',
-    color: '#004D40',
+    color: colors.teal,
   },
   itemDescricao: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#212121',
+    color: colors.text,
   },
   itemSubinfo: {
     fontSize: 12,
-    color: '#757575',
+    color: colors.textMuted,
     marginTop: 2,
   },
   itemTotal: {
     fontSize: 14,
     fontWeight: '700',
-    color: '#2E7D32',
+    color: colors.primary,
   },
   btnRemoverItem: {
     fontSize: 12,
-    color: '#C62828',
+    color: colors.danger,
     marginTop: 4,
   },
   btnGerenciarAreas: {
-    backgroundColor: '#E8F5E9',
+    backgroundColor: colors.primarySoft,
     alignSelf: 'flex-start',
     paddingHorizontal: 8,
     paddingVertical: 4,
     borderRadius: 6,
     marginTop: 6,
     borderWidth: 1,
-    borderColor: '#C8E6C9',
+    borderColor: colors.primaryBorder,
   },
   btnGerenciarAreasText: {
     fontSize: 12,
     fontWeight: '700',
-    color: '#2E7D32',
+    color: colors.primary,
   },
   financeiroRow: {
     flexDirection: 'row',
@@ -633,37 +634,37 @@ const styles = StyleSheet.create({
   },
   financeiroLabel: {
     fontSize: 14,
-    color: '#616161',
+    color: colors.textMuted,
   },
   financeiroValor: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#212121',
+    color: colors.text,
   },
   financeiroLabelDesconto: {
     fontSize: 14,
-    color: '#C62828',
+    color: colors.danger,
   },
   financeiroValorDesconto: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#C62828',
+    color: colors.danger,
   },
   financeiroTotalRow: {
     marginTop: 8,
     paddingTop: 8,
     borderTopWidth: 1,
-    borderTopColor: '#EEEEEE',
+    borderTopColor: colors.border,
   },
   financeiroTotalLabel: {
     fontSize: 16,
     fontWeight: '700',
-    color: '#1B5E20',
+    color: colors.primaryDark,
   },
   financeiroTotalValor: {
     fontSize: 18,
     fontWeight: '700',
-    color: '#2E7D32',
+    color: colors.primary,
   },
   infoCampoRow: {
     marginVertical: 4,
@@ -671,11 +672,11 @@ const styles = StyleSheet.create({
   infoCampoLabel: {
     fontSize: 12,
     fontWeight: '600',
-    color: '#757575',
+    color: colors.textMuted,
   },
   infoCampoValor: {
     fontSize: 14,
-    color: '#212121',
+    color: colors.text,
     marginTop: 2,
   },
   acoesContainer: {
@@ -683,96 +684,96 @@ const styles = StyleSheet.create({
     marginTop: 8,
   },
   btnAcaoPrimaria: {
-    backgroundColor: '#2E7D32',
+    backgroundColor: colors.primary,
     paddingVertical: 14,
     borderRadius: 8,
     alignItems: 'center',
   },
   btnAcaoPrimariaText: {
-    color: '#FFFFFF',
+    color: colors.textOnColor,
     fontSize: 15,
     fontWeight: '700',
   },
   btnAcaoSecundaria: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: colors.surface,
     borderWidth: 1,
-    borderColor: '#2E7D32',
+    borderColor: colors.primary,
     paddingVertical: 12,
     borderRadius: 8,
     alignItems: 'center',
   },
   btnAcaoSecundariaText: {
-    color: '#2E7D32',
+    color: colors.primary,
     fontSize: 14,
     fontWeight: '600',
   },
   btnAcaoDuplicar: {
-    backgroundColor: '#F1F3F4',
+    backgroundColor: colors.surfaceMuted,
     paddingVertical: 12,
     borderRadius: 8,
     alignItems: 'center',
   },
   btnAcaoDuplicarText: {
-    color: '#424242',
+    color: colors.textSecondary,
     fontSize: 14,
     fontWeight: '600',
   },
   btnAcaoAprovar: {
-    backgroundColor: '#2E7D32',
+    backgroundColor: colors.primary,
     paddingVertical: 14,
     borderRadius: 8,
     alignItems: 'center',
   },
   btnAcaoAprovarText: {
-    color: '#FFFFFF',
+    color: colors.textOnColor,
     fontSize: 15,
     fontWeight: '700',
   },
   btnAcaoRecusar: {
-    backgroundColor: '#C62828',
+    backgroundColor: colors.danger,
     paddingVertical: 12,
     borderRadius: 8,
     alignItems: 'center',
   },
   btnAcaoRecusarText: {
-    color: '#FFFFFF',
+    color: colors.textOnColor,
     fontSize: 14,
     fontWeight: '700',
   },
   btnAcaoConcluir: {
-    backgroundColor: '#004D40',
+    backgroundColor: colors.teal,
     paddingVertical: 14,
     borderRadius: 8,
     alignItems: 'center',
   },
   btnAcaoConcluirText: {
-    color: '#FFFFFF',
+    color: colors.textOnColor,
     fontSize: 15,
     fontWeight: '700',
   },
   btnAcaoPerigo: {
-    backgroundColor: '#FFF0F0',
+    backgroundColor: colors.dangerSoft,
     borderWidth: 1,
-    borderColor: '#FFCDD2',
+    borderColor: colors.dangerBorder,
     paddingVertical: 12,
     borderRadius: 8,
     alignItems: 'center',
   },
   btnAcaoPerigoText: {
-    color: '#C62828',
+    color: colors.danger,
     fontSize: 14,
     fontWeight: '600',
   },
   btnAcaoExcluir: {
-    backgroundColor: '#FFF0F0',
+    backgroundColor: colors.dangerSoft,
     borderWidth: 1,
-    borderColor: '#FFCDD2',
+    borderColor: colors.dangerBorder,
     paddingVertical: 12,
     borderRadius: 8,
     alignItems: 'center',
   },
   btnAcaoExcluirText: {
-    color: '#C62828',
+    color: colors.danger,
     fontSize: 14,
     fontWeight: '600',
   },
@@ -784,23 +785,23 @@ const styles = StyleSheet.create({
   },
   loadingText: {
     marginTop: 12,
-    color: '#616161',
+    color: colors.textMuted,
     fontSize: 14,
   },
   errorText: {
-    color: '#C62828',
+    color: colors.danger,
     fontSize: 15,
     textAlign: 'center',
     marginBottom: 16,
   },
   btnVoltarErro: {
-    backgroundColor: '#2E7D32',
+    backgroundColor: colors.primary,
     paddingHorizontal: 20,
     paddingVertical: 10,
     borderRadius: 8,
   },
   btnVoltarErroText: {
-    color: '#FFFFFF',
+    color: colors.textOnColor,
     fontWeight: '600',
   },
   pdfBotoesRow: {
@@ -810,12 +811,12 @@ const styles = StyleSheet.create({
   },
   btnGerarPdf: {
     flex: 1,
-    backgroundColor: '#1B5E20',
+    backgroundColor: colors.primaryDark,
     paddingVertical: 14,
     borderRadius: 8,
     alignItems: 'center',
     justifyContent: 'center',
-    shadowColor: '#1B5E20',
+    shadowColor: colors.primaryDark,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.2,
     shadowRadius: 4,
@@ -823,12 +824,12 @@ const styles = StyleSheet.create({
   },
   btnCompartilharPdf: {
     flex: 1,
-    backgroundColor: '#2E7D32',
+    backgroundColor: colors.primary,
     paddingVertical: 14,
     borderRadius: 8,
     alignItems: 'center',
     justifyContent: 'center',
-    shadowColor: '#2E7D32',
+    shadowColor: colors.primary,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.2,
     shadowRadius: 4,
@@ -839,7 +840,7 @@ const styles = StyleSheet.create({
     marginRight: 8,
   },
   btnCompartilharPdfText: {
-    color: '#FFFFFF',
+    color: colors.textOnColor,
     fontSize: 15,
     fontWeight: '700',
   },
@@ -848,7 +849,7 @@ const styles = StyleSheet.create({
     marginRight: 8,
   },
   btnGerarPdfText: {
-    color: '#FFFFFF',
+    color: colors.textOnColor,
     fontSize: 15,
     fontWeight: '700',
   },

@@ -3,6 +3,7 @@ import React, { useEffect } from 'react';
 import { Stack, useRouter, useSegments } from 'expo-router';
 import { AuthProvider, useAuth } from '../src/presentation/contexts/auth-context';
 import { ActivityIndicator, View, StyleSheet } from 'react-native';
+import { colors } from '../src/presentation/theme';
 
 function RootNavigation() {
   const { isAuthenticated, isLoading, perfil } = useAuth();
@@ -27,7 +28,7 @@ function RootNavigation() {
   if (isLoading) {
     return (
       <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color="#2e7d32" />
+        <ActivityIndicator size="large" color={colors.primary} />
       </View>
     );
   }
@@ -55,6 +56,6 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#f8fafc',
+    backgroundColor: colors.background,
   },
 });

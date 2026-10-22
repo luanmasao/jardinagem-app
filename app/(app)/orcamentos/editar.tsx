@@ -31,6 +31,7 @@ import {
   parseDataCivil,
 } from '../../../src/presentation/utils/data-formatters';
 import { formatarStatusOrcamento } from '../../../src/presentation/utils/status-orcamento.utils';
+import { colors } from '../../../src/presentation/theme';
 
 export default function EditarOrcamentoScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -241,7 +242,7 @@ export default function EditarOrcamentoScreen() {
   if (loadingOrcamento || loadingCatalogos) {
     return (
       <View style={styles.centerContainer}>
-        <ActivityIndicator size="large" color="#2E7D32" />
+        <ActivityIndicator size="large" color={colors.primary} />
         <Text style={styles.loadingText}>Carregando dados...</Text>
       </View>
     );
@@ -317,7 +318,7 @@ export default function EditarOrcamentoScreen() {
             <TextInput
               style={styles.textInput}
               placeholder="DD/MM/AAAA (ex: 07/10/2026)"
-              placeholderTextColor="#9E9E9E"
+              placeholderTextColor={colors.textPlaceholder}
               value={dataValidade}
               onChangeText={(val) => setDataValidade(aplicarMascaraData(val))}
               keyboardType="numeric"
@@ -481,7 +482,7 @@ export default function EditarOrcamentoScreen() {
           disabled={isSaving}
           activeOpacity={0.8}
         >
-          {isSaving ? <ActivityIndicator color="#FFFFFF" /> : <Text style={styles.btnSalvarText}>Salvar Alterações</Text>}
+          {isSaving ? <ActivityIndicator color={colors.surface} /> : <Text style={styles.btnSalvarText}>Salvar Alterações</Text>}
         </TouchableOpacity>
       </ScrollView>
 
@@ -623,43 +624,43 @@ export default function EditarOrcamentoScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F8F9FA',
+    backgroundColor: colors.background,
   },
   scrollContent: {
     padding: 16,
     paddingBottom: 100,
   },
   headerEdicao: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: colors.surface,
     padding: 16,
     borderRadius: 12,
     borderWidth: 1,
-    borderColor: '#E8EAED',
+    borderColor: colors.border,
     marginBottom: 12,
   },
   headerEdicaoNumero: {
     fontSize: 18,
     fontWeight: '700',
-    color: '#1B5E20',
+    color: colors.primaryDark,
   },
   headerEdicaoStatus: {
     fontSize: 13,
-    color: '#E65100',
+    color: colors.warning,
     marginTop: 2,
     fontWeight: '600',
   },
   sectionCard: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: colors.surface,
     borderRadius: 12,
     padding: 16,
     marginBottom: 12,
     borderWidth: 1,
-    borderColor: '#E8EAED',
+    borderColor: colors.border,
   },
   sectionTitle: {
     fontSize: 15,
     fontWeight: '700',
-    color: '#1B5E20',
+    color: colors.primaryDark,
     marginBottom: 10,
   },
   sectionHeaderRow: {
@@ -669,20 +670,20 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   selectButton: {
-    backgroundColor: '#F1F3F4',
+    backgroundColor: colors.surfaceMuted,
     padding: 14,
     borderRadius: 8,
     borderWidth: 1,
-    borderColor: '#E0E0E0',
+    borderColor: colors.border,
   },
   selectButtonTextSelected: {
     fontSize: 15,
     fontWeight: '600',
-    color: '#212121',
+    color: colors.text,
   },
   selectButtonTextPlaceholder: {
     fontSize: 14,
-    color: '#757575',
+    color: colors.textMuted,
   },
   inputGroup: {
     marginBottom: 12,
@@ -690,37 +691,37 @@ const styles = StyleSheet.create({
   inputLabel: {
     fontSize: 13,
     fontWeight: '600',
-    color: '#424242',
+    color: colors.textSecondary,
     marginBottom: 6,
   },
   textInput: {
-    backgroundColor: '#F8F9FA',
+    backgroundColor: colors.background,
     borderWidth: 1,
-    borderColor: '#E0E0E0',
+    borderColor: colors.border,
     borderRadius: 8,
     paddingHorizontal: 12,
     paddingVertical: 10,
     fontSize: 14,
-    color: '#212121',
+    color: colors.text,
   },
   textArea: {
     minHeight: 64,
     textAlignVertical: 'top',
   },
   btnAddItem: {
-    backgroundColor: '#E8F5E9',
+    backgroundColor: colors.primarySoft,
     paddingHorizontal: 10,
     paddingVertical: 4,
     borderRadius: 6,
   },
   btnAddItemText: {
-    color: '#2E7D32',
+    color: colors.primary,
     fontSize: 12,
     fontWeight: '700',
   },
   emptyItensTexto: {
     fontSize: 13,
-    color: '#9E9E9E',
+    color: colors.textPlaceholder,
     fontStyle: 'italic',
     paddingVertical: 8,
   },
@@ -729,10 +730,10 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     paddingVertical: 10,
     borderBottomWidth: 1,
-    borderBottomColor: '#F1F3F4',
+    borderBottomColor: colors.surfaceMuted,
   },
   itemTipoBadge: {
-    backgroundColor: '#E0F2F1',
+    backgroundColor: colors.tealSoft,
     alignSelf: 'flex-start',
     paddingHorizontal: 6,
     paddingVertical: 2,
@@ -741,12 +742,12 @@ const styles = StyleSheet.create({
   itemTipoBadgeText: {
     fontSize: 10,
     fontWeight: '700',
-    color: '#004D40',
+    color: colors.teal,
   },
   itemMedicaoBadge: {
-    backgroundColor: '#E8F5E9',
+    backgroundColor: colors.primarySoft,
     borderWidth: 1,
-    borderColor: '#C8E6C9',
+    borderColor: colors.primaryBorder,
     alignSelf: 'flex-start',
     paddingHorizontal: 6,
     paddingVertical: 2,
@@ -755,14 +756,14 @@ const styles = StyleSheet.create({
   itemMedicaoBadgeText: {
     fontSize: 10,
     fontWeight: '700',
-    color: '#2E7D32',
+    color: colors.primary,
   },
   btnMedirArea: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#E8F5E9',
+    backgroundColor: colors.primarySoft,
     borderWidth: 1,
-    borderColor: '#A5D6A7',
+    borderColor: colors.primaryBorder,
     paddingHorizontal: 8,
     paddingVertical: 5,
     borderRadius: 6,
@@ -770,28 +771,28 @@ const styles = StyleSheet.create({
     alignSelf: 'flex-start',
   },
   btnMedirAreaText: {
-    color: '#1B5E20',
+    color: colors.primaryDark,
     fontSize: 12,
     fontWeight: '700',
   },
   itemDescricao: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#212121',
+    color: colors.text,
   },
   itemDetalhes: {
     fontSize: 12,
-    color: '#757575',
+    color: colors.textMuted,
     marginTop: 2,
   },
   itemValorTotal: {
     fontSize: 14,
     fontWeight: '700',
-    color: '#2E7D32',
+    color: colors.primary,
   },
   btnRemoverText: {
     fontSize: 12,
-    color: '#C62828',
+    color: colors.danger,
     marginTop: 4,
   },
   descontoTipoRow: {
@@ -804,22 +805,22 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
     alignItems: 'center',
     borderRadius: 6,
-    backgroundColor: '#F1F3F4',
+    backgroundColor: colors.surfaceMuted,
   },
   tipoDescButtonActive: {
-    backgroundColor: '#2E7D32',
+    backgroundColor: colors.primary,
   },
   tipoDescText: {
     fontSize: 12,
     fontWeight: '600',
-    color: '#616161',
+    color: colors.textMuted,
   },
   tipoDescTextActive: {
-    color: '#FFFFFF',
+    color: colors.textOnColor,
   },
   divider: {
     height: 1,
-    backgroundColor: '#EEEEEE',
+    backgroundColor: colors.border,
     marginVertical: 10,
   },
   resumoRow: {
@@ -829,41 +830,41 @@ const styles = StyleSheet.create({
   },
   resumoLabel: {
     fontSize: 14,
-    color: '#616161',
+    color: colors.textMuted,
   },
   resumoValor: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#212121',
+    color: colors.text,
   },
   totalRow: {
     marginTop: 6,
     paddingTop: 6,
     borderTopWidth: 1,
-    borderTopColor: '#EEEEEE',
+    borderTopColor: colors.border,
   },
   totalLabel: {
     fontSize: 15,
     fontWeight: '700',
-    color: '#1B5E20',
+    color: colors.primaryDark,
   },
   totalFinalValor: {
     fontSize: 17,
     fontWeight: '700',
-    color: '#2E7D32',
+    color: colors.primary,
   },
   btnSalvar: {
-    backgroundColor: '#2E7D32',
+    backgroundColor: colors.primary,
     paddingVertical: 14,
     borderRadius: 8,
     alignItems: 'center',
     marginTop: 8,
   },
   btnSalvarDisabled: {
-    backgroundColor: '#A5D6A7',
+    backgroundColor: colors.primaryBorder,
   },
   btnSalvarText: {
-    color: '#FFFFFF',
+    color: colors.textOnColor,
     fontSize: 16,
     fontWeight: '700',
   },
@@ -875,71 +876,71 @@ const styles = StyleSheet.create({
   },
   loadingText: {
     marginTop: 12,
-    color: '#616161',
+    color: colors.textMuted,
     fontSize: 14,
   },
   errorText: {
-    color: '#C62828',
+    color: colors.danger,
     fontSize: 15,
     textAlign: 'center',
     marginBottom: 16,
   },
   btnVoltar: {
-    backgroundColor: '#2E7D32',
+    backgroundColor: colors.primary,
     paddingHorizontal: 20,
     paddingVertical: 10,
     borderRadius: 8,
   },
   btnVoltarText: {
-    color: '#FFFFFF',
+    color: colors.textOnColor,
     fontWeight: '600',
   },
   bloqueioCard: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: colors.surface,
     padding: 24,
     borderRadius: 12,
     borderWidth: 1,
-    borderColor: '#FFCDD2',
+    borderColor: colors.dangerBorder,
     alignItems: 'center',
   },
   bloqueioTitulo: {
     fontSize: 18,
     fontWeight: '700',
-    color: '#C62828',
+    color: colors.danger,
     marginBottom: 12,
   },
   bloqueioMensagem: {
     fontSize: 14,
-    color: '#424242',
+    color: colors.textSecondary,
     textAlign: 'center',
     lineHeight: 20,
     marginBottom: 10,
   },
   bloqueioMensagemSub: {
     fontSize: 13,
-    color: '#757575',
+    color: colors.textMuted,
     textAlign: 'center',
     lineHeight: 18,
     marginBottom: 20,
   },
   btnVoltarAoDetalhe: {
-    backgroundColor: '#2E7D32',
+    backgroundColor: colors.primary,
     paddingHorizontal: 20,
     paddingVertical: 12,
     borderRadius: 8,
   },
   btnVoltarAoDetalheText: {
-    color: '#FFFFFF',
+    color: colors.textOnColor,
     fontWeight: '600',
     fontSize: 14,
   },
   modalOverlay: {
     flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.5)',
+    backgroundColor: colors.overlay,
     justifyContent: 'flex-end',
   },
   modalContainer: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: colors.surface,
     borderTopLeftRadius: 16,
     borderTopRightRadius: 16,
     padding: 20,
@@ -948,13 +949,13 @@ const styles = StyleSheet.create({
   modalTitle: {
     fontSize: 18,
     fontWeight: '700',
-    color: '#1B5E20',
+    color: colors.primaryDark,
     marginBottom: 14,
   },
   modalTabsRow: {
     flexDirection: 'row',
     borderBottomWidth: 1,
-    borderBottomColor: '#EEEEEE',
+    borderBottomColor: colors.border,
     marginBottom: 12,
   },
   modalTab: {
@@ -964,69 +965,69 @@ const styles = StyleSheet.create({
   },
   modalTabActive: {
     borderBottomWidth: 2,
-    borderBottomColor: '#2E7D32',
+    borderBottomColor: colors.primary,
   },
   modalTabText: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#757575',
+    color: colors.textMuted,
   },
   modalTabTextActive: {
-    color: '#2E7D32',
+    color: colors.primary,
   },
   modalItemRow: {
     paddingVertical: 12,
     paddingHorizontal: 8,
     borderBottomWidth: 1,
-    borderBottomColor: '#F5F5F5',
+    borderBottomColor: colors.surfaceMuted,
   },
   modalItemRowSelected: {
-    backgroundColor: '#E8F5E9',
+    backgroundColor: colors.primarySoft,
     borderRadius: 6,
   },
   modalItemTitle: {
     fontSize: 15,
     fontWeight: '600',
-    color: '#212121',
+    color: colors.text,
   },
   modalItemSub: {
     fontSize: 13,
-    color: '#757575',
+    color: colors.textMuted,
     marginTop: 2,
   },
   itemConfigBox: {
-    backgroundColor: '#FAFAFA',
+    backgroundColor: colors.surfaceSubtle,
     padding: 12,
     borderRadius: 8,
     marginTop: 12,
     borderWidth: 1,
-    borderColor: '#EEEEEE',
+    borderColor: colors.border,
   },
   itemConfigTitle: {
     fontSize: 14,
     fontWeight: '700',
-    color: '#2E7D32',
+    color: colors.primary,
     marginBottom: 8,
   },
   avisoMedicaoBox: {
-    backgroundColor: '#FFF8E1',
+    backgroundColor: colors.warningSoft,
     padding: 10,
     borderRadius: 6,
     marginBottom: 10,
   },
   avisoMedicaoText: {
     fontSize: 12,
-    color: '#F57F17',
+    color: colors.warning,
     lineHeight: 16,
   },
   btnConfirmarItem: {
-    backgroundColor: '#2E7D32',
+    backgroundColor: colors.primary,
     paddingVertical: 10,
     borderRadius: 6,
     alignItems: 'center',
   },
   btnConfirmarItemText: {
-    color: '#FFFFFF',
+    color: colors.textOnColor,
     fontWeight: '600',
     fontSize: 14,
   },
@@ -1034,11 +1035,11 @@ const styles = StyleSheet.create({
     marginTop: 14,
     paddingVertical: 12,
     alignItems: 'center',
-    backgroundColor: '#F1F3F4',
+    backgroundColor: colors.surfaceMuted,
     borderRadius: 8,
   },
   modalBtnFecharText: {
-    color: '#424242',
+    color: colors.textSecondary,
     fontWeight: '600',
     fontSize: 14,
   },

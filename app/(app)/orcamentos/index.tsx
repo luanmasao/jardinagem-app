@@ -19,6 +19,7 @@ import {
   STATUS_FILTROS_ORCAMENTO,
   obterBadgeStatusOrcamento,
 } from '../../../src/presentation/utils/status-orcamento.utils';
+import { colors } from '../../../src/presentation/theme';
 
 export default function OrcamentosListScreen() {
   const router = useRouter();
@@ -107,7 +108,7 @@ export default function OrcamentosListScreen() {
         <TextInput
           style={styles.searchInput}
           placeholder="Buscar por número ou cliente..."
-          placeholderTextColor="#9E9E9E"
+          placeholderTextColor={colors.textPlaceholder}
           value={searchQuery}
           onChangeText={setSearchQuery}
           clearButtonMode="while-editing"
@@ -140,7 +141,7 @@ export default function OrcamentosListScreen() {
 
       {isLoading ? (
         <View style={styles.centerContainer}>
-          <ActivityIndicator size="large" color="#2E7D32" />
+          <ActivityIndicator size="large" color={colors.primary} />
           <Text style={styles.loadingText}>Carregando orçamentos...</Text>
         </View>
       ) : error ? (
@@ -159,7 +160,7 @@ export default function OrcamentosListScreen() {
           keyboardShouldPersistTaps="handled"
           keyboardDismissMode="on-drag"
           refreshControl={
-            <RefreshControl refreshing={isLoading} onRefresh={reload} colors={['#2E7D32']} />
+            <RefreshControl refreshing={isLoading} onRefresh={reload} colors={[colors.primary]} />
           }
           ListEmptyComponent={
             <View style={styles.emptyContainer}>
@@ -188,7 +189,7 @@ export default function OrcamentosListScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F8F9FA',
+    backgroundColor: colors.background,
   },
   header: {
     flexDirection: 'row',
@@ -197,28 +198,28 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingTop: 16,
     paddingBottom: 12,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: colors.surface,
     borderBottomWidth: 1,
-    borderBottomColor: '#EEEEEE',
+    borderBottomColor: colors.border,
   },
   headerTitle: {
     fontSize: 22,
     fontWeight: '700',
-    color: '#1B5E20',
+    color: colors.primaryDark,
   },
   headerSubtitle: {
     fontSize: 13,
-    color: '#616161',
+    color: colors.textMuted,
     marginTop: 2,
   },
   btnNovo: {
-    backgroundColor: '#2E7D32',
+    backgroundColor: colors.primary,
     paddingHorizontal: 16,
     paddingVertical: 10,
     borderRadius: 8,
   },
   btnNovoText: {
-    color: '#FFFFFF',
+    color: colors.textOnColor,
     fontSize: 14,
     fontWeight: '600',
   },
@@ -226,20 +227,20 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingTop: 12,
     paddingBottom: 8,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: colors.surface,
   },
   searchInput: {
-    backgroundColor: '#F1F3F4',
+    backgroundColor: colors.surfaceMuted,
     borderRadius: 8,
     paddingHorizontal: 14,
     paddingVertical: 10,
     fontSize: 14,
-    color: '#212121',
+    color: colors.text,
   },
   filterScrollWrapper: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: colors.surface,
     borderBottomWidth: 1,
-    borderBottomColor: '#EEEEEE',
+    borderBottomColor: colors.border,
   },
   filterContainer: {
     paddingHorizontal: 16,
@@ -250,19 +251,19 @@ const styles = StyleSheet.create({
     paddingHorizontal: 14,
     paddingVertical: 6,
     borderRadius: 20,
-    backgroundColor: '#F1F3F4',
+    backgroundColor: colors.surfaceMuted,
     marginRight: 6,
   },
   filterChipSelected: {
-    backgroundColor: '#2E7D32',
+    backgroundColor: colors.primary,
   },
   filterChipText: {
     fontSize: 13,
-    color: '#616161',
+    color: colors.textMuted,
     fontWeight: '500',
   },
   filterChipTextSelected: {
-    color: '#FFFFFF',
+    color: colors.textOnColor,
     fontWeight: '600',
   },
   listContent: {
@@ -270,14 +271,14 @@ const styles = StyleSheet.create({
     paddingBottom: 32,
   },
   card: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: colors.surface,
     borderRadius: 12,
     padding: 16,
     marginBottom: 12,
     borderWidth: 1,
-    borderColor: '#E8EAED',
+    borderColor: colors.border,
     elevation: 2,
-    shadowColor: '#000',
+    shadowColor: colors.shadow,
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.08,
     shadowRadius: 3,
@@ -294,11 +295,11 @@ const styles = StyleSheet.create({
   numeroText: {
     fontSize: 16,
     fontWeight: '700',
-    color: '#1B5E20',
+    color: colors.primaryDark,
   },
   clienteText: {
     fontSize: 14,
-    color: '#424242',
+    color: colors.textSecondary,
     marginTop: 2,
     fontWeight: '500',
   },
@@ -314,7 +315,7 @@ const styles = StyleSheet.create({
   },
   cardDivider: {
     height: 1,
-    backgroundColor: '#F1F3F4',
+    backgroundColor: colors.surfaceMuted,
     marginVertical: 12,
   },
   cardFooter: {
@@ -330,19 +331,19 @@ const styles = StyleSheet.create({
   },
   labelMuted: {
     fontSize: 11,
-    color: '#757575',
+    color: colors.textMuted,
     textTransform: 'uppercase',
   },
   infoValor: {
     fontSize: 13,
-    color: '#212121',
+    color: colors.text,
     marginTop: 2,
     fontWeight: '500',
   },
   totalValor: {
     fontSize: 16,
     fontWeight: '700',
-    color: '#2E7D32',
+    color: colors.primary,
     marginTop: 2,
   },
   centerContainer: {
@@ -353,23 +354,23 @@ const styles = StyleSheet.create({
   },
   loadingText: {
     marginTop: 12,
-    color: '#616161',
+    color: colors.textMuted,
     fontSize: 14,
   },
   errorText: {
-    color: '#C62828',
+    color: colors.danger,
     fontSize: 14,
     textAlign: 'center',
     marginBottom: 16,
   },
   retryButton: {
-    backgroundColor: '#2E7D32',
+    backgroundColor: colors.primary,
     paddingHorizontal: 20,
     paddingVertical: 10,
     borderRadius: 8,
   },
   retryButtonText: {
-    color: '#FFFFFF',
+    color: colors.textOnColor,
     fontSize: 14,
     fontWeight: '600',
   },
@@ -381,24 +382,24 @@ const styles = StyleSheet.create({
   emptyTitle: {
     fontSize: 16,
     fontWeight: '700',
-    color: '#424242',
+    color: colors.textSecondary,
     marginBottom: 6,
   },
   emptySubtitle: {
     fontSize: 13,
-    color: '#757575',
+    color: colors.textMuted,
     textAlign: 'center',
     lineHeight: 18,
     marginBottom: 20,
   },
   emptyButton: {
-    backgroundColor: '#2E7D32',
+    backgroundColor: colors.primary,
     paddingHorizontal: 20,
     paddingVertical: 10,
     borderRadius: 8,
   },
   emptyButtonText: {
-    color: '#FFFFFF',
+    color: colors.textOnColor,
     fontSize: 14,
     fontWeight: '600',
   },

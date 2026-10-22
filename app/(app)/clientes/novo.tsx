@@ -13,6 +13,7 @@ import {
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { clienteService } from '../../../src/application/services/cliente.service';
+import { colors } from '../../../src/presentation/theme';
 
 export default function NovoClienteScreen() {
   const router = useRouter();
@@ -134,7 +135,7 @@ export default function NovoClienteScreen() {
             <TextInput
               style={styles.input}
               placeholder="Ex: Maria da Silva"
-              placeholderTextColor="#94a3b8"
+              placeholderTextColor={colors.textPlaceholder}
               value={nome}
               onChangeText={setNome}
               maxLength={150}
@@ -147,7 +148,7 @@ export default function NovoClienteScreen() {
             <TextInput
               style={styles.input}
               placeholder="Ex: (11) 98888-7777"
-              placeholderTextColor="#94a3b8"
+              placeholderTextColor={colors.textPlaceholder}
               value={telefone}
               onChangeText={setTelefone}
               maxLength={30}
@@ -160,7 +161,7 @@ export default function NovoClienteScreen() {
             <TextInput
               style={styles.input}
               placeholder="Ex: cliente@email.com"
-              placeholderTextColor="#94a3b8"
+              placeholderTextColor={colors.textPlaceholder}
               value={email}
               onChangeText={setEmail}
               maxLength={255}
@@ -174,7 +175,7 @@ export default function NovoClienteScreen() {
             <TextInput
               style={styles.input}
               placeholder="Ex: 123.456.789-00"
-              placeholderTextColor="#94a3b8"
+              placeholderTextColor={colors.textPlaceholder}
               value={documento}
               onChangeText={setDocumento}
               maxLength={30}
@@ -186,7 +187,7 @@ export default function NovoClienteScreen() {
             <TextInput
               style={[styles.input, styles.textArea]}
               placeholder="Notas gerais sobre o cliente ou preferências..."
-              placeholderTextColor="#94a3b8"
+              placeholderTextColor={colors.textPlaceholder}
               value={observacoes}
               onChangeText={setObservacoes}
               multiline
@@ -209,7 +210,7 @@ export default function NovoClienteScreen() {
               <TextInput
                 style={styles.input}
                 placeholder="00000-000"
-                placeholderTextColor="#94a3b8"
+                placeholderTextColor={colors.textPlaceholder}
                 value={cep}
                 onChangeText={setCep}
                 maxLength={10}
@@ -222,7 +223,7 @@ export default function NovoClienteScreen() {
               <TextInput
                 style={styles.input}
                 placeholder="SP"
-                placeholderTextColor="#94a3b8"
+                placeholderTextColor={colors.textPlaceholder}
                 value={estado}
                 onChangeText={setEstado}
                 maxLength={2}
@@ -236,7 +237,7 @@ export default function NovoClienteScreen() {
             <TextInput
               style={styles.input}
               placeholder="Ex: São Paulo"
-              placeholderTextColor="#94a3b8"
+              placeholderTextColor={colors.textPlaceholder}
               value={cidade}
               onChangeText={setCidade}
               maxLength={100}
@@ -248,7 +249,7 @@ export default function NovoClienteScreen() {
             <TextInput
               style={styles.input}
               placeholder="Ex: Jardim Paulista"
-              placeholderTextColor="#94a3b8"
+              placeholderTextColor={colors.textPlaceholder}
               value={bairro}
               onChangeText={setBairro}
               maxLength={100}
@@ -261,7 +262,7 @@ export default function NovoClienteScreen() {
               <TextInput
                 style={styles.input}
                 placeholder="Ex: Rua das Flores"
-                placeholderTextColor="#94a3b8"
+                placeholderTextColor={colors.textPlaceholder}
                 value={logradouro}
                 onChangeText={setLogradouro}
                 maxLength={200}
@@ -273,7 +274,7 @@ export default function NovoClienteScreen() {
               <TextInput
                 style={styles.input}
                 placeholder="123"
-                placeholderTextColor="#94a3b8"
+                placeholderTextColor={colors.textPlaceholder}
                 value={numero}
                 onChangeText={setNumero}
                 maxLength={20}
@@ -286,7 +287,7 @@ export default function NovoClienteScreen() {
             <TextInput
               style={styles.input}
               placeholder="Ex: Casa 2 / Bloco B"
-              placeholderTextColor="#94a3b8"
+              placeholderTextColor={colors.textPlaceholder}
               value={complemento}
               onChangeText={setComplemento}
               maxLength={100}
@@ -302,7 +303,7 @@ export default function NovoClienteScreen() {
           activeOpacity={0.8}
         >
           {isSubmitting ? (
-            <ActivityIndicator color="#ffffff" />
+            <ActivityIndicator color={colors.surface} />
           ) : (
             <Text style={styles.submitButtonText}>Cadastrar Cliente</Text>
           )}
@@ -315,7 +316,7 @@ export default function NovoClienteScreen() {
 const styles = StyleSheet.create({
   keyboardContainer: {
     flex: 1,
-    backgroundColor: '#f8fafc',
+    backgroundColor: colors.background,
   },
   container: {
     flex: 1,
@@ -327,8 +328,8 @@ const styles = StyleSheet.create({
   errorBanner: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#fef2f2',
-    borderColor: '#fca5a5',
+    backgroundColor: colors.dangerSoft,
+    borderColor: colors.dangerBorder,
     borderWidth: 1,
     borderRadius: 8,
     padding: 12,
@@ -340,17 +341,17 @@ const styles = StyleSheet.create({
   },
   errorText: {
     fontSize: 13,
-    color: '#b91c1c',
+    color: colors.danger,
     flex: 1,
   },
   sectionCard: {
-    backgroundColor: '#ffffff',
+    backgroundColor: colors.surface,
     borderRadius: 12,
     padding: 18,
     marginBottom: 16,
     borderWidth: 1,
-    borderColor: '#e2e8f0',
-    shadowColor: '#000',
+    borderColor: colors.border,
+    shadowColor: colors.shadow,
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.05,
     shadowRadius: 3,
@@ -359,12 +360,12 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 16,
     fontWeight: '700',
-    color: '#1e293b',
+    color: colors.text,
     marginBottom: 4,
   },
   sectionSubtitle: {
     fontSize: 12,
-    color: '#64748b',
+    color: colors.textMuted,
     marginBottom: 14,
   },
   inputGroup: {
@@ -373,21 +374,21 @@ const styles = StyleSheet.create({
   label: {
     fontSize: 13,
     fontWeight: '600',
-    color: '#475569',
+    color: colors.textSecondary,
     marginBottom: 6,
   },
   requiredAsterisk: {
-    color: '#b91c1c',
+    color: colors.danger,
   },
   input: {
-    backgroundColor: '#f8fafc',
+    backgroundColor: colors.background,
     borderWidth: 1,
-    borderColor: '#cbd5e1',
+    borderColor: colors.borderStrong,
     borderRadius: 8,
     paddingHorizontal: 12,
     paddingVertical: 10,
     fontSize: 14,
-    color: '#0f172a',
+    color: colors.text,
   },
   textArea: {
     minHeight: 70,
@@ -396,7 +397,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
   },
   submitButton: {
-    backgroundColor: '#15803d',
+    backgroundColor: colors.primary,
     borderRadius: 8,
     paddingVertical: 14,
     alignItems: 'center',
@@ -407,7 +408,7 @@ const styles = StyleSheet.create({
     opacity: 0.7,
   },
   submitButtonText: {
-    color: '#ffffff',
+    color: colors.textOnColor,
     fontSize: 16,
     fontWeight: 'bold',
   },

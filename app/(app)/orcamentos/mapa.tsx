@@ -6,6 +6,7 @@ import { areaService } from '../../../src/application/services/area.service';
 import { GeometriaPoligono } from '../../../src/domain/types/geometria';
 import { RegiaoMapa } from '../../../src/infrastructure/maps/map-provider.interface';
 import { deviceLocationService } from '../../../src/infrastructure/services/location';
+import { colors } from '../../../src/presentation/theme';
 
 /**
  * Tela de Delimitação e Desenho de Área no Mapa.
@@ -130,7 +131,7 @@ export default function DelimitacaoMapaScreen() {
   if (carregandoPosicao) {
     return (
       <View style={styles.centerContainer}>
-        <ActivityIndicator size="large" color="#FFFFFF" />
+        <ActivityIndicator size="large" color={colors.surface} />
         <Text style={styles.loadingText}>Obtendo localização para o mapa...</Text>
       </View>
     );
@@ -151,16 +152,16 @@ export default function DelimitacaoMapaScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#000000',
+    backgroundColor: colors.black,
   },
   centerContainer: {
     flex: 1,
-    backgroundColor: '#000000',
+    backgroundColor: colors.black,
     alignItems: 'center',
     justifyContent: 'center',
   },
   loadingText: {
-    color: '#FFFFFF',
+    color: colors.textOnColor,
     marginTop: 12,
     fontSize: 14,
     fontWeight: '600',
