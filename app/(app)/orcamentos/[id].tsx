@@ -7,16 +7,19 @@ import {
   TouchableOpacity,
   ActivityIndicator,
   Alert,
+  Modal,
 } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useLocalSearchParams, useRouter, useFocusEffect } from 'expo-router';
 import { useOrcamentoDetalhe } from '../../../src/presentation/hooks/use-orcamento-detalhe';
 import { useGerarPdf } from '../../../src/presentation/hooks/use-gerar-pdf';
 import { useCompartilharPdf } from '../../../src/presentation/hooks/use-compartilhar-pdf';
 import { StatusOrcamento } from '../../../src/domain/enums/status-orcamento';
+import { TipoItem } from '../../../src/domain/enums/tipo-item';
 import { formatarDataCivil } from '../../../src/presentation/utils/data-formatters';
 import { formatarStatusOrcamento } from '../../../src/presentation/utils/status-orcamento.utils';
 import { colors, fonts } from '../../../src/presentation/theme';
-import { Button, Card, Icon, StatusBadge } from '../../../src/presentation/components/ui';
+import { Button, Card, Icon, IconName, StatusBadge } from '../../../src/presentation/components/ui';
 
 export default function OrcamentoDetalheScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -46,6 +49,8 @@ export default function OrcamentoDetalheScreen() {
 
   const { isGenerating: isGeneratingPdf, gerarEVisualizarPdf, executarBenchmark } = useGerarPdf();
   const { isSharing: isSharingPdf, compartilharPdf } = useCompartilharPdf();
+  const [menuVisivel, setMenuVisivel] = useState(false);
+  const insets = useSafeAreaInsets();
 
   const formatarMoeda = (valor: number): string => {
     return `R$ ${valor.toFixed(2).replace('.', ',')}`;
@@ -149,313 +154,385 @@ export default function OrcamentoDetalheScreen() {
 
   const isRascunho = orcamento.status === StatusOrcamento.RASCUNHO;
 
+  // Ação principal do status atual (barra fixa). Mesmas transições e mensagens de antes.
+  let acaoPrincipal: { titulo: string; icone: IconName; onPress: () => void } | null = null;
+  if (isRascunho) {
+    acaoPrincipal = {
+      titulo: 'Enviar Proposta',
+      icone: 'send',
+      onPress: () =>
+        handleTransitarStatus(
+          StatusOrcamento.ENVIADO,
+          'Deseja enviar esta proposta? Ela sairá do status de rascunho.'
+        ),
+    };
+  } else if (orcamento.status === StatusOrcamento.ENVIADO) {
+    acaoPrincipal = {
+      titulo: 'Marcar "Em análise"',
+      icone: 'check',
+      onPress: () =>
+        handleTransitarStatus(
+          StatusOrcamento.EM_ANALISE,
+          'Marcar orçamento como "Em análise" pelo cliente?'
+        ),
+    };
+  } else if (orcamento.status === StatusOrcamento.EM_ANALISE) {
+    acaoPrincipal = {
+      titulo: 'Aprovar Orçamento',
+      icone: 'check',
+      onPress: () =>
+        handleTransitarStatus(
+          StatusOrcamento.APROVADO,
+          'Confirmar aprovação do orçamento pelo cliente?'
+        ),
+    };
+  } else if (orcamento.status === StatusOrcamento.APROVADO) {
+    acaoPrincipal = {
+      titulo: 'Concluir Orçamento',
+      icone: 'check',
+      onPress: () =>
+        handleTransitarStatus(
+          StatusOrcamento.CONCLUIDO,
+          'Finalizar e marcar serviços deste orçamento como Concluídos?'
+        ),
+    };
+  }
+
+  // Demais ações do status atual (menu ⋮). Mesmas transições e mensagens de antes.
+  const acoesMenu: {
+    titulo: string;
+    icone: IconName;
+    onPress?: () => void;
+    perigo?: boolean;
+    detalhe?: string;
+  }[] = [{ titulo: 'Duplicar Orçamento', icone: 'copy', onPress: handleDuplicar }];
+
+  if (isRascunho) {
+    acoesMenu.push(
+      {
+        titulo: 'Editar Dados (Rascunho)',
+        icone: 'edit',
+        onPress: () => router.push(`/orcamentos/editar?id=${orcamento.id}` as any),
+      },
+      { titulo: 'Excluir Rascunho', icone: 'trash', onPress: handleExcluir, perigo: true }
+    );
+  } else {
+    // RF69: edição direta só em RASCUNHO; a opção aparece desabilitada para explicar o motivo
+    acoesMenu.push({ titulo: 'Editar Dados', icone: 'edit', detalhe: 'Disponível somente em Rascunho' });
+  }
+  if (orcamento.status === StatusOrcamento.ENVIADO) {
+    acoesMenu.push({
+      titulo: 'Cancelar Proposta',
+      icone: 'cancel',
+      perigo: true,
+      onPress: () =>
+        handleTransitarStatus(
+          StatusOrcamento.CANCELADO,
+          'Tem certeza que deseja cancelar esta proposta enviada?'
+        ),
+    });
+  }
+  if (orcamento.status === StatusOrcamento.EM_ANALISE) {
+    acoesMenu.push(
+      {
+        titulo: 'Recusar Orçamento',
+        icone: 'cancel',
+        perigo: true,
+        onPress: () =>
+          handleTransitarStatus(
+            StatusOrcamento.RECUSADO,
+            'Confirmar recusa do orçamento pelo cliente?'
+          ),
+      },
+      {
+        titulo: 'Cancelar Proposta',
+        icone: 'cancel',
+        perigo: true,
+        onPress: () =>
+          handleTransitarStatus(
+            StatusOrcamento.CANCELADO,
+            'Tem certeza que deseja cancelar esta proposta em análise?'
+          ),
+      }
+    );
+  }
+
+  const pdfOcupado = isGeneratingPdf || isSharingPdf || isSaving;
+
   return (
     <View style={styles.container}>
       <ScrollView contentContainerStyle={styles.scrollContent}>
-        {/* Cabeçalho do Orçamento */}
-        <Card style={styles.cardHeaderPrincipal}>
-          <View style={styles.headerLeft}>
-            <Text style={styles.numeroOrcamento}>{orcamento.numero}</Text>
-            <Text style={styles.dataCriacaoSub}>Criado em {formatarData(orcamento.dataCriacao)}</Text>
-          </View>
-          <StatusBadge status={orcamento.status} />
-        </Card>
-
-        {/* Card do Cliente */}
-        <Card style={styles.cardSection}>
-          <Text style={styles.cardSectionTitle}>Cliente</Text>
-          <Text style={styles.clienteNome}>{clienteNome || 'Cliente não identificado'}</Text>
-          {clienteTelefone ? <Text style={styles.clienteInfoText}>Telefone: {clienteTelefone}</Text> : null}
-          {clienteEmail ? <Text style={styles.clienteInfoText}>E-mail: {clienteEmail}</Text> : null}
-        </Card>
-
-        {/* Card de Itens */}
-        <Card style={styles.cardSection}>
-          <View style={styles.itensSectionHeader}>
-            <Text style={styles.cardSectionTitle}>Itens ({itens.length})</Text>
-            {isRascunho ? (
-              <TouchableOpacity
-                style={styles.btnEditarItensHeader}
-                onPress={() => router.push(`/orcamentos/editar?id=${orcamento.id}` as any)}
-              >
-                <Text style={styles.btnEditarItensHeaderText}>Gerenciar Itens</Text>
-              </TouchableOpacity>
-            ) : null}
-          </View>
-
-          {itens.length === 0 ? (
-            <Text style={styles.emptyItensAviso}>Nenhum item adicionado a este orçamento.</Text>
-          ) : (
-            itens.map((it) => (
-              <View key={it.id} style={styles.itemRow}>
-                <View style={{ flex: 1, marginRight: 8 }}>
-                  <View style={styles.itemTipoBadge}>
-                    <Text style={styles.itemTipoBadgeText}>{it.tipo}</Text>
-                  </View>
-                  <Text style={styles.itemDescricao}>{it.descricao}</Text>
-                  <Text style={styles.itemSubinfo}>
-                    {it.usaMedicaoArea
-                      ? `${it.quantidade.toFixed(2)} m² (${it.areas.length} ${it.areas.length === 1 ? 'área' : 'áreas'}) x ${formatarMoeda(it.valorUnitario)}`
-                      : `${it.quantidade} ${it.unidade} x ${formatarMoeda(it.valorUnitario)}`}
-                  </Text>
-                  {it.usaMedicaoArea ? (
-                    <TouchableOpacity
-                      style={styles.btnGerenciarAreas}
-                      onPress={() =>
-                        router.push(
-                          `/orcamentos/areas?orcamentoId=${orcamento.id}&itemId=${it.id}` as any
-                        )
-                      }
-                      activeOpacity={0.7}
-                    >
-                      <Text style={styles.btnGerenciarAreasText}>
-                        <Icon name="map" size={12} /> Áreas Medidas ({it.areas.length})
-                      </Text>
-                    </TouchableOpacity>
-                  ) : null}
-                </View>
-                <View style={{ alignItems: 'flex-end', justifyContent: 'space-between' }}>
-                  <Text style={styles.itemTotal}>{formatarMoeda(it.valorTotal)}</Text>
-                  {isRascunho ? (
-                    <TouchableOpacity onPress={() => handleRemoverItemConfirm(it.id, it.descricao)}>
-                      <Text style={styles.btnRemoverItem}>Excluir</Text>
-                    </TouchableOpacity>
-                  ) : null}
-                </View>
-              </View>
-            ))
-          )}
-        </Card>
-
-        {/* Card de Resumo Financeiro */}
-        <Card style={styles.cardSection}>
-          <Text style={styles.cardSectionTitle}>Resumo Financeiro</Text>
-          <View style={styles.financeiroRow}>
-            <Text style={styles.financeiroLabel}>Subtotal:</Text>
-            <Text style={styles.financeiroValor}>{formatarMoeda(orcamento.subtotal)}</Text>
-          </View>
-
-          {orcamento.valorDesconto > 0 ? (
-            <View style={styles.financeiroRow}>
-              <Text style={styles.financeiroLabelDesconto}>
-                Desconto ({orcamento.tipoDesconto === 'PERCENTUAL' ? `${orcamento.valorDesconto}%` : 'Fixo'}):
-              </Text>
-              <Text style={styles.financeiroValorDesconto}>
-                -{' '}
-                {formatarMoeda(
-                  orcamento.tipoDesconto === 'PERCENTUAL'
-                    ? (orcamento.subtotal * orcamento.valorDesconto) / 100
-                    : orcamento.valorDesconto
-                )}
-              </Text>
+        {/* Resumo do orçamento */}
+        <View style={styles.hero}>
+          <View style={styles.heroTopo}>
+            <View style={styles.heroIdentificacao}>
+              <Text style={styles.numeroOrcamento}>{orcamento.numero}</Text>
+              <Text style={styles.dataCriacaoSub}>Criado em {formatarData(orcamento.dataCriacao)}</Text>
             </View>
-          ) : null}
-
-          <View style={[styles.financeiroRow, styles.financeiroTotalRow]}>
-            <Text style={styles.financeiroTotalLabel}>Total:</Text>
-            <Text style={styles.financeiroTotalValor}>{formatarMoeda(orcamento.total)}</Text>
-          </View>
-        </Card>
-
-        {/* Card de Condições e Validade */}
-        <Card style={styles.cardSection}>
-          <Text style={styles.cardSectionTitle}>Prazos e Condições</Text>
-          <View style={styles.infoCampoRow}>
-            <Text style={styles.infoCampoLabel}>Data de Validade:</Text>
-            <Text style={styles.infoCampoValor}>
-              {orcamento.dataValidade ? formatarData(orcamento.dataValidade) : 'Não informada'}
-            </Text>
-          </View>
-
-          {orcamento.condicoesPagamento ? (
-            <View style={styles.infoCampoRow}>
-              <Text style={styles.infoCampoLabel}>Condições de Pagamento:</Text>
-              <Text style={styles.infoCampoValor}>{orcamento.condicoesPagamento}</Text>
-            </View>
-          ) : null}
-
-          {orcamento.observacoes ? (
-            <View style={styles.infoCampoRow}>
-              <Text style={styles.infoCampoLabel}>Observações:</Text>
-              <Text style={styles.infoCampoValor}>{orcamento.observacoes}</Text>
-            </View>
-          ) : null}
-        </Card>
-
-        {/* Seção de Ações de Ciclo de Vida e Gestão */}
-        <View style={styles.acoesContainer}>
-          {/* Ações de Emissão, Visualização e Compartilhamento de PDF (RF80 / RF82 / RN81 / RNF03) */}
-          <View style={styles.pdfBotoesRow}>
-            {/* Visualização de PDF (Bloco B - Homologado) */}
             <TouchableOpacity
-              style={[styles.btnGerarPdf, isGeneratingPdf && styles.btnDesabilitado]}
-              onPress={() => gerarEVisualizarPdf(orcamento.id)}
-              onLongPress={async () => {
-                Alert.alert('Iniciando Benchmark', 'Executando protocolo oficial (1 warm-up + 5 amostras para Cenários A, B, C)...');
-                try {
-                  const res = await executarBenchmark([
-                    { id: '366b942a-35dd-41b3-bea6-35e60944d582', nome: 'Cenário A (Pequeno)' },
-                    { id: '6306122b-fe26-4468-a4fc-786dd2486909', nome: 'Cenário B (Médio)' },
-                    { id: '1f70f86a-4afc-48f1-9cd9-7bff62ce07fc', nome: 'Cenário C (Grande)' },
-                  ]);
-                  const textoRes = Object.entries(res)
-                    .map(([nome, d]) => `${nome}:\nAmostras: [${d.amostras.join(', ')}] ms\nMédia: ${d.media}ms | p95: ${d.p95}ms`)
-                    .join('\n\n');
-                  Alert.alert('Resultado Benchmark Oficial', textoRes);
-                } catch (e: unknown) {
-                  Alert.alert('Erro no Benchmark', e instanceof Error ? e.message : String(e));
-                }
-              }}
-              disabled={isGeneratingPdf || isSharingPdf || isSaving}
-              activeOpacity={0.8}
+              style={styles.btnMenu}
+              onPress={() => setMenuVisivel(true)}
+              disabled={isSaving}
+              accessibilityRole="button"
+              accessibilityLabel="Mais ações"
+              hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
             >
-              {isGeneratingPdf ? (
-                <View style={styles.loadingRow}>
-                  <ActivityIndicator size="small" color={colors.surface} />
-                  <Text style={styles.btnGerarPdfText}>Abrindo...</Text>
-                </View>
-              ) : (
-                <View style={styles.loadingRow}>
-                  <Icon name="file" size={18} color={colors.textOnColor} style={styles.btnGerarPdfIcon} />
-                  <Text style={styles.btnGerarPdfText}>Visualizar PDF</Text>
-                </View>
-              )}
-            </TouchableOpacity>
-
-            {/* Compartilhamento de PDF (Bloco C) */}
-            <TouchableOpacity
-              style={[styles.btnCompartilharPdf, isSharingPdf && styles.btnDesabilitado]}
-              onPress={() => compartilharPdf(orcamento.id)}
-              disabled={isGeneratingPdf || isSharingPdf || isSaving}
-              activeOpacity={0.8}
-            >
-              {isSharingPdf ? (
-                <View style={styles.loadingRow}>
-                  <ActivityIndicator size="small" color={colors.surface} />
-                  <Text style={styles.btnCompartilharPdfText}>Preparando...</Text>
-                </View>
-              ) : (
-                <View style={styles.loadingRow}>
-                  <Icon name="share" size={18} color={colors.textOnColor} style={styles.btnCompartilharPdfIcon} />
-                  <Text style={styles.btnCompartilharPdfText}>Compartilhar</Text>
-                </View>
-              )}
+              <Icon name="more" size={22} color={colors.textOnColor} />
             </TouchableOpacity>
           </View>
+          <StatusBadge status={orcamento.status} style={styles.heroStatus} />
+          <Text style={styles.heroTotal}>{formatarMoeda(orcamento.total)}</Text>
+          <Text style={styles.heroCliente} numberOfLines={1}>
+            {clienteNome || 'Cliente não identificado'}
+          </Text>
+        </View>
 
-          {isSaving ? (
-            <ActivityIndicator size="small" color={colors.primary} style={{ marginVertical: 12 }} />
-          ) : (
-            <>
-              {/* Ações para RASCUNHO */}
+        <View style={styles.secoes}>
+          {/* Card de Itens */}
+          <Card style={styles.cardSection}>
+            <View style={styles.itensSectionHeader}>
+              <Text style={styles.cardSectionTitle}>Itens ({itens.length})</Text>
               {isRascunho ? (
-                <>
-                  <Button
-                    title="Enviar Proposta"
-                    onPress={() =>
-                      handleTransitarStatus(
-                        StatusOrcamento.ENVIADO,
-                        'Deseja enviar esta proposta? Ela sairá do status de rascunho.'
-                      )
-                    }
-                  />
-
-                  <Button
-                    title="Editar Dados (Rascunho)"
-                    variant="secondary"
-                    onPress={() => router.push(`/orcamentos/editar?id=${orcamento.id}` as any)}
-                  />
-
-                  <Button
-                    title="Excluir Rascunho"
-                    variant="danger"
-                    onPress={handleExcluir}
-                  />
-                </>
+                <TouchableOpacity
+                  onPress={() => router.push(`/orcamentos/editar?id=${orcamento.id}` as any)}
+                  hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+                  accessibilityRole="button"
+                >
+                  <Text style={styles.linkAcao}>Gerenciar Itens</Text>
+                </TouchableOpacity>
               ) : null}
+            </View>
 
-              {/* Ações para ENVIADO */}
-              {orcamento.status === StatusOrcamento.ENVIADO ? (
-                <>
-                  <Button
-                    title={'Marcar "Em análise"'}
-                    onPress={() =>
-                      handleTransitarStatus(
-                        StatusOrcamento.EM_ANALISE,
-                        'Marcar orçamento como "Em análise" pelo cliente?'
-                      )
-                    }
-                  />
+            {itens.length === 0 ? (
+              <Text style={styles.emptyItensAviso}>Nenhum item adicionado a este orçamento.</Text>
+            ) : (
+              itens.map((it, indice) => (
+                <View key={it.id} style={[styles.itemRow, indice === itens.length - 1 && styles.itemRowUltimo]}>
+                  <View style={styles.itemIcone}>
+                    <Icon
+                      name={it.tipo === TipoItem.PRODUTO ? 'package' : 'leaf'}
+                      size={18}
+                      color={colors.primaryDark}
+                    />
+                  </View>
+                  <View style={styles.itemTextos}>
+                    <Text style={styles.itemDescricao}>{it.descricao}</Text>
+                    <Text style={styles.itemSubinfo}>
+                      {it.usaMedicaoArea
+                        ? `${it.quantidade.toFixed(2)} m² (${it.areas.length} ${it.areas.length === 1 ? 'área' : 'áreas'}) x ${formatarMoeda(it.valorUnitario)}`
+                        : `${it.quantidade} ${it.unidade} x ${formatarMoeda(it.valorUnitario)}`}
+                    </Text>
+                    {it.usaMedicaoArea ? (
+                      <TouchableOpacity
+                        style={styles.btnGerenciarAreas}
+                        onPress={() =>
+                          router.push(
+                            `/orcamentos/areas?orcamentoId=${orcamento.id}&itemId=${it.id}` as any
+                          )
+                        }
+                        activeOpacity={0.7}
+                      >
+                        <Text style={styles.btnGerenciarAreasText}>
+                          <Icon name="map" size={12} /> Áreas Medidas ({it.areas.length})
+                        </Text>
+                      </TouchableOpacity>
+                    ) : null}
+                  </View>
+                  <View style={styles.itemValores}>
+                    <Text style={styles.itemTotal}>{formatarMoeda(it.valorTotal)}</Text>
+                    {isRascunho ? (
+                      <TouchableOpacity
+                        onPress={() => handleRemoverItemConfirm(it.id, it.descricao)}
+                        hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+                      >
+                        <Text style={styles.btnRemoverItem}>Excluir</Text>
+                      </TouchableOpacity>
+                    ) : null}
+                  </View>
+                </View>
+              ))
+            )}
+          </Card>
 
-                  <Button
-                    title="Cancelar Proposta"
-                    variant="danger"
-                    onPress={() =>
-                      handleTransitarStatus(
-                        StatusOrcamento.CANCELADO,
-                        'Tem certeza que deseja cancelar esta proposta enviada?'
-                      )
-                    }
-                  />
-                </>
-              ) : null}
+          {/* Card de Resumo Financeiro */}
+          <Card style={styles.cardSection}>
+            <Text style={styles.cardSectionTitle}>Resumo Financeiro</Text>
+            <View style={styles.financeiroRow}>
+              <Text style={styles.financeiroLabel}>Subtotal:</Text>
+              <Text style={styles.financeiroValor}>{formatarMoeda(orcamento.subtotal)}</Text>
+            </View>
 
-              {/* Ações para EM_ANALISE */}
-              {orcamento.status === StatusOrcamento.EM_ANALISE ? (
-                <>
-                  <Button
-                    title="Aprovar Orçamento"
-                    onPress={() =>
-                      handleTransitarStatus(
-                        StatusOrcamento.APROVADO,
-                        'Confirmar aprovação do orçamento pelo cliente?'
-                      )
-                    }
-                  />
+            {orcamento.valorDesconto > 0 ? (
+              <View style={styles.financeiroRow}>
+                <Text style={styles.financeiroLabelDesconto}>
+                  Desconto ({orcamento.tipoDesconto === 'PERCENTUAL' ? `${orcamento.valorDesconto}%` : 'Fixo'}):
+                </Text>
+                <Text style={styles.financeiroValorDesconto}>
+                  -{' '}
+                  {formatarMoeda(
+                    orcamento.tipoDesconto === 'PERCENTUAL'
+                      ? (orcamento.subtotal * orcamento.valorDesconto) / 100
+                      : orcamento.valorDesconto
+                  )}
+                </Text>
+              </View>
+            ) : null}
 
-                  <Button
-                    title="Recusar Orçamento"
-                    variant="danger"
-                    onPress={() =>
-                      handleTransitarStatus(
-                        StatusOrcamento.RECUSADO,
-                        'Confirmar recusa do orçamento pelo cliente?'
-                      )
-                    }
-                  />
+            <View style={[styles.financeiroRow, styles.financeiroTotalRow]}>
+              <Text style={styles.financeiroTotalLabel}>Total:</Text>
+              <Text style={styles.financeiroTotalValor}>{formatarMoeda(orcamento.total)}</Text>
+            </View>
+          </Card>
 
-                  <Button
-                    title="Cancelar Proposta"
-                    variant="danger"
-                    onPress={() =>
-                      handleTransitarStatus(
-                        StatusOrcamento.CANCELADO,
-                        'Tem certeza que deseja cancelar esta proposta em análise?'
-                      )
-                    }
-                  />
-                </>
-              ) : null}
+          {/* Card de Condições e Validade */}
+          <Card style={styles.cardSection}>
+            <Text style={styles.cardSectionTitle}>Prazos e Condições</Text>
+            <View style={styles.infoCampoRow}>
+              <Text style={styles.infoCampoLabel}>Data de Validade</Text>
+              <Text style={styles.infoCampoValor}>
+                {orcamento.dataValidade ? formatarData(orcamento.dataValidade) : 'Não informada'}
+              </Text>
+            </View>
 
-              {/* Ações para APROVADO */}
-              {orcamento.status === StatusOrcamento.APROVADO ? (
-                <Button
-                  title="Concluir Orçamento"
-                  onPress={() =>
-                    handleTransitarStatus(
-                      StatusOrcamento.CONCLUIDO,
-                      'Finalizar e marcar serviços deste orçamento como Concluídos?'
-                    )
-                  }
-                />
-              ) : null}
+            {orcamento.condicoesPagamento ? (
+              <View style={styles.infoCampoRow}>
+                <Text style={styles.infoCampoLabel}>Condições de Pagamento</Text>
+                <Text style={styles.infoCampoValor}>{orcamento.condicoesPagamento}</Text>
+              </View>
+            ) : null}
 
-              {/* Ação universal: Duplicar Orçamento (sempre disponível) */}
-              <Button title="Duplicar Orçamento" variant="neutral" onPress={handleDuplicar} />
-            </>
-          )}
+            {orcamento.observacoes ? (
+              <View style={styles.infoCampoRow}>
+                <Text style={styles.infoCampoLabel}>Observações</Text>
+                <Text style={styles.infoCampoValor}>{orcamento.observacoes}</Text>
+              </View>
+            ) : null}
+          </Card>
+
+          {/* Card do Cliente */}
+          <Card style={styles.cardSection}>
+            <Text style={styles.cardSectionTitle}>Cliente</Text>
+            <Text style={styles.clienteNome}>{clienteNome || 'Cliente não identificado'}</Text>
+            {clienteTelefone ? <Text style={styles.clienteInfoText}>Telefone: {clienteTelefone}</Text> : null}
+            {clienteEmail ? <Text style={styles.clienteInfoText}>E-mail: {clienteEmail}</Text> : null}
+          </Card>
         </View>
       </ScrollView>
+
+      {/* Barra fixa: PDF (RF79 / RF80), compartilhamento (RF82) e ação principal do status */}
+      <View style={[styles.barraAcoes, { paddingBottom: 12 + insets.bottom }]}>
+        <TouchableOpacity
+          style={[styles.btnIcone, pdfOcupado && styles.btnDesabilitado]}
+          onPress={() => gerarEVisualizarPdf(orcamento.id)}
+          onLongPress={async () => {
+            Alert.alert('Iniciando Benchmark', 'Executando protocolo oficial (1 warm-up + 5 amostras para Cenários A, B, C)...');
+            try {
+              const res = await executarBenchmark([
+                { id: '366b942a-35dd-41b3-bea6-35e60944d582', nome: 'Cenário A (Pequeno)' },
+                { id: '6306122b-fe26-4468-a4fc-786dd2486909', nome: 'Cenário B (Médio)' },
+                { id: '1f70f86a-4afc-48f1-9cd9-7bff62ce07fc', nome: 'Cenário C (Grande)' },
+              ]);
+              const textoRes = Object.entries(res)
+                .map(([nome, d]) => `${nome}:\nAmostras: [${d.amostras.join(', ')}] ms\nMédia: ${d.media}ms | p95: ${d.p95}ms`)
+                .join('\n\n');
+              Alert.alert('Resultado Benchmark Oficial', textoRes);
+            } catch (e: unknown) {
+              Alert.alert('Erro no Benchmark', e instanceof Error ? e.message : String(e));
+            }
+          }}
+          disabled={isGeneratingPdf || isSharingPdf || isSaving}
+          activeOpacity={0.8}
+          accessibilityRole="button"
+          accessibilityLabel="Visualizar PDF"
+          accessibilityState={{ disabled: pdfOcupado, busy: isGeneratingPdf }}
+        >
+          {isGeneratingPdf ? (
+            <ActivityIndicator size="small" color={colors.primaryDark} />
+          ) : (
+            <Icon name="file" size={22} color={colors.primaryDark} />
+          )}
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={[styles.btnIcone, pdfOcupado && styles.btnDesabilitado]}
+          onPress={() => compartilharPdf(orcamento.id)}
+          disabled={isGeneratingPdf || isSharingPdf || isSaving}
+          activeOpacity={0.8}
+          accessibilityRole="button"
+          accessibilityLabel="Compartilhar PDF"
+          accessibilityState={{ disabled: pdfOcupado, busy: isSharingPdf }}
+        >
+          {isSharingPdf ? (
+            <ActivityIndicator size="small" color={colors.primaryDark} />
+          ) : (
+            <Icon name="share" size={22} color={colors.primaryDark} />
+          )}
+        </TouchableOpacity>
+
+        {acaoPrincipal ? (
+          <Button
+            title={acaoPrincipal.titulo}
+            icon={acaoPrincipal.icone}
+            onPress={acaoPrincipal.onPress}
+            loading={isSaving}
+            style={styles.btnPrincipal}
+          />
+        ) : isSaving ? (
+          <View style={styles.btnPrincipal}>
+            <ActivityIndicator size="small" color={colors.primary} />
+          </View>
+        ) : null}
+      </View>
+
+      {/* Menu ⋮: demais ações do status atual */}
+      <Modal visible={menuVisivel} transparent animationType="slide" onRequestClose={() => setMenuVisivel(false)}>
+        <View style={styles.menuOverlay}>
+          <TouchableOpacity
+            style={styles.menuFundo}
+            onPress={() => setMenuVisivel(false)}
+            accessibilityRole="button"
+            accessibilityLabel="Fechar menu"
+          />
+          <View style={[styles.menuPainel, { paddingBottom: 16 + insets.bottom }]}>
+            <View style={styles.menuAlca} />
+            <View style={styles.menuCabecalho}>
+              <Text style={styles.menuTitulo}>{orcamento.numero}</Text>
+              <StatusBadge status={orcamento.status} />
+            </View>
+            {acoesMenu.map((acao) => (
+              <TouchableOpacity
+                key={acao.titulo}
+                style={styles.menuItem}
+                disabled={!acao.onPress}
+                onPress={() => {
+                  setMenuVisivel(false);
+                  acao.onPress?.();
+                }}
+                accessibilityRole="button"
+                accessibilityState={{ disabled: !acao.onPress }}
+              >
+                <Icon
+                  name={acao.icone}
+                  size={20}
+                  color={!acao.onPress ? colors.textPlaceholder : acao.perigo ? colors.danger : colors.primaryDark}
+                />
+                <View style={styles.menuItemTextos}>
+                  <Text
+                    style={[
+                      styles.menuItemTitulo,
+                      acao.perigo && styles.menuItemTituloPerigo,
+                      !acao.onPress && styles.menuItemTituloDesabilitado,
+                    ]}
+                  >
+                    {acao.titulo}
+                  </Text>
+                  {acao.detalhe ? <Text style={styles.menuItemDetalhe}>{acao.detalhe}</Text> : null}
+                </View>
+              </TouchableOpacity>
+            ))}
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 }
@@ -466,40 +543,89 @@ const styles = StyleSheet.create({
     backgroundColor: colors.background,
   },
   scrollContent: {
-    padding: 16,
-    paddingBottom: 40,
+    paddingBottom: 24,
   },
-  cardHeaderPrincipal: {
+  centerContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 32,
+  },
+  loadingText: {
+    marginTop: 12,
+    color: colors.textMuted,
+    fontSize: 14,
+    fontFamily: fonts.regular,
+  },
+  errorText: {
+    color: colors.danger,
+    fontSize: 15,
+    fontFamily: fonts.regular,
+    textAlign: 'center',
+    marginBottom: 16,
+  },
+  hero: {
+    backgroundColor: colors.primaryDark,
+    paddingHorizontal: 20,
+    paddingTop: 8,
+    paddingBottom: 24,
+  },
+  heroTopo: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
     alignItems: 'flex-start',
-    marginBottom: 12,
   },
-  headerLeft: {
+  heroIdentificacao: {
     flex: 1,
   },
   numeroOrcamento: {
-    fontSize: 20,
+    fontSize: 15,
     fontFamily: fonts.bold,
-    color: colors.primaryDark,
+    color: colors.primarySoft,
   },
   dataCriacaoSub: {
-    fontSize: 13,
+    fontSize: 12,
     fontFamily: fonts.regular,
-    color: colors.textMuted,
+    color: colors.primarySoft,
     marginTop: 2,
+  },
+  btnMenu: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginTop: -6,
+    marginRight: -10,
+  },
+  heroStatus: {
+    marginTop: 12,
+  },
+  heroTotal: {
+    fontSize: 32,
+    fontFamily: fonts.extrabold,
+    color: colors.textOnColor,
+    marginTop: 8,
+  },
+  heroCliente: {
+    fontSize: 15,
+    fontFamily: fonts.medium,
+    color: colors.primarySoft,
+    marginTop: 2,
+  },
+  secoes: {
+    padding: 16,
   },
   cardSection: {
     marginBottom: 12,
   },
   cardSectionTitle: {
-    fontSize: 15,
-    fontFamily: fonts.bold,
-    color: colors.primaryDark,
-    marginBottom: 8,
+    fontSize: 16,
+    fontFamily: fonts.extrabold,
+    color: colors.text,
+    marginBottom: 10,
   },
   clienteNome: {
-    fontSize: 16,
+    fontSize: 15,
     fontFamily: fonts.semibold,
     color: colors.text,
   },
@@ -512,17 +638,10 @@ const styles = StyleSheet.create({
   itensSectionHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 10,
+    alignItems: 'baseline',
   },
-  btnEditarItensHeader: {
-    backgroundColor: colors.primarySoft,
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-    borderRadius: 6,
-  },
-  btnEditarItensHeaderText: {
-    fontSize: 12,
+  linkAcao: {
+    fontSize: 13,
     fontFamily: fonts.bold,
     color: colors.primary,
   },
@@ -535,27 +654,31 @@ const styles = StyleSheet.create({
   },
   itemRow: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
-    paddingVertical: 10,
+    alignItems: 'flex-start',
+    paddingVertical: 12,
     borderBottomWidth: 1,
     borderBottomColor: colors.surfaceMuted,
   },
-  itemTipoBadge: {
-    backgroundColor: colors.tealSoft,
-    alignSelf: 'flex-start',
-    paddingHorizontal: 6,
-    paddingVertical: 2,
-    borderRadius: 4,
-    marginBottom: 2,
+  itemRowUltimo: {
+    borderBottomWidth: 0,
+    paddingBottom: 0,
   },
-  itemTipoBadgeText: {
-    fontSize: 10,
-    fontFamily: fonts.bold,
-    color: colors.teal,
+  itemIcone: {
+    width: 36,
+    height: 36,
+    borderRadius: 10,
+    backgroundColor: colors.primarySoft,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: 12,
+  },
+  itemTextos: {
+    flex: 1,
+    marginRight: 8,
   },
   itemDescricao: {
     fontSize: 14,
-    fontFamily: fonts.semibold,
+    fontFamily: fonts.bold,
     color: colors.text,
   },
   itemSubinfo: {
@@ -564,26 +687,24 @@ const styles = StyleSheet.create({
     color: colors.textMuted,
     marginTop: 2,
   },
+  itemValores: {
+    alignItems: 'flex-end',
+  },
   itemTotal: {
     fontSize: 14,
-    fontFamily: fonts.bold,
-    color: colors.primary,
+    fontFamily: fonts.extrabold,
+    color: colors.text,
   },
   btnRemoverItem: {
     fontSize: 12,
-    fontFamily: fonts.regular,
+    fontFamily: fonts.semibold,
     color: colors.danger,
-    marginTop: 4,
+    marginTop: 6,
   },
   btnGerenciarAreas: {
-    backgroundColor: colors.primarySoft,
     alignSelf: 'flex-start',
-    paddingHorizontal: 8,
     paddingVertical: 4,
-    borderRadius: 6,
-    marginTop: 6,
-    borderWidth: 1,
-    borderColor: colors.primaryBorder,
+    marginTop: 4,
   },
   btnGerenciarAreasText: {
     fontSize: 12,
@@ -617,27 +738,29 @@ const styles = StyleSheet.create({
   },
   financeiroTotalRow: {
     marginTop: 8,
-    paddingTop: 8,
+    paddingTop: 10,
     borderTopWidth: 1,
     borderTopColor: colors.border,
   },
   financeiroTotalLabel: {
     fontSize: 16,
-    fontFamily: fonts.bold,
-    color: colors.primaryDark,
+    fontFamily: fonts.extrabold,
+    color: colors.text,
   },
   financeiroTotalValor: {
-    fontSize: 18,
-    fontFamily: fonts.bold,
-    color: colors.primary,
+    fontSize: 16,
+    fontFamily: fonts.extrabold,
+    color: colors.primaryDark,
   },
   infoCampoRow: {
-    marginVertical: 4,
+    marginVertical: 5,
   },
   infoCampoLabel: {
     fontSize: 12,
-    fontFamily: fonts.semibold,
+    fontFamily: fonts.bold,
     color: colors.textMuted,
+    textTransform: 'uppercase',
+    letterSpacing: 0.6,
   },
   infoCampoValor: {
     fontSize: 14,
@@ -645,84 +768,95 @@ const styles = StyleSheet.create({
     color: colors.text,
     marginTop: 2,
   },
-  acoesContainer: {
-    gap: 10,
-    marginTop: 8,
-  },
-  centerContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: 32,
-  },
-  loadingText: {
-    marginTop: 12,
-    color: colors.textMuted,
-    fontSize: 14,
-    fontFamily: fonts.regular,
-  },
-  errorText: {
-    color: colors.danger,
-    fontSize: 15,
-    fontFamily: fonts.regular,
-    textAlign: 'center',
-    marginBottom: 16,
-  },
-  pdfBotoesRow: {
+  barraAcoes: {
     flexDirection: 'row',
+    alignItems: 'center',
     gap: 10,
-    marginBottom: 12,
+    paddingHorizontal: 16,
+    paddingTop: 12,
+    backgroundColor: colors.surface,
+    borderTopWidth: 1,
+    borderTopColor: colors.border,
   },
-  btnGerarPdf: {
-    flex: 1,
-    backgroundColor: colors.primaryDark,
-    paddingVertical: 14,
+  btnIcone: {
+    width: 52,
+    height: 52,
     borderRadius: 14,
+    borderWidth: 1.5,
+    borderColor: colors.borderStrong,
+    backgroundColor: colors.surface,
     alignItems: 'center',
     justifyContent: 'center',
-    shadowColor: colors.primaryDark,
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.2,
-    shadowRadius: 4,
-    elevation: 2,
-  },
-  btnCompartilharPdf: {
-    flex: 1,
-    backgroundColor: colors.primary,
-    paddingVertical: 14,
-    borderRadius: 14,
-    alignItems: 'center',
-    justifyContent: 'center',
-    shadowColor: colors.primary,
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.2,
-    shadowRadius: 4,
-    elevation: 2,
-  },
-  btnCompartilharPdfIcon: {
-    fontSize: 18,
-    marginRight: 8,
-  },
-  btnCompartilharPdfText: {
-    color: colors.textOnColor,
-    fontSize: 15,
-    fontFamily: fonts.bold,
-  },
-  btnGerarPdfIcon: {
-    fontSize: 18,
-    marginRight: 8,
-  },
-  btnGerarPdfText: {
-    color: colors.textOnColor,
-    fontSize: 15,
-    fontFamily: fonts.bold,
   },
   btnDesabilitado: {
-    opacity: 0.65,
+    opacity: 0.6,
   },
-  loadingRow: {
+  btnPrincipal: {
+    flex: 1,
+    minHeight: 52,
+    justifyContent: 'center',
+  },
+  menuOverlay: {
+    flex: 1,
+    justifyContent: 'flex-end',
+    backgroundColor: colors.overlay,
+  },
+  menuFundo: {
+    flex: 1,
+  },
+  menuPainel: {
+    backgroundColor: colors.surface,
+    borderTopLeftRadius: 24,
+    borderTopRightRadius: 24,
+    paddingHorizontal: 12,
+    paddingTop: 10,
+  },
+  menuAlca: {
+    alignSelf: 'center',
+    width: 40,
+    height: 4,
+    borderRadius: 2,
+    backgroundColor: colors.borderStrong,
+    marginBottom: 12,
+  },
+  menuCabecalho: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: 12,
+    paddingBottom: 10,
+  },
+  menuTitulo: {
+    fontSize: 17,
+    fontFamily: fonts.extrabold,
+    color: colors.text,
+  },
+  menuItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    minHeight: 56,
+    paddingHorizontal: 12,
+    borderRadius: 14,
+  },
+  menuItemTextos: {
+    flex: 1,
+    marginLeft: 14,
+  },
+  menuItemTitulo: {
+    fontSize: 15,
+    fontFamily: fonts.semibold,
+    color: colors.text,
+  },
+  menuItemTituloPerigo: {
+    color: colors.danger,
+  },
+  menuItemTituloDesabilitado: {
+    color: colors.textMuted,
+  },
+  menuItemDetalhe: {
+    fontSize: 12,
+    fontFamily: fonts.regular,
+    color: colors.textMuted,
+    marginTop: 2,
   },
 });
