@@ -13,7 +13,6 @@ import {
 import { useRouter } from 'expo-router';
 import { useOrcamentos } from '../../../src/presentation/hooks/use-orcamentos';
 import { OrcamentoResumo } from '../../../src/domain/repositories/orcamento.repository.interface';
-import { StatusOrcamento } from '../../../src/domain/enums/status-orcamento';
 import { formatarDataCivil } from '../../../src/presentation/utils/data-formatters';
 import { STATUS_FILTROS_ORCAMENTO } from '../../../src/presentation/utils/status-orcamento.utils';
 import { colors, fonts } from '../../../src/presentation/theme';

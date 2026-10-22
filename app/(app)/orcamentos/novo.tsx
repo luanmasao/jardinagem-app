@@ -82,7 +82,7 @@ export default function NovoOrcamentoScreen() {
         setClientes(listaClientes.filter((c) => c.ativo));
         setServicos(listaServicos.filter((s) => s.ativo));
         setProdutos(listaProdutos.filter((p) => p.ativo));
-      } catch (err) {
+      } catch {
         Alert.alert('Erro', 'Falha ao carregar catálogo para criação do orçamento.');
       } finally {
         setLoadingCatalogos(false);

@@ -46,7 +46,6 @@ export function useServicoDetalhe(id: string | undefined) {
     try {
       const novoStatus = !servico.ativo;
       await servicoService.alterarAtivoServico(servico.id, novoStatus);
-      servico.ativo = novoStatus;
       setServico(new Servico({
         id: servico.id,
         usuarioId: servico.usuarioId,

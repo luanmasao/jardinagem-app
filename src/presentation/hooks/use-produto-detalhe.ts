@@ -46,7 +46,6 @@ export function useProdutoDetalhe(id: string | undefined) {
     try {
       const novoStatus = !produto.ativo;
       await produtoService.alterarAtivoProduto(produto.id, novoStatus);
-      produto.ativo = novoStatus;
       setProduto(new Produto({
         id: produto.id,
         usuarioId: produto.usuarioId,

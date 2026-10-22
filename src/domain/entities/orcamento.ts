@@ -83,7 +83,7 @@ export class Orcamento {
     this.recalcularValores();
   }
 
-  public get itens(): ReadonlyArray<ItemOrcamento> {
+  public get itens(): readonly ItemOrcamento[] {
     return this._itens;
   }
 

@@ -7,7 +7,7 @@ import { PlusJakartaSans_700Bold } from '@expo-google-fonts/plus-jakarta-sans/70
 import { PlusJakartaSans_800ExtraBold } from '@expo-google-fonts/plus-jakarta-sans/800ExtraBold';
 
 /** Pesos da Plus Jakarta Sans usados no template do PDF. */
-const FONTES_PDF: ReadonlyArray<{ peso: number; modulo: number }> = [
+const FONTES_PDF: readonly { peso: number; modulo: number }[] = [
   { peso: 400, modulo: PlusJakartaSans_400Regular },
   { peso: 600, modulo: PlusJakartaSans_600SemiBold },
   { peso: 700, modulo: PlusJakartaSans_700Bold },

@@ -21,7 +21,6 @@ export default function ServicoDetalheScreen() {
     isLoading,
     isTogglingAtivo,
     error,
-    reload,
     toggleAtivo,
   } = useServicoDetalhe(id);
 

@@ -21,7 +21,6 @@ export default function ProdutoDetalheScreen() {
     isLoading,
     isTogglingAtivo,
     error,
-    reload,
     toggleAtivo,
   } = useProdutoDetalhe(id);
 

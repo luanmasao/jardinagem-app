@@ -21,7 +21,6 @@ export default function ClienteDetalheScreen() {
     isLoading,
     isTogglingAtivo,
     error,
-    reload,
     toggleAtivo,
   } = useClienteDetalhe(id);
 

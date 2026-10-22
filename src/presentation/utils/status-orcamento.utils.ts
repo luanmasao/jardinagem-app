@@ -98,7 +98,7 @@ export function obterBadgeStatusOrcamento(status: StatusOrcamento | string | nul
 /**
  * Lista de filtros pré-formatada para uso em telas de consulta e listagem.
  */
-export const STATUS_FILTROS_ORCAMENTO: ReadonlyArray<{ label: string; valor: StatusOrcamento | 'TODOS' }> = Object.freeze([
+export const STATUS_FILTROS_ORCAMENTO: readonly { label: string; valor: StatusOrcamento | 'TODOS' }[] = Object.freeze([
   { label: 'Todos', valor: 'TODOS' },
   { label: 'Rascunho', valor: StatusOrcamento.RASCUNHO },
   { label: 'Enviado', valor: StatusOrcamento.ENVIADO },

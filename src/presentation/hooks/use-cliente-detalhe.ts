@@ -47,7 +47,6 @@ export function useClienteDetalhe(id: string | undefined) {
       const novoStatus = !cliente.ativo;
       await clienteService.alterarAtivoCliente(cliente.id, novoStatus);
       // Atualiza o estado local
-      cliente.ativo = novoStatus;
       setCliente(new Cliente({
         id: cliente.id,
         usuarioId: cliente.usuarioId,

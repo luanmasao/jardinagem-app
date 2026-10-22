@@ -41,11 +41,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   }, []);
 
+  const userId = user?.id;
   const refreshPerfil = useCallback(async () => {
-    if (user?.id) {
-      await fetchPerfil(user.id);
+    if (userId) {
+      await fetchPerfil(userId);
     }
-  }, [user?.id, fetchPerfil]);
+  }, [userId, fetchPerfil]);
 
   useEffect(() => {
     let isMounted = true;

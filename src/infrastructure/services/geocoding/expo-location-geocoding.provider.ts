@@ -101,7 +101,7 @@ export interface ExpoLocationModule {
   }>;
   geocodeAsync: (
     address: string
-  ) => Promise<Array<{ latitude: number; longitude: number }>>;
+  ) => Promise<{ latitude: number; longitude: number }[]>;
 }
 
 /**

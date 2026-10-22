@@ -1,7 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { Orcamento } from '../../domain/entities/orcamento';
 import { StatusOrcamento } from '../../domain/enums/status-orcamento';
-import { TipoItem } from '../../domain/enums/tipo-item';
 import { orcamentoService, AdicionarItemServiceInput, AtualizarItemServiceInput } from '../../application/services/orcamento.service';
 
 /**

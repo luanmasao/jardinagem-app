@@ -8,7 +8,6 @@ import {
   TouchableOpacity,
   ActivityIndicator,
   RefreshControl,
-  Platform,
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useClientes } from '../../../src/presentation/hooks/use-clientes';

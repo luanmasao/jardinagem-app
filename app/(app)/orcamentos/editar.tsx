@@ -86,7 +86,7 @@ export default function EditarOrcamentoScreen() {
         setClientes(listaClientes.filter((c) => c.ativo));
         setServicos(listaServicos.filter((s) => s.ativo));
         setProdutos(listaProdutos.filter((p) => p.ativo));
-      } catch (err) {
+      } catch {
         Alert.alert('Erro', 'Falha ao carregar catálogos.');
       } finally {
         setLoadingCatalogos(false);
@@ -264,12 +264,12 @@ export default function EditarOrcamentoScreen() {
         <Card style={styles.bloqueioCard}>
           <Text style={styles.bloqueioTitulo}>Edição Direta Não Permitida</Text>
           <Text style={styles.bloqueioMensagem}>
-            Este orçamento está no status "{formatarStatusOrcamento(orcamento.status)}". Conforme as regras de negócio homologadas
+            Este orçamento está no status &quot;{formatarStatusOrcamento(orcamento.status)}&quot;. Conforme as regras de negócio homologadas
             (RN64 e RN65), propostas fora do status RASCUNHO não podem ser editadas diretamente para
             preservação histórica.
           </Text>
           <Text style={styles.bloqueioMensagemSub}>
-            Para alterar valores ou itens desta proposta, utilize a opção "Duplicar Orçamento" na tela de
+            Para alterar valores ou itens desta proposta, utilize a opção &quot;Duplicar Orçamento&quot; na tela de
             detalhes.
           </Text>
           <Button

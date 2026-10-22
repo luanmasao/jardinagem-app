@@ -117,7 +117,7 @@ export class ItemOrcamento {
     this.valorTotal = arredondarMoeda(this.quantidade * this.valorUnitario);
   }
 
-  public get areas(): ReadonlyArray<Area> {
+  public get areas(): readonly Area[] {
     return this._areas;
   }
 

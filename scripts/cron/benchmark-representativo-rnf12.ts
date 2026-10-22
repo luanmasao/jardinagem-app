@@ -8,19 +8,6 @@ function execSql(sql: string): string {
   });
 }
 
-function execSqlJson(sql: string): any {
-  const cleanSql = sql.trim().replace(/;+$/, '');
-  const query = `SELECT json_agg(t) FROM (${cleanSql}) t;`;
-  const raw = execSql(query).trim();
-  if (!raw || raw === '') return [];
-  try {
-    return JSON.parse(raw);
-  } catch (err) {
-    console.error('Falha ao parsear JSON:', raw, err);
-    return [];
-  }
-}
-
 interface BenchmarkResult {
   volume: number;
   expectedTargets: number;

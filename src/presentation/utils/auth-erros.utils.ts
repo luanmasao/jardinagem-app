@@ -26,7 +26,7 @@ const MENSAGENS_POR_CODIGO: Readonly<Record<string, string>> = Object.freeze({
   request_timeout: 'O servidor demorou para responder. Tente novamente.',
 });
 
-const MENSAGENS_POR_TEXTO: ReadonlyArray<[RegExp, string]> = Object.freeze([
+const MENSAGENS_POR_TEXTO: readonly [RegExp, string][] = Object.freeze([
   [/invalid login credentials/i, MENSAGENS_POR_CODIGO.invalid_credentials],
   [/user already registered/i, MENSAGENS_POR_CODIGO.user_already_exists],
   [/email not confirmed/i, MENSAGENS_POR_CODIGO.email_not_confirmed],

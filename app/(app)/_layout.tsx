@@ -13,11 +13,13 @@ import { opcoesCabecalho } from '../../src/presentation/navigation/header-option
 const ROTAS_COM_BARRA = ['/', '/orcamentos', '/clientes', '/catalogo', '/perfil'];
 
 function iconeDaAba(nome: IconName) {
-  return ({ focused }: { focused: boolean }) => (
-    <View style={[styles.iconeAba, focused && styles.iconeAbaAtivo]}>
-      <Icon name={nome} size={20} color={focused ? colors.primaryDark : colors.textMuted} />
-    </View>
-  );
+  return function IconeAba({ focused }: { focused: boolean }) {
+    return (
+      <View style={[styles.iconeAba, focused && styles.iconeAbaAtivo]}>
+        <Icon name={nome} size={20} color={focused ? colors.primaryDark : colors.textMuted} />
+      </View>
+    );
+  };
 }
 
 export default function AppLayout() {

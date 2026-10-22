@@ -4,7 +4,7 @@ import { Orcamento } from '../../../domain/entities/orcamento';
 import { validarDadosOrcamento } from '../../validation/orcamento.validator';
 import { RegraNegocioError } from '../../../domain/errors/dominio-error';
 
-export interface CriarOrcamentoInput extends CriarOrcamentoDados {}
+export type CriarOrcamentoInput = CriarOrcamentoDados;
 
 /**
  * Caso de uso: Criar novo orçamento.
