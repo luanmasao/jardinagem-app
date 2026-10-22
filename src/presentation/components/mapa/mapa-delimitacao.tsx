@@ -14,7 +14,7 @@ import {
   Keyboard,
 } from 'react-native';
 import { MapProvider } from '../../../infrastructure/maps/map-provider';
-import { RegiaoMapa } from '../../../infrastructure/maps/map-provider.interface';
+import { CoordenadaMapa, RegiaoMapa } from '../../../infrastructure/maps/map-provider.interface';
 import { useMapaDelimitacao } from '../../hooks/use-mapa-delimitacao';
 import { usePesquisaEndereco } from '../../hooks/use-pesquisa-endereco';
 import { GeometriaPoligono } from '../../../domain/types/geometria';
@@ -22,8 +22,16 @@ import { colors, fonts } from '../../theme';
 import { Button, Icon, TextField } from '../ui';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
+/** Área salva aberta para edição (RF45/RF46): o desenho começa com seus vértices e dados. */
+export interface AreaEmEdicao {
+  vertices: CoordenadaMapa[];
+  nome: string;
+  observacoes: string;
+}
+
 interface MapaDelimitacaoProps {
   regiaoInicial?: RegiaoMapa;
+  areaInicial?: AreaEmEdicao;
   onSalvarArea: (dados: {
     nome: string;
     observacoes?: string | null;
@@ -39,21 +47,24 @@ interface MapaDelimitacaoProps {
  */
 export const MapaDelimitacao: React.FC<MapaDelimitacaoProps> = ({
   regiaoInicial,
+  areaInicial,
   onSalvarArea,
   onCancelar,
   salvando = false,
 }) => {
+  const emEdicao = !!areaInicial;
   const {
     vertices,
     modoMapa,
     areaEstimada,
     isPoligonoValido,
     adicionarVertice,
+    moverVertice,
     desfazerUltimoVertice,
     limparVertices,
     alternarModoMapa,
     converterParaGeometriaDominio,
-  } = useMapaDelimitacao();
+  } = useMapaDelimitacao(areaInicial?.vertices);
 
   const {
     texto: textoBusca,
@@ -66,8 +77,8 @@ export const MapaDelimitacao: React.FC<MapaDelimitacaoProps> = ({
   } = usePesquisaEndereco();
 
   const [modalVisible, setModalVisible] = useState(false);
-  const [nome, setNome] = useState('');
-  const [observacoes, setObservacoes] = useState('');
+  const [nome, setNome] = useState(areaInicial?.nome ?? '');
+  const [observacoes, setObservacoes] = useState(areaInicial?.observacoes ?? '');
 
   const handlePesquisarEndereco = async () => {
     Keyboard.dismiss();
@@ -120,6 +131,7 @@ export const MapaDelimitacao: React.FC<MapaDelimitacaoProps> = ({
         modoMapa={modoMapa}
         vertices={vertices}
         onAdicionarVertice={adicionarVertice}
+        onMoverVertice={moverVertice}
         desenhoHabilitado={!modalVisible && !salvando}
       />
 
@@ -218,7 +230,7 @@ export const MapaDelimitacao: React.FC<MapaDelimitacaoProps> = ({
           </Text>
         ) : (
           <Text style={styles.dicaSucesso}>
-            <Icon name="check" size={13} /> Polígono delimitado. Toque para adicionar mais pontos ou conclua a medição.
+            <Icon name="check" size={13} /> Polígono delimitado. Toque para adicionar pontos, segure um ponto para ajustar a posição ou conclua a medição.
           </Text>
         )}
 
@@ -270,7 +282,7 @@ export const MapaDelimitacao: React.FC<MapaDelimitacaoProps> = ({
               showsVerticalScrollIndicator={false}
               bounces={false}
             >
-              <Text style={styles.modalTitulo}>Salvar Área Medida</Text>
+              <Text style={styles.modalTitulo}>{emEdicao ? 'Editar Área Medida' : 'Salvar Área Medida'}</Text>
               <Text style={styles.modalSubtitulo}>
                 Metragem calculada:{' '}
                 <Text style={styles.modalDestaque}>{areaEstimada.toFixed(2)} m²</Text>
@@ -303,7 +315,7 @@ export const MapaDelimitacao: React.FC<MapaDelimitacaoProps> = ({
                 />
 
                 <Button
-                  title="Salvar Área"
+                  title={emEdicao ? 'Salvar alterações' : 'Salvar Área'}
                   onPress={handleConfirmarSalvar}
                   loading={salvando}
                   style={styles.modalBtnAcao}

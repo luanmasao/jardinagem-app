@@ -107,6 +107,18 @@ export default function AreasItemScreen() {
     );
   };
 
+  // Edição de área salva (RF45/RF46): o mapa abre com a geometria e os dados da área
+  const handleEditarArea = (areaId: string) => {
+    if (!isRascunho) {
+      Alert.alert(
+        'Ação Bloqueada',
+        'Áreas só podem ser editadas enquanto o orçamento estiver em status RASCUNHO.'
+      );
+      return;
+    }
+    router.push(`/orcamentos/mapa?orcamentoId=${orcamentoId}&itemId=${itemId}&areaId=${areaId}` as any);
+  };
+
   const handleAbrirMapa = useCallback(async () => {
     if (!isRascunho) {
       Alert.alert(
@@ -242,11 +254,18 @@ export default function AreasItemScreen() {
                     {a.geometria.coordenadas.length} vértices • Satélite PostGIS
                   </Text>
                   {isRascunho ? (
-                    <TouchableOpacity
-                      onPress={() => handleExcluirArea(a.id, a.nome || `Área ${index + 1}`)}
-                    >
-                      <Text style={styles.btnExcluirArea}>Excluir</Text>
-                    </TouchableOpacity>
+                    <View style={styles.areaAcoes}>
+                      <TouchableOpacity onPress={() => handleEditarArea(a.id)}>
+                        <Text style={styles.btnEditarArea}>
+                          <Icon name="edit" size={12} /> Editar
+                        </Text>
+                      </TouchableOpacity>
+                      <TouchableOpacity
+                        onPress={() => handleExcluirArea(a.id, a.nome || `Área ${index + 1}`)}
+                      >
+                        <Text style={styles.btnExcluirArea}>Excluir</Text>
+                      </TouchableOpacity>
+                    </View>
                   ) : null}
                 </View>
               </View>
@@ -424,6 +443,16 @@ const styles = StyleSheet.create({
     fontSize: 11,
     fontFamily: fonts.regular,
     color: colors.textPlaceholder,
+  },
+  areaAcoes: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 18,
+  },
+  btnEditarArea: {
+    color: colors.primary,
+    fontSize: 12,
+    fontFamily: fonts.bold,
   },
   btnExcluirArea: {
     color: colors.danger,

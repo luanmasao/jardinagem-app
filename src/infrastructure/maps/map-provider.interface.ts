@@ -24,6 +24,8 @@ export interface MapProviderProps {
   modoMapa?: ModoMapa;
   vertices: CoordenadaMapa[];
   onAdicionarVertice?: (coordenada: CoordenadaMapa) => void;
+  /** Chamado ao soltar um vértice arrastado (toque longo + arrastar). Sem ele, os vértices ficam fixos. */
+  onMoverVertice?: (indice: number, coordenada: CoordenadaMapa) => void;
   desenhoHabilitado?: boolean;
   estilo?: any;
   children?: React.ReactNode;

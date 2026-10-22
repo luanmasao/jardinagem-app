@@ -2,6 +2,7 @@ import { useState, useCallback, useMemo } from 'react';
 import { CoordenadaMapa, ModoMapa } from '../../infrastructure/maps/map-provider.interface';
 import { GeometriaPoligono } from '../../domain/types/geometria';
 import { geodesicCalculadorAreaService } from '../../infrastructure/services/geodesic-calculador-area.service';
+import { moverVertice as moverVerticeNaLista } from '../utils/mapa-vertices.utils';
 
 interface UseMapaDelimitacaoReturn {
   vertices: CoordenadaMapa[];
@@ -9,6 +10,7 @@ interface UseMapaDelimitacaoReturn {
   areaEstimada: number;
   isPoligonoValido: boolean;
   adicionarVertice: (coord: CoordenadaMapa) => void;
+  moverVertice: (indice: number, coord: CoordenadaMapa) => void;
   desfazerUltimoVertice: () => void;
   limparVertices: () => void;
   alternarModoMapa: () => void;
@@ -17,9 +19,10 @@ interface UseMapaDelimitacaoReturn {
 
 /**
  * Hook para gerenciamento do estado interativo de desenho e delimitação de polígonos no mapa.
+ * Na edição de uma área salva, recebe os vértices dela como ponto de partida.
  */
-export function useMapaDelimitacao(): UseMapaDelimitacaoReturn {
-  const [vertices, setVertices] = useState<CoordenadaMapa[]>([]);
+export function useMapaDelimitacao(verticesIniciais?: CoordenadaMapa[]): UseMapaDelimitacaoReturn {
+  const [vertices, setVertices] = useState<CoordenadaMapa[]>(() => verticesIniciais ?? []);
   const [modoMapa, setModoMapa] = useState<ModoMapa>('satellite');
 
   const adicionarVertice = useCallback((coord: CoordenadaMapa) => {
@@ -36,6 +39,11 @@ export function useMapaDelimitacao(): UseMapaDelimitacaoReturn {
       }
       return [...prev, coord];
     });
+  }, []);
+
+  // Ajuste fino: reposiciona um vértice já marcado (arrastado no mapa)
+  const moverVertice = useCallback((indice: number, coord: CoordenadaMapa) => {
+    setVertices((prev) => moverVerticeNaLista(prev, indice, coord));
   }, []);
 
   const desfazerUltimoVertice = useCallback(() => {
@@ -89,6 +97,7 @@ export function useMapaDelimitacao(): UseMapaDelimitacaoReturn {
     areaEstimada,
     isPoligonoValido,
     adicionarVertice,
+    moverVertice,
     desfazerUltimoVertice,
     limparVertices,
     alternarModoMapa,

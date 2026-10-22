@@ -6,6 +6,7 @@ import MapView, {
   Polyline,
   PROVIDER_GOOGLE,
   MapPressEvent,
+  MarkerDragStartEndEvent,
   Region,
 } from 'react-native-maps';
 import { MapProviderProps, CoordenadaMapa } from './map-provider.interface';
@@ -69,6 +70,7 @@ export const MapProvider: React.FC<MapProviderProps> = ({
   modoMapa = 'satellite',
   vertices = [],
   onAdicionarVertice,
+  onMoverVertice,
   desenhoHabilitado = true,
   estilo,
   children,
@@ -95,6 +97,16 @@ export const MapProvider: React.FC<MapProviderProps> = ({
       longitude: e.nativeEvent.coordinate.longitude,
     };
     onAdicionarVertice(coord);
+  };
+
+  const verticesArrastaveis = desenhoHabilitado && !!onMoverVertice;
+
+  const handleSoltarVertice = (indice: number, e: MarkerDragStartEndEvent) => {
+    if (!verticesArrastaveis || !onMoverVertice) return;
+    onMoverVertice(indice, {
+      latitude: e.nativeEvent.coordinate.latitude,
+      longitude: e.nativeEvent.coordinate.longitude,
+    });
   };
 
   return (
@@ -124,13 +136,15 @@ export const MapProvider: React.FC<MapProviderProps> = ({
             />
           )}
 
-          {/* Renderiza marcadores para cada vértice inserido */}
+          {/* Marcadores dos vértices: toque longo + arrastar reposiciona o ponto (ajuste fino).
+              Sem title, para que um toque simples no ponto não abra a etiqueta do Google Maps. */}
           {vertices.map((vertice, index) => (
             <Marker
               key={`vertex-${index}-${vertice.latitude}-${vertice.longitude}`}
               coordinate={vertice}
-              title={`Vértice ${index + 1}`}
               anchor={{ x: 0.5, y: 0.5 }}
+              draggable={verticesArrastaveis}
+              onDragEnd={(e) => handleSoltarVertice(index, e)}
             >
               <View style={styles.vertexMarker}>
                 <Text style={styles.vertexMarkerText}>{index + 1}</Text>
