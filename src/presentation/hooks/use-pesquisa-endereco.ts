@@ -108,7 +108,8 @@ export function usePesquisaEndereco(
               msgErro = 'Permissão de localização necessária para pesquisar endereços.';
               break;
             case 'INDISPONIVEL':
-              msgErro = 'Serviço de busca indisponível no momento.';
+              msgErro =
+                'Serviço de busca indisponível. Verifique sua conexão com a internet e tente novamente.';
               break;
             default:
               msgErro = 'Não foi possível localizar o endereço informado.';

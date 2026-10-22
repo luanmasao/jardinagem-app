@@ -66,6 +66,26 @@ export function normalizarTextoPesquisaEndereco(texto: string): string {
   return `${limpo}, Brasil`;
 }
 
+/**
+ * Identifica falhas de conexão ou do serviço de geocodificação do aparelho (RNF15 / RNF22).
+ * No Android, o Geocoder lança java.io.IOException quando não há rede ou o serviço do Google
+ * Play Services não responde (ex.: "grpc failed", "Service not Available"); o expo-location
+ * informa "Could not find the Geocoder" quando o aparelho não possui o serviço.
+ */
+export function ehFalhaDeRedeOuServico(mensagem: string): boolean {
+  const texto = mensagem.toLowerCase();
+  return [
+    'ioexception',
+    'grpc failed',
+    'service not available',
+    'timed out waiting for response',
+    'unable to resolve host',
+    'network',
+    'could not find the geocoder',
+    'geocoder is not running',
+  ].some((trecho) => texto.includes(trecho));
+}
+
 export interface ExpoLocationModule {
   getForegroundPermissionsAsync?: () => Promise<{
     status: string;
@@ -297,7 +317,8 @@ export class ExpoLocationGeocodingProvider implements GeocodingProvider {
           } else if (
             mensagem.includes('unavailable') ||
             mensagem.includes('indisponivel') ||
-            mensagem.includes('Indisponível')
+            mensagem.includes('Indisponível') ||
+            ehFalhaDeRedeOuServico(mensagem)
           ) {
             reject(new GeocodingError('INDISPONIVEL', `Serviço de localização indisponível: ${mensagem}`));
           } else {
