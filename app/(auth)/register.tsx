@@ -12,7 +12,8 @@ import { useRouter } from 'expo-router';
 import { useAuth } from '../../src/presentation/contexts/auth-context';
 import { validarFormularioCadastro } from '../../src/presentation/utils/auth-form.utils';
 import { colors, fonts } from '../../src/presentation/theme';
-import { Button, Card, Icon, TextField } from '../../src/presentation/components/ui';
+import { Button, TextField } from '../../src/presentation/components/ui';
+import { AuthHero, AuthPainel } from '../../src/presentation/components/auth/auth-hero';
 
 export default function RegisterScreen() {
   const router = useRouter();
@@ -53,13 +54,14 @@ export default function RegisterScreen() {
       style={styles.container}
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
     >
-      <ScrollView contentContainerStyle={styles.scrollContent} keyboardShouldPersistTaps="handled">
-        <View style={styles.header}>
-          <Text style={styles.appTitle}><Icon name="leaf" size={26} color={colors.primary} /> Jardinagem App</Text>
-          <Text style={styles.subtitle}>Criação de Perfil Profissional</Text>
-        </View>
+      <ScrollView
+        contentContainerStyle={styles.scrollContent}
+        keyboardShouldPersistTaps="handled"
+        bounces={false}
+      >
+        <AuthHero titulo={'Criação de Perfil\nProfissional'} />
 
-        <Card>
+        <AuthPainel>
           <Text style={styles.cardTitle}>Criar nova conta</Text>
 
           {errorMessage && (
@@ -139,7 +141,7 @@ export default function RegisterScreen() {
               <Text style={styles.linkText}>Fazer Login</Text>
             </TouchableOpacity>
           </View>
-        </Card>
+        </AuthPainel>
       </ScrollView>
     </KeyboardAvoidingView>
   );
@@ -148,32 +150,14 @@ export default function RegisterScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.background,
+    backgroundColor: colors.primaryDark,
   },
   scrollContent: {
     flexGrow: 1,
-    justifyContent: 'center',
-    padding: 24,
-  },
-  header: {
-    alignItems: 'center',
-    marginBottom: 24,
-  },
-  appTitle: {
-    fontSize: 28,
-    fontFamily: fonts.bold,
-    color: colors.text,
-    marginBottom: 6,
-  },
-  subtitle: {
-    fontSize: 14,
-    fontFamily: fonts.regular,
-    color: colors.textMuted,
-    textAlign: 'center',
   },
   cardTitle: {
-    fontSize: 20,
-    fontFamily: fonts.bold,
+    fontSize: 22,
+    fontFamily: fonts.extrabold,
     color: colors.text,
     marginBottom: 20,
   },

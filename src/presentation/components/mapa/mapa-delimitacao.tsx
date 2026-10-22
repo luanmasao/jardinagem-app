@@ -20,6 +20,7 @@ import { usePesquisaEndereco } from '../../hooks/use-pesquisa-endereco';
 import { GeometriaPoligono } from '../../../domain/types/geometria';
 import { colors, fonts } from '../../theme';
 import { Button, Icon, TextField } from '../ui';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 interface MapaDelimitacaoProps {
   regiaoInicial?: RegiaoMapa;
@@ -107,6 +108,8 @@ export const MapaDelimitacao: React.FC<MapaDelimitacaoProps> = ({
     }
   };
 
+  const insets = useSafeAreaInsets();
+
   return (
     <View style={styles.container}>
       {/* Provedor de Mapa (react-native-maps com Google Maps no Android) */}
@@ -120,132 +123,136 @@ export const MapaDelimitacao: React.FC<MapaDelimitacaoProps> = ({
         desenhoHabilitado={!modalVisible && !salvando}
       />
 
-      {/* Painel Superior Flutuante: Feedback de Metragem e Modo Satélite */}
-      <View style={styles.topOverlay}>
-        <View style={styles.topRow}>
+      {/* Topo flutuante: voltar, busca de endereço (RF12 / RN09) e modo do mapa */}
+      <View style={[styles.topo, { top: insets.top + 12 }]}>
+        <View style={styles.topoLinha}>
           <TouchableOpacity
-            style={styles.btnVoltarTop}
+            style={styles.btnCircular}
             onPress={onCancelar}
             disabled={salvando}
             activeOpacity={0.7}
+            accessibilityRole="button"
+            accessibilityLabel="Voltar"
           >
-            <Text style={styles.btnVoltarTopText}><Icon name="close" size={13} /> Voltar</Text>
+            <Icon name="close" size={22} color={colors.text} />
           </TouchableOpacity>
 
-          <TouchableOpacity
-            style={styles.btnModoMapa}
-            onPress={alternarModoMapa}
-            activeOpacity={0.7}
-          >
-            <Text style={styles.btnModoMapaText}>
-              <Icon name={modoMapa === 'satellite' ? 'satellite' : 'map'} size={13} />{' '}
-              {modoMapa === 'satellite' ? 'Satélite' : 'Padrão'}
-            </Text>
-          </TouchableOpacity>
-        </View>
-
-        {/* Barra de Pesquisa de Endereço no Mapa (RF12 / RN09) */}
-        <View style={styles.searchBarContainer}>
-          <TextInput
-            style={styles.searchBarInput}
-            placeholder="Buscar endereço, rua, bairro..."
-            placeholderTextColor={colors.textPlaceholder}
-            value={textoBusca}
-            onChangeText={setTextoBusca}
-            returnKeyType="search"
-            onSubmitEditing={handlePesquisarEndereco}
-            editable={!pesquisandoEndereco && !salvando}
-            autoCorrect={false}
-          />
-          {textoBusca.length > 0 && (
-            <TouchableOpacity
-              style={styles.btnSearchClear}
-              onPress={limparPesquisa}
-              disabled={pesquisandoEndereco || salvando}
-              hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
-            >
-              <Icon name="close" size={14} color={colors.textMuted} style={styles.btnSearchClearText} />
-            </TouchableOpacity>
-          )}
-          <TouchableOpacity
-            style={[
-              styles.btnSearch,
-              (pesquisandoEndereco || salvando) && styles.btnSearchDisabled,
-            ]}
-            onPress={handlePesquisarEndereco}
-            disabled={pesquisandoEndereco || salvando}
-            activeOpacity={0.7}
-          >
-            {pesquisandoEndereco ? (
-              <ActivityIndicator size="small" color={colors.surface} />
-            ) : (
-              <Icon name="search" size={16} color={colors.textOnColor} style={styles.btnSearchText} />
+          <View style={styles.buscaPill}>
+            <Icon name="map-pin" size={18} color={colors.primary} />
+            <TextInput
+              style={styles.buscaInput}
+              placeholder="Buscar endereço, rua, bairro..."
+              placeholderTextColor={colors.textPlaceholder}
+              value={textoBusca}
+              onChangeText={setTextoBusca}
+              returnKeyType="search"
+              onSubmitEditing={handlePesquisarEndereco}
+              editable={!pesquisandoEndereco && !salvando}
+              autoCorrect={false}
+            />
+            {textoBusca.length > 0 && (
+              <TouchableOpacity
+                onPress={limparPesquisa}
+                disabled={pesquisandoEndereco || salvando}
+                hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+                accessibilityRole="button"
+                accessibilityLabel="Limpar busca"
+              >
+                <Icon name="close" size={18} color={colors.textMuted} />
+              </TouchableOpacity>
             )}
-          </TouchableOpacity>
+            <TouchableOpacity
+              style={[
+                styles.btnBuscar,
+                (pesquisandoEndereco || salvando) && styles.btnBuscarDesabilitado,
+              ]}
+              onPress={handlePesquisarEndereco}
+              disabled={pesquisandoEndereco || salvando}
+              activeOpacity={0.7}
+              accessibilityRole="button"
+              accessibilityLabel="Buscar endereço"
+            >
+              {pesquisandoEndereco ? (
+                <ActivityIndicator size="small" color={colors.surface} />
+              ) : (
+                <Icon name="search" size={18} color={colors.textOnColor} />
+              )}
+            </TouchableOpacity>
+          </View>
         </View>
 
-        <View style={styles.feedbackCard}>
-          <View style={styles.feedbackRow}>
-            <View>
-              <Text style={styles.feedbackLabel}>Área Calculada</Text>
-              <Text style={styles.feedbackValor}>
-                {areaEstimada > 0 ? `${areaEstimada.toFixed(2)} m²` : '0.00 m²'}
-              </Text>
-            </View>
-            <View style={styles.verticeBadge}>
-              <Text style={styles.verticeBadgeText}>
-                {vertices.length} {vertices.length === 1 ? 'ponto' : 'pontos'}
-              </Text>
-            </View>
-          </View>
-          {vertices.length < 3 ? (
-            <Text style={styles.dicaText}>
-              Toque no mapa para marcar {3 - vertices.length} {3 - vertices.length === 1 ? 'vértice restante' : 'vértices'}
-            </Text>
-          ) : (
-            <Text style={styles.dicaSucessoText}>
-              <Icon name="check" size={12} /> Polígono delimitado. Toque para adicionar mais pontos ou conclua a medição.
-            </Text>
-          )}
-        </View>
+        <TouchableOpacity
+          style={styles.chipModo}
+          onPress={alternarModoMapa}
+          activeOpacity={0.7}
+          accessibilityRole="button"
+          accessibilityLabel={modoMapa === 'satellite' ? 'Mapa em modo satélite' : 'Mapa em modo padrão'}
+        >
+          <Text style={styles.chipModoTexto}>
+            <Icon name={modoMapa === 'satellite' ? 'satellite' : 'map'} size={14} />{' '}
+            {modoMapa === 'satellite' ? 'Satélite' : 'Padrão'}
+          </Text>
+        </TouchableOpacity>
       </View>
 
-      {/* Barra Inferior de Ações */}
-      <View style={styles.bottomOverlay}>
-        <View style={styles.toolbarRow}>
+      {/* Painel inferior: metragem (RNF05), dica e ações de desenho */}
+      <View style={[styles.painel, { paddingBottom: 16 + insets.bottom }]}>
+        <View style={styles.painelAlca} />
+        <View style={styles.painelLinha}>
+          <View>
+            <Text style={styles.painelRotulo}>Área Calculada</Text>
+            <Text style={styles.painelArea}>
+              {areaEstimada > 0 ? `${areaEstimada.toFixed(2)} m²` : '0.00 m²'}
+            </Text>
+          </View>
+          <View style={styles.pontosBadge}>
+            <Text style={styles.pontosTexto}>
+              {vertices.length} {vertices.length === 1 ? 'ponto' : 'pontos'}
+            </Text>
+          </View>
+        </View>
+
+        {vertices.length < 3 ? (
+          <Text style={styles.dica}>
+            Toque no mapa para marcar {3 - vertices.length} {3 - vertices.length === 1 ? 'vértice restante' : 'vértices'}
+          </Text>
+        ) : (
+          <Text style={styles.dicaSucesso}>
+            <Icon name="check" size={13} /> Polígono delimitado. Toque para adicionar mais pontos ou conclua a medição.
+          </Text>
+        )}
+
+        <View style={styles.ferramentas}>
           <TouchableOpacity
-            style={[styles.btnTool, vertices.length === 0 && styles.btnToolDisabled]}
+            style={[styles.btnFerramenta, vertices.length === 0 && styles.btnFerramentaDesabilitado]}
             onPress={desfazerUltimoVertice}
             disabled={vertices.length === 0 || salvando}
             activeOpacity={0.7}
+            accessibilityRole="button"
           >
-            <Text style={[styles.btnToolText, vertices.length === 0 && styles.btnToolTextDisabled]}>
-              <Icon name="undo" size={13} /> Desfazer
+            <Text style={[styles.btnFerramentaTexto, vertices.length === 0 && styles.btnFerramentaTextoDesabilitado]}>
+              <Icon name="undo" size={15} /> Desfazer
             </Text>
           </TouchableOpacity>
 
           <TouchableOpacity
-            style={[styles.btnTool, vertices.length === 0 && styles.btnToolDisabled]}
+            style={[styles.btnFerramenta, styles.btnFerramentaLimpar, vertices.length === 0 && styles.btnFerramentaDesabilitado]}
             onPress={limparVertices}
             disabled={vertices.length === 0 || salvando}
             activeOpacity={0.7}
+            accessibilityRole="button"
           >
-            <Text style={[styles.btnToolText, vertices.length === 0 && styles.btnToolTextDisabled]}>
-              <Icon name="trash" size={13} /> Limpar
-            </Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={[styles.btnConcluir, !isPoligonoValido && styles.btnConcluirDisabled]}
-            onPress={handleAbrirConclusao}
-            disabled={!isPoligonoValido || salvando}
-            activeOpacity={0.8}
-          >
-            <Text style={[styles.btnConcluirText, !isPoligonoValido && styles.btnConcluirTextDisabled]}>
-              Concluir Medição ({areaEstimada.toFixed(1)} m²)
+            <Text style={[styles.btnLimparTexto, vertices.length === 0 && styles.btnFerramentaTextoDesabilitado]}>
+              <Icon name="trash" size={15} /> Limpar
             </Text>
           </TouchableOpacity>
         </View>
+
+        <Button
+          title={`Concluir Medição (${areaEstimada.toFixed(1)} m²)`}
+          onPress={handleAbrirConclusao}
+          disabled={!isPoligonoValido || salvando}
+        />
       </View>
 
       {/* Modal para Definir Nome e Observações da Área */}
@@ -311,200 +318,182 @@ export const MapaDelimitacao: React.FC<MapaDelimitacaoProps> = ({
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: colors.black,
-  },
-  topOverlay: {
+  topo: {
     position: 'absolute',
-    top: 40,
     left: 16,
     right: 16,
     zIndex: 10,
+    gap: 10,
   },
-  topRow: {
+  topoLinha: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginBottom: 8,
+    gap: 10,
   },
-  btnVoltarTop: {
-    backgroundColor: 'rgba(0, 0, 0, 0.75)',
-    paddingHorizontal: 14,
-    paddingVertical: 8,
-    borderRadius: 20,
-    borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.3)',
+  btnCircular: {
+    width: 48,
+    height: 48,
+    borderRadius: 14,
+    backgroundColor: colors.surface,
+    alignItems: 'center',
+    justifyContent: 'center',
+    shadowColor: colors.shadow,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.2,
+    shadowRadius: 8,
+    elevation: 5,
   },
-  btnVoltarTopText: {
-    color: colors.textOnColor,
-    fontFamily: fonts.bold,
-    fontSize: 13,
-  },
-  btnModoMapa: {
-    backgroundColor: 'rgba(0, 0, 0, 0.75)',
-    paddingHorizontal: 14,
-    paddingVertical: 8,
-    borderRadius: 20,
-    borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.3)',
-  },
-  btnModoMapaText: {
-    color: colors.textOnColor,
-    fontFamily: fonts.bold,
-    fontSize: 13,
-  },
-  searchBarContainer: {
+  buscaPill: {
+    flex: 1,
+    height: 48,
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: 'rgba(255, 255, 255, 0.95)',
-    borderRadius: 10,
-    paddingHorizontal: 10,
-    paddingVertical: Platform.OS === 'ios' ? 8 : 4,
-    marginBottom: 8,
+    gap: 8,
+    paddingLeft: 14,
+    paddingRight: 5,
+    borderRadius: 14,
+    backgroundColor: colors.surface,
     shadowColor: colors.shadow,
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.25,
-    shadowRadius: 3,
-    elevation: 4,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.2,
+    shadowRadius: 8,
+    elevation: 5,
   },
-  searchBarInput: {
+  buscaInput: {
     flex: 1,
     fontSize: 14,
     fontFamily: fonts.regular,
     color: colors.text,
-    paddingVertical: 6,
-    paddingHorizontal: 4,
+    paddingVertical: 0,
   },
-  btnSearchClear: {
-    paddingHorizontal: 6,
-    paddingVertical: 4,
-  },
-  btnSearchClearText: {
-    color: colors.textMuted,
-    fontSize: 14,
-  },
-  btnSearch: {
+  btnBuscar: {
+    width: 38,
+    height: 38,
+    borderRadius: 11,
     backgroundColor: colors.primary,
-    width: 36,
-    height: 36,
-    borderRadius: 8,
     alignItems: 'center',
     justifyContent: 'center',
-    marginLeft: 6,
   },
-  btnSearchDisabled: {
-    backgroundColor: colors.textPlaceholder,
+  btnBuscarDesabilitado: {
     opacity: 0.6,
   },
-  btnSearchText: {
-    fontSize: 16,
-  },
-  feedbackCard: {
-    backgroundColor: 'rgba(255, 255, 255, 0.95)',
-    borderRadius: 12,
-    padding: 14,
+  chipModo: {
+    alignSelf: 'flex-end',
+    height: 36,
+    paddingHorizontal: 14,
+    borderRadius: 18,
+    justifyContent: 'center',
+    backgroundColor: colors.surface,
     shadowColor: colors.shadow,
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.3,
-    shadowRadius: 4,
-    elevation: 5,
-  },
-  feedbackRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 4,
-  },
-  feedbackLabel: {
-    fontSize: 12,
-    color: colors.textMuted,
-    fontFamily: fonts.medium,
-  },
-  feedbackValor: {
-    fontSize: 22,
-    fontFamily: fonts.bold,
-    color: colors.primary,
-  },
-  verticeBadge: {
-    backgroundColor: colors.primarySoft,
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-    borderRadius: 12,
-    borderWidth: 1,
-    borderColor: colors.primaryBorder,
-  },
-  verticeBadgeText: {
-    fontSize: 12,
-    fontFamily: fonts.bold,
-    color: colors.primary,
-  },
-  dicaText: {
-    fontSize: 12,
-    fontFamily: fonts.regular,
-    color: colors.textMuted,
-    marginTop: 2,
-  },
-  dicaSucessoText: {
-    fontSize: 12,
-    color: colors.primary,
-    fontFamily: fonts.semibold,
-    marginTop: 2,
-  },
-  bottomOverlay: {
-    position: 'absolute',
-    bottom: 24,
-    left: 16,
-    right: 16,
-    zIndex: 10,
-  },
-  toolbarRow: {
-    flexDirection: 'row',
-    gap: 8,
-    alignItems: 'center',
-  },
-  btnTool: {
-    backgroundColor: 'rgba(0, 0, 0, 0.8)',
-    paddingVertical: 12,
-    paddingHorizontal: 12,
-    borderRadius: 10,
-    borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.25)',
-  },
-  btnToolDisabled: {
-    opacity: 0.4,
-  },
-  btnToolText: {
-    color: colors.textOnColor,
-    fontFamily: fonts.semibold,
-    fontSize: 13,
-  },
-  btnToolTextDisabled: {
-    color: colors.borderStrong,
-  },
-  btnConcluir: {
-    flex: 1,
-    backgroundColor: colors.primary,
-    paddingVertical: 14,
-    paddingHorizontal: 16,
-    borderRadius: 10,
-    alignItems: 'center',
-    shadowColor: colors.shadow,
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.3,
-    shadowRadius: 3,
+    shadowOpacity: 0.2,
+    shadowRadius: 6,
     elevation: 4,
   },
-  btnConcluirDisabled: {
-    backgroundColor: colors.textPlaceholder,
-    opacity: 0.6,
-  },
-  btnConcluirText: {
-    color: colors.textOnColor,
+  chipModoTexto: {
+    fontSize: 13,
     fontFamily: fonts.bold,
-    fontSize: 14,
+    color: colors.primaryDark,
   },
-  btnConcluirTextDisabled: {
-    color: colors.border,
+  painel: {
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    bottom: 0,
+    zIndex: 10,
+    backgroundColor: colors.surface,
+    borderTopLeftRadius: 24,
+    borderTopRightRadius: 24,
+    paddingHorizontal: 20,
+    paddingTop: 10,
+    gap: 12,
+    shadowColor: colors.shadow,
+    shadowOffset: { width: 0, height: -6 },
+    shadowOpacity: 0.18,
+    shadowRadius: 12,
+    elevation: 12,
+  },
+  painelAlca: {
+    alignSelf: 'center',
+    width: 40,
+    height: 4,
+    borderRadius: 2,
+    backgroundColor: colors.borderStrong,
+  },
+  painelLinha: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-end',
+  },
+  painelRotulo: {
+    fontSize: 12,
+    fontFamily: fonts.bold,
+    color: colors.textMuted,
+    textTransform: 'uppercase',
+    letterSpacing: 0.6,
+  },
+  painelArea: {
+    fontSize: 30,
+    fontFamily: fonts.extrabold,
+    color: colors.text,
+    marginTop: 2,
+  },
+  pontosBadge: {
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 999,
+    backgroundColor: colors.primarySoft,
+  },
+  pontosTexto: {
+    fontSize: 13,
+    fontFamily: fonts.bold,
+    color: colors.primaryDark,
+  },
+  dica: {
+    fontSize: 13,
+    fontFamily: fonts.regular,
+    color: colors.textMuted,
+  },
+  dicaSucesso: {
+    fontSize: 13,
+    fontFamily: fonts.semibold,
+    color: colors.primary,
+  },
+  ferramentas: {
+    flexDirection: 'row',
+    gap: 10,
+  },
+  btnFerramenta: {
+    flex: 1,
+    height: 48,
+    borderRadius: 14,
+    borderWidth: 1.5,
+    borderColor: colors.borderStrong,
+    backgroundColor: colors.surface,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  btnFerramentaLimpar: {
+    borderColor: colors.dangerBorder,
+  },
+  btnFerramentaDesabilitado: {
+    opacity: 0.5,
+  },
+  btnFerramentaTexto: {
+    fontSize: 14,
+    fontFamily: fonts.bold,
+    color: colors.text,
+  },
+  btnLimparTexto: {
+    fontSize: 14,
+    fontFamily: fonts.bold,
+    color: colors.danger,
+  },
+  btnFerramentaTextoDesabilitado: {
+    color: colors.textMuted,
+  },
+  container: {
+    flex: 1,
+    backgroundColor: colors.black,
   },
   // Painel inferior (mesmo layout dos modais de orçamento): o modal centralizado com
   // altura percentual oscilava verticalmente ao abrir o teclado no Android.
