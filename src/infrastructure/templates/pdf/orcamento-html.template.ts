@@ -14,6 +14,34 @@ function escapeHtml(valor: string | null | undefined): string {
 }
 
 /**
+ * Cores do selo de status no PDF. Espelham a paleta de status do app
+ * (src/presentation/utils/status-orcamento.utils.ts); ficam aqui porque a
+ * infraestrutura não depende da camada de apresentação.
+ */
+const CORES_STATUS: Readonly<Record<string, { fundo: string; texto: string }>> = Object.freeze({
+  Rascunho: { fundo: '#EEF0EC', texto: '#3F4A42' },
+  Enviado: { fundo: '#E6EEF8', texto: '#234E8C' },
+  'Em análise': { fundo: '#EEEAF7', texto: '#553A97' },
+  Aprovado: { fundo: '#DCEBDD', texto: '#1E4D34' },
+  Concluído: { fundo: '#DFF0EE', texto: '#155A52' },
+  Recusado: { fundo: '#F8E6E3', texto: '#B23A2E' },
+  Expirado: { fundo: '#FBEFD9', texto: '#7A4F0E' },
+  Cancelado: { fundo: '#ECEEF0', texto: '#46505A' },
+});
+const COR_STATUS_PADRAO = { fundo: '#EEF0EC', texto: '#5A665D' };
+
+/** Marca (folha) desenhada em SVG inline, sem depender de arquivos externos. */
+const SVG_MARCA = `<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#1E4D34" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z"/><path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"/></svg>`;
+
+export interface OpcoesTemplateOrcamento {
+  /**
+   * Regras @font-face da Plus Jakarta Sans embutidas no HTML (ex.: fontes em base64).
+   * Sem elas, o PDF usa a fonte do sistema.
+   */
+  fontFaceCss?: string;
+}
+
+/**
  * Gera o documento HTML5 print-ready para renderização em A4 via expo-print.
  *
  * Segue estritamente:
@@ -21,33 +49,37 @@ function escapeHtml(valor: string | null | undefined): string {
  * - Ausência absoluta de contadores dinâmicos counter(pages);
  * - Prevenção de quebra indevida de linhas e blocos (page-break-inside: avoid);
  * - Tratamento defensivo total contra null, undefined e NaN.
+ *
+ * Visual alinhado ao app (verde-floresta, superfícies claras e total em destaque),
+ * sem fundos escuros extensos para economizar tinta na impressão.
  */
-export function gerarOrcamentoHtml(modelo: OrcamentoPdfModel): string {
+export function gerarOrcamentoHtml(modelo: OrcamentoPdfModel, opcoes?: OpcoesTemplateOrcamento): string {
   // 1. Itens e Detalhamento de Áreas
   const itensHtml = modelo.itens
     .map((item) => {
       let areasDetalhamentoHtml = '';
       if (item.usaMedicaoArea && item.areas && item.areas.length > 0) {
-        const areasTexto = item.areas
-          .map((a) => `${escapeHtml(a.nome)} (${escapeHtml(a.areaCalculadaFormatada)})`)
-          .join(' | ');
+        const areasLista = item.areas
+          .map((a) => `<li>${escapeHtml(a.nome)} (${escapeHtml(a.areaCalculadaFormatada)})</li>`)
+          .join('');
         areasDetalhamentoHtml = `
           <div class="areas-detalhe">
-            <span class="areas-icone">&#9656;</span> <strong>Áreas Medidas:</strong> ${areasTexto}
+            <div class="areas-titulo">Áreas Medidas:</div>
+            <ul class="areas-lista">${areasLista}</ul>
           </div>
         `;
       }
 
+      const tipoClasse = item.tipoDescricao === 'Produto' ? 'badge-tipo-produto' : 'badge-tipo-servico';
+
       return `
         <tr>
           <td class="col-num">${escapeHtml(String(item.numeroItem))}</td>
-          <td class="col-tipo"><span class="badge-tipo badge-tipo-${item.tipoDescricao.toLowerCase()}">${escapeHtml(item.tipoDescricao)}</span></td>
           <td class="col-desc">
-            <div class="item-titulo">${escapeHtml(item.descricao)}</div>
+            <div class="item-titulo">${escapeHtml(item.descricao)} <span class="badge-tipo ${tipoClasse}">${escapeHtml(item.tipoDescricao)}</span></div>
             ${areasDetalhamentoHtml}
           </td>
-          <td class="col-qtd text-right">${escapeHtml(item.quantidadeFormatada)}</td>
-          <td class="col-un text-center">${escapeHtml(item.unidade)}</td>
+          <td class="col-qtd text-right">${escapeHtml(item.quantidadeFormatada)} ${escapeHtml(item.unidade)}</td>
           <td class="col-unitario text-right">${escapeHtml(item.valorUnitarioFormatado)}</td>
           <td class="col-total text-right">${escapeHtml(item.valorTotalFormatado)}</td>
         </tr>
@@ -55,37 +87,49 @@ export function gerarOrcamentoHtml(modelo: OrcamentoPdfModel): string {
     })
     .join('');
 
-  // 2. Linhas de Contato do Prestador
+  // 2. Contato do Prestador
   const prestadorTelefoneHtml = modelo.prestador.telefoneFormatado
-    ? `<div class="contato-linha">&#9990; ${escapeHtml(modelo.prestador.telefoneFormatado)}</div>`
+    ? `<div class="contato-linha">${escapeHtml(modelo.prestador.telefoneFormatado)}</div>`
     : '';
 
-  // 3. Linhas de Contato do Cliente
+  // 3. Contatos do Cliente
   const clienteContatos: string[] = [];
   if (modelo.cliente.documentoFormatado) {
-    clienteContatos.push(`<strong>Doc:</strong> ${escapeHtml(modelo.cliente.documentoFormatado)}`);
+    clienteContatos.push(`<div>Documento: ${escapeHtml(modelo.cliente.documentoFormatado)}</div>`);
   }
   if (modelo.cliente.telefoneFormatado) {
-    clienteContatos.push(`<strong>Tel:</strong> ${escapeHtml(modelo.cliente.telefoneFormatado)}`);
+    clienteContatos.push(`<div>Telefone: ${escapeHtml(modelo.cliente.telefoneFormatado)}</div>`);
   }
   if (modelo.cliente.email) {
-    clienteContatos.push(`<strong>E-mail:</strong> ${escapeHtml(modelo.cliente.email)}`);
+    clienteContatos.push(`<div>E-mail: ${escapeHtml(modelo.cliente.email)}</div>`);
   }
   const clienteContatosHtml = clienteContatos.length > 0
-    ? `<div class="cliente-contatos">${clienteContatos.join(' &nbsp;&bull;&nbsp; ')}</div>`
+    ? `<div class="cliente-contatos">${clienteContatos.join('')}</div>`
     : '';
 
-  // 4. Linha de Desconto no Resumo
+  // 4. Validade: o mapper entrega a data (DD/MM/AAAA) ou o texto "Validade: A combinar"
+  const validadeEhData = /^\d{2}\/\d{2}\/\d{4}$/.test(modelo.dataValidadeFormatada);
+  const validadeResumoHtml = validadeEhData
+    ? `<div class="resumo-rotulo">Válido até</div><div class="resumo-valor">${escapeHtml(modelo.dataValidadeFormatada)}</div>`
+    : `<div class="resumo-rotulo">Validade</div><div class="resumo-valor">A combinar</div>`;
+  const validadeRodape = validadeEhData
+    ? `Válido até ${escapeHtml(modelo.dataValidadeFormatada)}`
+    : escapeHtml(modelo.dataValidadeFormatada);
+
+  // 5. Selo de Status
+  const corStatus = CORES_STATUS[modelo.statusBadge] ?? COR_STATUS_PADRAO;
+
+  // 6. Linha de Desconto no Resumo
   const descontoHtml = modelo.temDesconto && modelo.valorDescontoFormatado
     ? `
       <div class="linha-financeira linha-desconto">
         <span class="label">${escapeHtml(modelo.descricaoDesconto || 'Desconto:')}</span>
-        <span class="valor text-desconto">${escapeHtml(modelo.valorDescontoFormatado)}</span>
+        <span class="valor">${escapeHtml(modelo.valorDescontoFormatado)}</span>
       </div>
     `
     : '';
 
-  // 5. Bloco de Observações
+  // 7. Bloco de Observações
   const observacoesHtml = modelo.observacoes
     ? `
       <div class="bloco-info">
@@ -95,10 +139,10 @@ export function gerarOrcamentoHtml(modelo: OrcamentoPdfModel): string {
     `
     : '';
 
-  // 6. Bloco de Condições de Pagamento
+  // 8. Bloco de Condições de Pagamento
   const condicoesHtml = `
     <div class="bloco-info">
-      <div class="bloco-info-titulo">Condições Comerciais e Pagamento</div>
+      <div class="bloco-info-titulo">Condições de Pagamento</div>
       <div class="bloco-info-conteudo">${escapeHtml(modelo.condicoesPagamento || 'A combinar com o prestador')}</div>
     </div>
   `;
@@ -109,9 +153,10 @@ export function gerarOrcamentoHtml(modelo: OrcamentoPdfModel): string {
   <meta charset="UTF-8">
   <title>Orçamento ${escapeHtml(modelo.numero)}</title>
   <style>
+    ${opcoes?.fontFaceCss ?? ''}
     @page {
       size: A4 portrait;
-      margin: 14mm 12mm 16mm 12mm;
+      margin: 12mm 12mm 14mm 12mm;
     }
     * {
       box-sizing: border-box;
@@ -119,254 +164,314 @@ export function gerarOrcamentoHtml(modelo: OrcamentoPdfModel): string {
       padding: 0;
     }
     body {
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-      font-size: 10pt;
-      line-height: 1.4;
-      color: #212121;
+      font-family: "Plus Jakarta Sans", Roboto, "Segoe UI", Helvetica, Arial, sans-serif;
+      font-size: 9.5pt;
+      line-height: 1.45;
+      color: #18221B;
       background-color: #FFFFFF;
       -webkit-print-color-adjust: exact;
       print-color-adjust: exact;
     }
 
-    /* Cabeçalho Institucional */
+    /* Faixa da marca */
+    .faixa-marca {
+      height: 6px;
+      background-color: #1E4D34;
+      border-radius: 3px;
+      margin-bottom: 18px;
+    }
+
+    /* Cabeçalho */
     .header-container {
       display: flex;
       justify-content: space-between;
       align-items: flex-start;
-      border-bottom: 2px solid #2E7D32;
-      padding-bottom: 12px;
-      margin-bottom: 14px;
+      margin-bottom: 16px;
     }
     .prestador-info {
+      display: flex;
+      align-items: center;
+      gap: 12px;
       flex: 1;
       padding-right: 16px;
     }
+    .marca-icone {
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
+      background-color: #DCEBDD;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
     .prestador-nome {
-      font-size: 16pt;
-      font-weight: 700;
-      color: #1B5E20;
-      margin-bottom: 4px;
+      font-size: 15pt;
+      font-weight: 800;
+      color: #18221B;
     }
     .contato-linha {
       font-size: 9pt;
-      color: #555555;
+      color: #5A665D;
       margin-top: 2px;
     }
     .proposta-badge-box {
       text-align: right;
-      min-width: 170px;
+      min-width: 180px;
+    }
+    .proposta-rotulo {
+      font-size: 8pt;
+      font-weight: 700;
+      letter-spacing: 1.2px;
+      text-transform: uppercase;
+      color: #5A665D;
     }
     .proposta-numero {
-      font-size: 14pt;
-      font-weight: 700;
-      color: #2E7D32;
-      margin-bottom: 4px;
-    }
-    .proposta-meta {
-      font-size: 8.5pt;
-      color: #616161;
-      line-height: 1.3;
+      font-size: 17pt;
+      font-weight: 800;
+      color: #1E4D34;
+      margin-top: 1px;
     }
     .status-tag {
       display: inline-block;
       margin-top: 5px;
-      padding: 2px 8px;
+      padding: 2px 9px;
       font-size: 8pt;
-      font-weight: 600;
-      text-transform: uppercase;
-      border-radius: 4px;
-      background-color: #E8F5E9;
-      color: #2E7D32;
-      border: 1px solid #C8E6C9;
+      font-weight: 700;
+      border-radius: 999px;
     }
 
-    /* Caixa do Cliente */
-    .cliente-card {
-      background-color: #F9FBF9;
-      border: 1px solid #E0E8E0;
-      border-radius: 6px;
-      padding: 10px 12px;
-      margin-bottom: 16px;
-    }
-    .cliente-header-linha {
+    /* Resumo: emissão, validade e total */
+    .resumo-faixa {
       display: flex;
-      justify-content: space-between;
-      align-items: baseline;
-      margin-bottom: 4px;
+      border: 1px solid #E3E7E0;
+      border-radius: 10px;
+      overflow: hidden;
+      margin-bottom: 14px;
     }
-    .cliente-titulo-secao {
+    .resumo-celula {
+      flex: 1;
+      padding: 8px 12px;
+      border-right: 1px solid #E3E7E0;
+    }
+    .resumo-celula:last-child {
+      border-right: none;
+    }
+    .resumo-celula-total {
+      background-color: #EEF5EE;
+    }
+    .resumo-rotulo {
       font-size: 7.5pt;
       font-weight: 700;
-      color: #2E7D32;
+      letter-spacing: 0.8px;
       text-transform: uppercase;
-      letter-spacing: 0.5px;
+      color: #5A665D;
+    }
+    .resumo-celula-total .resumo-rotulo,
+    .resumo-celula-total .resumo-valor {
+      color: #1E4D34;
+    }
+    .resumo-valor {
+      font-size: 10.5pt;
+      font-weight: 700;
+      margin-top: 1px;
+    }
+
+    /* Cliente e local do serviço */
+    .cliente-grid {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 18px;
+    }
+    .cliente-card {
+      flex: 1;
+      background-color: #F5F6F1;
+      border-radius: 10px;
+      padding: 10px 12px;
+    }
+    .secao-rotulo {
+      font-size: 7.5pt;
+      font-weight: 700;
+      letter-spacing: 0.8px;
+      text-transform: uppercase;
+      color: #5A665D;
     }
     .cliente-nome {
       font-size: 11pt;
-      font-weight: 600;
-      color: #212121;
+      font-weight: 700;
+      margin-top: 3px;
     }
     .cliente-contatos {
       font-size: 8.5pt;
-      color: #555555;
-      margin-top: 3px;
+      color: #3F4A42;
+      margin-top: 4px;
+      line-height: 1.5;
     }
     .cliente-endereco {
-      font-size: 8.5pt;
-      color: #424242;
-      margin-top: 4px;
-      padding-top: 4px;
-      border-top: 1px dashed #E0E8E0;
+      font-size: 9pt;
+      font-weight: 600;
+      color: #18221B;
+      margin-top: 3px;
+      line-height: 1.5;
     }
 
     /* Tabela de Itens */
+    .secao-titulo {
+      font-size: 11pt;
+      font-weight: 800;
+      margin-bottom: 8px;
+    }
     .tabela-itens {
       width: 100%;
       border-collapse: collapse;
-      margin-bottom: 16px;
+      margin-bottom: 18px;
       font-size: 9pt;
     }
     .tabela-itens th {
-      background-color: #2E7D32;
-      color: #FFFFFF;
-      font-weight: 600;
-      padding: 6px 8px;
+      background-color: #EEF5EE;
+      color: #1E4D34;
+      font-weight: 700;
+      padding: 7px 8px;
       text-align: left;
       font-size: 8.5pt;
+      border-bottom: 1px solid #A9CBB0;
+    }
+    .tabela-itens th.text-right {
+      text-align: right;
     }
     .tabela-itens td {
-      padding: 7px 8px;
-      border-bottom: 1px solid #EAEAEA;
+      padding: 8px;
+      border-bottom: 1px solid #E3E7E0;
       vertical-align: top;
     }
-    .tabela-itens tbody tr:nth-child(even) {
-      background-color: #FAFCFA;
-    }
-    .col-num { width: 4%; text-align: center; color: #757575; }
-    .col-tipo { width: 10%; }
-    .col-desc { width: 48%; }
-    .col-qtd { width: 9%; }
-    .col-un { width: 6%; }
-    .col-unitario { width: 11%; }
-    .col-total { width: 12%; font-weight: 600; color: #1B5E20; }
+    .col-num { width: 4%; color: #5A665D; }
+    .col-desc { width: 54%; }
+    .col-qtd { width: 13%; white-space: nowrap; }
+    .col-unitario { width: 13%; white-space: nowrap; }
+    .col-total { width: 16%; font-weight: 700; white-space: nowrap; }
 
     .item-titulo {
-      font-weight: 500;
-      color: #212121;
+      font-weight: 700;
+      color: #18221B;
     }
-    .areas-detalhe {
-      font-size: 8pt;
-      color: #388E3C;
-      background-color: #F1F8F1;
-      padding: 3px 6px;
-      border-radius: 4px;
-      margin-top: 4px;
-      display: inline-block;
-      line-height: 1.25;
-    }
-    .areas-icone {
-      font-size: 7pt;
-    }
-
     .badge-tipo {
       font-size: 7.5pt;
-      font-weight: 600;
-      padding: 1px 5px;
-      border-radius: 3px;
+      font-weight: 700;
+      padding: 1px 7px;
+      border-radius: 999px;
+      margin-left: 4px;
+      white-space: nowrap;
     }
-    .badge-tipo-serviço, .badge-tipo-servico {
-      background-color: #E8F5E9;
-      color: #2E7D32;
+    .badge-tipo-servico {
+      background-color: #DCEBDD;
+      color: #1E4D34;
     }
     .badge-tipo-produto {
-      background-color: #E3F2FD;
-      color: #1565C0;
+      background-color: #E6EEF8;
+      color: #234E8C;
+    }
+    .areas-detalhe {
+      margin-top: 5px;
+      font-size: 8.5pt;
+      color: #3F4A42;
+    }
+    .areas-titulo {
+      font-weight: 700;
+      color: #1E4D34;
+    }
+    .areas-lista {
+      list-style: none;
+      margin-top: 1px;
+    }
+    .areas-lista li::before {
+      content: "\\2022  ";
+      color: #2F6B47;
     }
 
     /* Alinhamentos */
     .text-right { text-align: right; }
     .text-center { text-align: center; }
 
-    /* Quadro Financeiro */
+    /* Condições e Totais */
     .secao-inferior {
       display: flex;
       justify-content: space-between;
       align-items: flex-start;
+      gap: 18px;
       margin-bottom: 16px;
     }
     .bloco-observacoes-wrapper {
       flex: 1;
-      padding-right: 20px;
+    }
+    .bloco-info {
+      margin-bottom: 10px;
+    }
+    .bloco-info-titulo {
+      font-size: 7.5pt;
+      font-weight: 700;
+      letter-spacing: 0.8px;
+      text-transform: uppercase;
+      color: #5A665D;
+      margin-bottom: 2px;
+    }
+    .bloco-info-conteudo {
+      font-size: 9pt;
+      color: #18221B;
+      white-space: pre-wrap;
     }
     .bloco-totais {
       width: 250px;
-      background-color: #F9FBF9;
-      border: 1px solid #C8E6C9;
-      border-radius: 6px;
-      padding: 10px 14px;
+      border: 1px solid #E3E7E0;
+      border-radius: 12px;
+      overflow: hidden;
+    }
+    .linhas-parciais {
+      padding: 8px 14px;
     }
     .linha-financeira {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 4px 0;
+      padding: 3px 0;
       font-size: 9.5pt;
-      color: #424242;
     }
-    .linha-desconto {
-      color: #C62828;
+    .linha-financeira .label {
+      color: #5A665D;
     }
-    .text-desconto {
+    .linha-financeira .valor {
       font-weight: 600;
-      color: #C62828;
+    }
+    .linha-desconto .label,
+    .linha-desconto .valor {
+      color: #B23A2E;
     }
     .linha-total-geral {
-      border-top: 2px solid #2E7D32;
-      margin-top: 6px;
-      padding-top: 8px;
+      background-color: #DCEBDD;
+      padding: 10px 14px;
     }
     .linha-total-geral .label {
-      font-size: 11pt;
-      font-weight: 700;
-      color: #1B5E20;
+      font-size: 10pt;
+      font-weight: 800;
+      color: #1E4D34;
     }
     .linha-total-geral .valor {
-      font-size: 13pt;
-      font-weight: 700;
-      color: #1B5E20;
+      font-size: 15pt;
+      font-weight: 800;
+      color: #1E4D34;
     }
 
-    /* Blocos Informativos */
-    .bloco-info {
-      background-color: #FAFAFA;
-      border: 1px solid #EEEEEE;
-      border-radius: 4px;
-      padding: 8px 10px;
-      margin-bottom: 8px;
-    }
-    .bloco-info-titulo {
-      font-size: 8pt;
-      font-weight: 700;
-      text-transform: uppercase;
-      color: #555555;
-      margin-bottom: 2px;
-      letter-spacing: 0.4px;
-    }
-    .bloco-info-conteudo {
-      font-size: 8.5pt;
-      color: #333333;
-      white-space: pre-wrap;
-    }
-
-    /* Rodapé Institucional */
+    /* Rodapé */
     .rodape-estatico {
-      margin-top: 20px;
+      margin-top: 18px;
       padding-top: 8px;
-      border-top: 1px solid #E0E0E0;
+      border-top: 1px solid #E3E7E0;
       font-size: 7.5pt;
-      color: #888888;
-      text-align: center;
-      line-height: 1.3;
+      color: #5A665D;
+      line-height: 1.5;
+    }
+    .rodape-linha-principal {
+      font-weight: 700;
+      color: #3F4A42;
     }
 
     /* Regras Print / Paginação */
@@ -398,42 +503,59 @@ export function gerarOrcamentoHtml(modelo: OrcamentoPdfModel): string {
 </head>
 <body>
 
-  <!-- 1. Cabeçalho Institucional (RF80 / RNF33) -->
+  <div class="faixa-marca"></div>
+
+  <!-- 1. Cabeçalho: prestador e identificação do orçamento (RF80 / RNF33) -->
   <div class="header-container">
     <div class="prestador-info">
-      <div class="prestador-nome">${escapeHtml(modelo.prestador.nome)}</div>
-      ${prestadorTelefoneHtml}
+      <div class="marca-icone">${SVG_MARCA}</div>
+      <div>
+        <div class="prestador-nome">${escapeHtml(modelo.prestador.nome)}</div>
+        ${prestadorTelefoneHtml}
+      </div>
     </div>
     <div class="proposta-badge-box">
-      <div class="proposta-numero">Orçamento ${escapeHtml(modelo.numero)}</div>
-      <div class="proposta-meta">
-        <div>Emissão: <strong>${escapeHtml(modelo.dataCriacaoFormatada)}</strong></div>
-        <div>${escapeHtml(modelo.dataValidadeFormatada)}</div>
-      </div>
-      <div><span class="status-tag">${escapeHtml(modelo.statusBadge)}</span></div>
+      <div class="proposta-rotulo">Orçamento</div>
+      <div class="proposta-numero">${escapeHtml(modelo.numero)}</div>
+      <div><span class="status-tag" style="background-color: ${corStatus.fundo}; color: ${corStatus.texto};">${escapeHtml(modelo.statusBadge)}</span></div>
     </div>
   </div>
 
-  <!-- 2. Dados do Cliente e Endereço da Intervenção -->
-  <div class="cliente-card">
-    <div class="cliente-header-linha">
-      <span class="cliente-titulo-secao">Destinatário / Proposta Comercial</span>
+  <!-- 2. Resumo: emissão, validade e valor total -->
+  <div class="resumo-faixa">
+    <div class="resumo-celula">
+      <div class="resumo-rotulo">Emissão</div>
+      <div class="resumo-valor">${escapeHtml(modelo.dataCriacaoFormatada)}</div>
     </div>
-    <div class="cliente-nome">${escapeHtml(modelo.cliente.nome)}</div>
-    ${clienteContatosHtml}
-    <div class="cliente-endereco">${escapeHtml(modelo.cliente.enderecoFormatado)}</div>
+    <div class="resumo-celula">${validadeResumoHtml}</div>
+    <div class="resumo-celula resumo-celula-total">
+      <div class="resumo-rotulo">Valor total</div>
+      <div class="resumo-valor">${escapeHtml(modelo.totalFormatado)}</div>
+    </div>
   </div>
 
-  <!-- 3. Relação de Serviços e Produtos (Tabela Principal) -->
+  <!-- 3. Cliente e local do serviço -->
+  <div class="cliente-grid">
+    <div class="cliente-card">
+      <div class="secao-rotulo">Cliente</div>
+      <div class="cliente-nome">${escapeHtml(modelo.cliente.nome)}</div>
+      ${clienteContatosHtml}
+    </div>
+    <div class="cliente-card">
+      <div class="secao-rotulo">Local do serviço</div>
+      <div class="cliente-endereco">${escapeHtml(modelo.cliente.enderecoFormatado)}</div>
+    </div>
+  </div>
+
+  <!-- 4. Serviços e produtos -->
+  <div class="secao-titulo">Serviços e produtos</div>
   <table class="tabela-itens">
     <thead>
       <tr>
         <th class="col-num">#</th>
-        <th class="col-tipo">Tipo</th>
         <th class="col-desc">Descrição</th>
         <th class="col-qtd text-right">Qtd</th>
-        <th class="col-un text-center">Un.</th>
-        <th class="col-unitario text-right">Valor Unit.</th>
+        <th class="col-unitario text-right">Unitário</th>
         <th class="col-total text-right">Total</th>
       </tr>
     </thead>
@@ -442,7 +564,7 @@ export function gerarOrcamentoHtml(modelo: OrcamentoPdfModel): string {
     </tbody>
   </table>
 
-  <!-- 4. Resumo Financeiro e Condições Complementares -->
+  <!-- 5. Condições complementares e resumo financeiro -->
   <div class="secao-inferior">
     <div class="bloco-observacoes-wrapper">
       ${condicoesHtml}
@@ -450,11 +572,13 @@ export function gerarOrcamentoHtml(modelo: OrcamentoPdfModel): string {
     </div>
 
     <div class="bloco-totais">
-      <div class="linha-financeira">
-        <span class="label">Subtotal:</span>
-        <span class="valor">${escapeHtml(modelo.subtotalFormatado)}</span>
+      <div class="linhas-parciais">
+        <div class="linha-financeira">
+          <span class="label">Subtotal:</span>
+          <span class="valor">${escapeHtml(modelo.subtotalFormatado)}</span>
+        </div>
+        ${descontoHtml}
       </div>
-      ${descontoHtml}
       <div class="linha-financeira linha-total-geral">
         <span class="label">Total Geral:</span>
         <span class="valor">${escapeHtml(modelo.totalFormatado)}</span>
@@ -462,9 +586,10 @@ export function gerarOrcamentoHtml(modelo: OrcamentoPdfModel): string {
     </div>
   </div>
 
-  <!-- 5. Rodapé Institucional Estático -->
+  <!-- 6. Rodapé -->
   <div class="rodape-estatico">
-    Orçamento ${escapeHtml(modelo.numero)} &bull; Documento emitido eletronicamente pelo Sistema de Orçamentos para Jardinagem &bull; Proposta comercial sujeita às condições informadas.
+    <div class="rodape-linha-principal">Orçamento ${escapeHtml(modelo.numero)} &bull; Emitido em ${escapeHtml(modelo.dataCriacaoFormatada)} &bull; ${validadeRodape}</div>
+    <div>Documento emitido eletronicamente pelo Sistema de Orçamentos para Jardinagem &bull; Proposta comercial sujeita às condições informadas.</div>
   </div>
 
 </body>

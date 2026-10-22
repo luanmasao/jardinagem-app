@@ -5,6 +5,7 @@ import {
   ResultadoGeracaoPdf,
 } from '../../../application/interfaces/pdf-generator.interface';
 import { gerarOrcamentoHtml } from '../../templates/pdf/orcamento-html.template';
+import { carregarFontesPdf } from './pdf-fontes';
 
 /**
  * Implementação concreta de PdfGenerator utilizando expo-print.
@@ -15,7 +16,8 @@ import { gerarOrcamentoHtml } from '../../templates/pdf/orcamento-html.template'
  */
 export class ExpoPrintPdfGenerator implements PdfGenerator {
   async gerar(modelo: OrcamentoPdfModel): Promise<ResultadoGeracaoPdf> {
-    const html = gerarOrcamentoHtml(modelo);
+    const fontFaceCss = await carregarFontesPdf();
+    const html = gerarOrcamentoHtml(modelo, { fontFaceCss });
 
     const resultado = await Print.printToFileAsync({
       html,
