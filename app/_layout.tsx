@@ -1,5 +1,5 @@
 import 'react-native-get-random-values';
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Stack, useRouter, useSegments } from 'expo-router';
 import {
   useFonts,
@@ -18,9 +18,19 @@ function RootNavigation({ fontesProntas }: { fontesProntas: boolean }) {
   const segments = useSegments();
   const router = useRouter();
 
+  // isLoading também fica true durante login, cadastro, saída e conclusão de perfil.
+  // A tela de carregamento cobre só a verificação inicial da sessão: depois dela a navegação
+  // permanece montada, para que a tela atual não seja recriada e possa exibir erros
+  // (ex.: senha incorreta) com os campos preenchidos.
+  const [sessaoVerificada, setSessaoVerificada] = useState(false);
   useEffect(() => {
-    // Só redireciona depois que o Stack estiver montado (fontes prontas e sessão carregada)
-    if (isLoading || !fontesProntas) return;
+    if (!isLoading) setSessaoVerificada(true);
+  }, [isLoading]);
+
+  useEffect(() => {
+    // Só redireciona depois que o Stack estiver montado (fontes prontas e sessão verificada)
+    // e fora de uma operação de autenticação em andamento.
+    if (isLoading || !sessaoVerificada || !fontesProntas) return;
 
     const inAuthGroup = segments[0] === '(auth)';
     const inConcluirPerfil = segments[0] === 'concluir-perfil';
@@ -32,9 +42,9 @@ function RootNavigation({ fontesProntas }: { fontesProntas: boolean }) {
     } else if (isAuthenticated && perfil && (inAuthGroup || inConcluirPerfil)) {
       router.replace('/(app)');
     }
-  }, [isAuthenticated, isLoading, perfil, segments, router, fontesProntas]);
+  }, [isAuthenticated, isLoading, sessaoVerificada, perfil, segments, router, fontesProntas]);
 
-  if (isLoading || !fontesProntas) {
+  if (!sessaoVerificada || !fontesProntas) {
     return (
       <View style={styles.loadingContainer}>
         <ActivityIndicator size="large" color={colors.primary} />
