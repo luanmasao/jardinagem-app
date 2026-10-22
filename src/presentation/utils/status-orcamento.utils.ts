@@ -1,4 +1,5 @@
 import { StatusOrcamento } from '../../domain/enums/status-orcamento';
+import { colors } from '../theme';
 
 /**
  * Mapeamento explícito e determinístico dos estados técnicos do orçamento
@@ -52,21 +53,24 @@ export interface StatusOrcamentoBadge extends StatusOrcamentoEstilo {
   label: string;
 }
 
+/**
+ * Cores dos status, a partir da paleta do tema (texto com contraste mínimo de 4,5:1 sobre o fundo).
+ */
 export const STATUS_ORCAMENTO_ESTILOS: Readonly<Record<StatusOrcamento, StatusOrcamentoEstilo>> = Object.freeze({
-  [StatusOrcamento.RASCUNHO]: { bg: '#FFF3E0', text: '#E65100', border: '#FFE0B2' },
-  [StatusOrcamento.ENVIADO]: { bg: '#E3F2FD', text: '#1565C0', border: '#BBDEFB' },
-  [StatusOrcamento.EM_ANALISE]: { bg: '#EDE7F6', text: '#512DA8', border: '#D1C4E9' },
-  [StatusOrcamento.APROVADO]: { bg: '#E8F5E9', text: '#2E7D32', border: '#C8E6C9' },
-  [StatusOrcamento.CONCLUIDO]: { bg: '#E0F2F1', text: '#004D40', border: '#B2DFDB' },
-  [StatusOrcamento.RECUSADO]: { bg: '#FFEBEE', text: '#C62828', border: '#FFCDD2' },
-  [StatusOrcamento.EXPIRADO]: { bg: '#FFF8E1', text: '#F57F17', border: '#FFECB3' },
-  [StatusOrcamento.CANCELADO]: { bg: '#ECEFF1', text: '#455A64', border: '#CFD8DC' },
+  [StatusOrcamento.RASCUNHO]: { bg: colors.surfaceMuted, text: colors.textSecondary, border: colors.borderStrong },
+  [StatusOrcamento.ENVIADO]: { bg: colors.infoSoft, text: colors.info, border: colors.infoBorder },
+  [StatusOrcamento.EM_ANALISE]: { bg: colors.analysisSoft, text: colors.analysis, border: colors.analysisBorder },
+  [StatusOrcamento.APROVADO]: { bg: colors.primarySoft, text: colors.primaryDark, border: colors.primaryBorder },
+  [StatusOrcamento.CONCLUIDO]: { bg: colors.tealSoft, text: colors.teal, border: colors.tealBorder },
+  [StatusOrcamento.RECUSADO]: { bg: colors.dangerSoft, text: colors.danger, border: colors.dangerBorder },
+  [StatusOrcamento.EXPIRADO]: { bg: colors.warningSoft, text: colors.warning, border: colors.warningBorder },
+  [StatusOrcamento.CANCELADO]: { bg: colors.slateSoft, text: colors.slate, border: colors.slateBorder },
 });
 
 export const STATUS_ORCAMENTO_ESTILO_PADRAO: StatusOrcamentoEstilo = Object.freeze({
-  bg: '#F5F5F5',
-  text: '#616161',
-  border: '#E0E0E0',
+  bg: colors.surfaceMuted,
+  text: colors.textMuted,
+  border: colors.border,
 });
 
 /**

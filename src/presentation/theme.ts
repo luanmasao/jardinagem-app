@@ -42,8 +42,16 @@ export const colors = Object.freeze({
   warningBorder: '#F0D29A',
   info: '#234E8C',
   infoSoft: '#E6EEF8',
+  infoBorder: '#BFD2EC',
   teal: '#155A52',
   tealSoft: '#DFF0EE',
+  tealBorder: '#B5DCD6',
+  analysis: '#553A97',
+  analysisSoft: '#EEEAF7',
+  analysisBorder: '#D6CCEC',
+  slate: '#46505A',
+  slateSoft: '#ECEEF0',
+  slateBorder: '#D2D7DC',
 
   shadow: '#000000',
 });
