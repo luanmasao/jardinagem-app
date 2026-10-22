@@ -9,6 +9,7 @@ import {
   SignUpParams,
 } from '../../application/services/auth.service';
 import { Usuario } from '../../domain/entities/usuario';
+import { traduzirErroAutenticacao } from '../utils/auth-erros.utils';
 
 export interface AuthContextData {
   user: AuthUser | null;
@@ -124,7 +125,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     try {
       const response = await authService.signIn(params);
       if (response.error) {
-        return { success: false, error: response.error.message };
+        return { success: false, error: traduzirErroAutenticacao(response.error, 'Falha ao autenticar') };
       }
       if (response.user) {
         setUser(response.user);
@@ -133,8 +134,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       }
       return { success: true };
     } catch (err) {
-      const message = err instanceof Error ? err.message : 'Falha ao autenticar';
-      return { success: false, error: message };
+      return { success: false, error: traduzirErroAutenticacao(err, 'Falha ao autenticar') };
     } finally {
       setIsLoading(false);
     }
@@ -145,7 +145,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     try {
       const response = await authService.signUp(params);
       if (response.error) {
-        return { success: false, error: response.error.message };
+        return { success: false, error: traduzirErroAutenticacao(response.error, 'Falha ao cadastrar') };
       }
       if (response.user) {
         setUser(response.user);
@@ -154,8 +154,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       }
       return { success: true };
     } catch (err) {
-      const message = err instanceof Error ? err.message : 'Falha ao cadastrar';
-      return { success: false, error: message };
+      return { success: false, error: traduzirErroAutenticacao(err, 'Falha ao cadastrar') };
     } finally {
       setIsLoading(false);
     }
@@ -179,15 +178,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       try {
         const response = await authService.concluirPerfil(params);
         if (response.error) {
-          return { success: false, error: response.error.message };
+          return {
+            success: false,
+            error: traduzirErroAutenticacao(response.error, 'Falha ao concluir perfil.'),
+          };
         }
         if (response.perfil) {
           setPerfil(response.perfil);
         }
         return { success: true };
       } catch (err) {
-        const message = err instanceof Error ? err.message : 'Falha ao concluir perfil.';
-        return { success: false, error: message };
+        return { success: false, error: traduzirErroAutenticacao(err, 'Falha ao concluir perfil.') };
       } finally {
         setIsLoading(false);
       }
