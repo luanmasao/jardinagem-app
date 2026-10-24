@@ -40,3 +40,14 @@ screenshot_*.png
 
 tests/
 tsconfig.test.json
+
+# Instruções e agentes do Claude Code e adendo de arquitetura (mantidos só localmente)
+CLAUDE.md
+.claude/agents/
+docs/arquitetura-offline-adendo.md
+
+# Scripts auxiliares de desenvolvimento (mantidos só localmente)
+scripts/
+
+# Fontes PlantUML dos diagramas (mantidas só localmente; as imagens ficam em apresentacao/)
+docs/uml/
