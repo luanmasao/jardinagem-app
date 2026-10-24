@@ -10,8 +10,8 @@ import {
 } from 'react-native';
 import { useLocalSearchParams, useRouter, useFocusEffect } from 'expo-router';
 import { useAreas } from '../../../src/presentation/hooks/use-areas';
-import { supabaseOrcamentoRepository } from '../../../src/infrastructure/repositories/supabase-orcamento.repository';
-import { supabaseItemOrcamentoRepository } from '../../../src/infrastructure/repositories/supabase-item-orcamento.repository';
+import { orcamentoRepositoryOffline } from '../../../src/infrastructure/offline/orcamento-repository-offline';
+import { itemOrcamentoRepositoryOffline } from '../../../src/infrastructure/offline/item-orcamento-repository-offline';
 import { clienteService } from '../../../src/application/services/cliente.service';
 import { StatusOrcamento } from '../../../src/domain/enums/status-orcamento';
 import { ItemOrcamento } from '../../../src/domain/entities/item-orcamento';
@@ -45,7 +45,7 @@ export default function AreasItemScreen() {
     if (!orcamentoId || !itemId) return;
     setCarregandoItem(true);
     try {
-      const orcDetalhe = await supabaseOrcamentoRepository.buscarPorId(orcamentoId);
+      const orcDetalhe = await orcamentoRepositoryOffline.buscarPorId(orcamentoId);
       if (orcDetalhe) {
         setStatusOrcamento(orcDetalhe.orcamento.status);
         setClienteId(orcDetalhe.orcamento.clienteId);
@@ -54,7 +54,7 @@ export default function AreasItemScreen() {
           setItem(itemEncontrado);
         } else {
           // Fallback consulta direta do item
-          const itDireto = await supabaseItemOrcamentoRepository.buscarPorId(itemId);
+          const itDireto = await itemOrcamentoRepositoryOffline.buscarPorId(itemId);
           setItem(itDireto);
         }
       }

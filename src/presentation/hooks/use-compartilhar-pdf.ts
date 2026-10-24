@@ -2,8 +2,8 @@ import { useState, useCallback, useMemo } from 'react';
 import { Alert } from 'react-native';
 import { CompartilharPdfOrcamentoUseCase } from '../../application/use-cases/orcamento/compartilhar-pdf-orcamento.use-case';
 import { GerarPdfOrcamentoUseCase } from '../../application/use-cases/orcamento/gerar-pdf-orcamento.use-case';
-import { supabaseOrcamentoRepository } from '../../infrastructure/repositories/supabase-orcamento.repository';
-import { supabaseClienteRepository } from '../../infrastructure/repositories/supabase-cliente.repository';
+import { orcamentoRepositoryOffline } from '../../infrastructure/offline/orcamento-repository-offline';
+import { clienteRepositoryComCopiaLocal } from '../../infrastructure/offline/cliente-repository-com-copia-local';
 import { expoPrintPdfGenerator } from '../../infrastructure/services/pdf/expo-print-pdf.generator';
 import { expoSharingShareProvider } from '../../infrastructure/services/share/expo-sharing.provider';
 import { authService } from '../../application/services/auth.service';
@@ -35,8 +35,8 @@ export function useCompartilharPdf(
     if (customUseCase) return customUseCase;
 
     const gerarPdfUseCase = new GerarPdfOrcamentoUseCase(
-      supabaseOrcamentoRepository,
-      supabaseClienteRepository,
+      orcamentoRepositoryOffline,
+      clienteRepositoryComCopiaLocal,
       authService,
       expoPrintPdfGenerator
     );
@@ -44,7 +44,7 @@ export function useCompartilharPdf(
     return new CompartilharPdfOrcamentoUseCase(
       expoSharingShareProvider,
       gerarPdfUseCase,
-      supabaseOrcamentoRepository,
+      orcamentoRepositoryOffline,
       authService
     );
   }, [customUseCase]);

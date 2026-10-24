@@ -16,7 +16,7 @@ import { OrcamentoResumo } from '../../../src/domain/repositories/orcamento.repo
 import { formatarDataCivil } from '../../../src/presentation/utils/data-formatters';
 import { STATUS_FILTROS_ORCAMENTO } from '../../../src/presentation/utils/status-orcamento.utils';
 import { colors, fonts } from '../../../src/presentation/theme';
-import { Button, Icon, StatusBadge } from '../../../src/presentation/components/ui';
+import { Badge, Button, Icon, StatusBadge } from '../../../src/presentation/components/ui';
 
 /** Iniciais exibidas no círculo do card (até duas letras do nome do cliente). */
 function iniciaisDoCliente(nome?: string): string {
@@ -72,6 +72,7 @@ export default function OrcamentosListScreen() {
         <View style={styles.cardFooter}>
           <View style={styles.statusCol}>
             <StatusBadge status={item.status} />
+            {item.pendenteSincronizacao ? <Badge label="Não sincronizado" tone="warning" /> : null}
             {item.dataValidade ? (
               <Text style={styles.validadeText}>Validade {formatarData(item.dataValidade)}</Text>
             ) : null}

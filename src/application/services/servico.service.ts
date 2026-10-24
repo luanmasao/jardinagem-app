@@ -1,6 +1,6 @@
 import { Servico } from '../../domain/entities/servico';
 import { ServicoRepository } from '../../domain/repositories/servico.repository.interface';
-import { supabaseServicoRepository } from '../../infrastructure/repositories/supabase-servico.repository';
+import { servicoRepositoryComCopiaLocal } from '../../infrastructure/offline/servico-repository-com-copia-local';
 import { AuthService, authService } from './auth.service';
 import {
   ListarServicosUseCase,
@@ -24,7 +24,7 @@ export class ServicoService {
   private readonly alterarAtivoServicoUseCase: AlterarAtivoServicoUseCase;
 
   constructor(
-    repository: ServicoRepository = supabaseServicoRepository,
+    repository: ServicoRepository = servicoRepositoryComCopiaLocal,
     auth: AuthService = authService
   ) {
     this.listarServicosUseCase = new ListarServicosUseCase(repository, auth);

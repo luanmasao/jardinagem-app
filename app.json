@@ -1,9 +1,10 @@
 {
   "expo": {
-    "name": "Sistema de Orçamentos para Jardinagem",
+    "name": "Área Verde",
     "slug": "jardinagem-app",
     "version": "1.0.0",
     "orientation": "portrait",
+    "icon": "./assets/icon.png",
     "userInterfaceStyle": "automatic",
     "scheme": "jardinagem-app",
     "ios": {
@@ -13,7 +14,9 @@
       "package": "com.jardinagem.app",
       "softwareKeyboardLayoutMode": "resize",
       "adaptiveIcon": {
-        "backgroundColor": "#2e7d32"
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "monochromeImage": "./assets/adaptive-icon-monochrome.png",
+        "backgroundColor": "#1E4D34"
       },
       "predictiveBackGestureEnabled": false
     },

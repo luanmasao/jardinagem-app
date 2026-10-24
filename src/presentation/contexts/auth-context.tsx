@@ -17,6 +17,8 @@ export interface AuthContextData {
   perfil: Usuario | null;
   /** true quando a última consulta do perfil falhou (ex.: sem conexão), e não por perfil inexistente. */
   falhaPerfil: boolean;
+  /** true quando o usuário está identificado só pela identidade local, porque o token não pôde ser renovado sem conexão. */
+  sessaoOffline: boolean;
   isLoading: boolean;
   isAuthenticated: boolean;
   signIn: (params: SignInParams) => Promise<{ success: boolean; error?: string }>;
@@ -33,6 +35,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<AuthUser | null>(null);
   const [perfil, setPerfil] = useState<Usuario | null>(null);
   const [falhaPerfil, setFalhaPerfil] = useState<boolean>(false);
+  const [sessaoOffline, setSessaoOffline] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
   const fetchPerfil = useCallback(async (userId: string) => {
@@ -61,11 +64,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     // 1. Inicializa o estado com a sessão persistida existente
     async function initializeAuth() {
       try {
-        const initialSession = await authService.getSession();
+        const { session: initialSession, usuarioOffline } = await authService.recuperarSessao();
         if (!isMounted) return;
 
         if (initialSession?.user) {
           setSession(initialSession);
+          setSessaoOffline(false);
           const authUser: AuthUser = {
             id: initialSession.user.id,
             email: initialSession.user.email ?? null,
@@ -74,8 +78,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           };
           setUser(authUser);
           await fetchPerfil(initialSession.user.id);
+        } else if (usuarioOffline) {
+          // Sem conexão e com o token vencido: segue com a última identidade do dispositivo (D-OFF-07).
+          // Quando a conexão voltar, o refresh automático emite TOKEN_REFRESHED com a sessão renovada.
+          setSession(null);
+          setSessaoOffline(true);
+          setUser(usuarioOffline);
+          await fetchPerfil(usuarioOffline.id);
         } else {
           setSession(null);
+          setSessaoOffline(false);
           setUser(null);
           setPerfil(null);
           setFalhaPerfil(false);
@@ -92,11 +104,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     initializeAuth();
 
     // 2. Observa mudanças no estado de autenticação de forma centralizada
-    const { data: { subscription } } = authService.onAuthStateChange(async (_event, newSession) => {
+    const { data: { subscription } } = authService.onAuthStateChange(async (event, newSession) => {
       if (!isMounted) return;
+
+      // A sessão inicial nula é tratada por initializeAuth, que distingue "sem sessão" de "sem conexão".
+      if (event === 'INITIAL_SESSION' && !newSession) return;
 
       if (newSession?.user) {
         setSession(newSession);
+        setSessaoOffline(false);
         const authUser: AuthUser = {
           id: newSession.user.id,
           email: newSession.user.email ?? null,
@@ -107,6 +123,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         await fetchPerfil(newSession.user.id);
       } else {
         setSession(null);
+        setSessaoOffline(false);
         setUser(null);
         setPerfil(null);
         setFalhaPerfil(false);
@@ -175,6 +192,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     try {
       await authService.signOut();
       setSession(null);
+      setSessaoOffline(false);
       setUser(null);
       setPerfil(null);
       setFalhaPerfil(false);
@@ -214,15 +232,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       session,
       perfil,
       falhaPerfil,
+      sessaoOffline,
       isLoading,
-      isAuthenticated: !!session && !!user,
+      isAuthenticated: !!user && (!!session || sessaoOffline),
       signIn,
       signUp,
       signOut,
       refreshPerfil,
       concluirPerfil,
     }),
-    [user, session, perfil, falhaPerfil, isLoading, signIn, signUp, signOut, refreshPerfil, concluirPerfil]
+    [user, session, perfil, falhaPerfil, sessaoOffline, isLoading, signIn, signUp, signOut, refreshPerfil, concluirPerfil]
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

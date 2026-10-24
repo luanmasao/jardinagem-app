@@ -8,11 +8,11 @@ import { ItemOrcamentoRepository } from '../../domain/repositories/item-orcament
 import { ClienteRepository } from '../../domain/repositories/cliente.repository.interface';
 import { ServicoRepository } from '../../domain/repositories/servico.repository.interface';
 import { ProdutoRepository } from '../../domain/repositories/produto.repository.interface';
-import { supabaseOrcamentoRepository } from '../../infrastructure/repositories/supabase-orcamento.repository';
-import { supabaseItemOrcamentoRepository } from '../../infrastructure/repositories/supabase-item-orcamento.repository';
-import { supabaseClienteRepository } from '../../infrastructure/repositories/supabase-cliente.repository';
-import { supabaseServicoRepository } from '../../infrastructure/repositories/supabase-servico.repository';
-import { supabaseProdutoRepository } from '../../infrastructure/repositories/supabase-produto.repository';
+import { orcamentoRepositoryOffline } from '../../infrastructure/offline/orcamento-repository-offline';
+import { itemOrcamentoRepositoryOffline } from '../../infrastructure/offline/item-orcamento-repository-offline';
+import { clienteRepositoryComCopiaLocal } from '../../infrastructure/offline/cliente-repository-com-copia-local';
+import { servicoRepositoryComCopiaLocal } from '../../infrastructure/offline/servico-repository-com-copia-local';
+import { produtoRepositoryComCopiaLocal } from '../../infrastructure/offline/produto-repository-com-copia-local';
 import { AuthService, authService } from './auth.service';
 import {
   ListarOrcamentosUseCase,
@@ -83,11 +83,11 @@ export class OrcamentoService {
   private readonly expirarOrcamentosVencidosUseCase: ExpirarOrcamentosVencidosUseCase;
 
   constructor(
-    private readonly orcamentoRepo: OrcamentoRepository = supabaseOrcamentoRepository,
-    private readonly itemOrcamentoRepo: ItemOrcamentoRepository = supabaseItemOrcamentoRepository,
-    private readonly clienteRepo: ClienteRepository = supabaseClienteRepository,
-    private readonly servicoRepo: ServicoRepository = supabaseServicoRepository,
-    private readonly produtoRepo: ProdutoRepository = supabaseProdutoRepository,
+    private readonly orcamentoRepo: OrcamentoRepository = orcamentoRepositoryOffline,
+    private readonly itemOrcamentoRepo: ItemOrcamentoRepository = itemOrcamentoRepositoryOffline,
+    private readonly clienteRepo: ClienteRepository = clienteRepositoryComCopiaLocal,
+    private readonly servicoRepo: ServicoRepository = servicoRepositoryComCopiaLocal,
+    private readonly produtoRepo: ProdutoRepository = produtoRepositoryComCopiaLocal,
     private readonly auth: AuthService = authService
   ) {
     this.listarOrcamentosUseCase = new ListarOrcamentosUseCase(this.orcamentoRepo);
@@ -165,6 +165,13 @@ export class OrcamentoService {
   async excluirOrcamento(id: string): Promise<void> {
     const usuarioId = await this.getUsuarioId();
     return this.excluirOrcamentoUseCase.execute({ id, usuarioId });
+  }
+
+  /**
+   * Quantidade de rascunhos com alterações guardadas só no aparelho (RNF40, RF87).
+   */
+  async contarRascunhosPendentes(): Promise<number> {
+    return this.orcamentoRepo.contarPendentesSincronizacao ? this.orcamentoRepo.contarPendentesSincronizacao() : 0;
   }
 
   /**

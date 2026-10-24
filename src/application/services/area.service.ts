@@ -4,9 +4,9 @@ import { AreaRepository } from '../../domain/repositories/area.repository.interf
 import { ItemOrcamentoRepository } from '../../domain/repositories/item-orcamento.repository.interface';
 import { OrcamentoRepository } from '../../domain/repositories/orcamento.repository.interface';
 import { CalculadorAreaService } from '../../domain/services/calculador-area.service';
-import { supabaseAreaRepository } from '../../infrastructure/repositories/supabase-area.repository';
-import { supabaseItemOrcamentoRepository } from '../../infrastructure/repositories/supabase-item-orcamento.repository';
-import { supabaseOrcamentoRepository } from '../../infrastructure/repositories/supabase-orcamento.repository';
+import { areaRepositoryOffline } from '../../infrastructure/offline/area-repository-offline';
+import { itemOrcamentoRepositoryOffline } from '../../infrastructure/offline/item-orcamento-repository-offline';
+import { orcamentoRepositoryOffline } from '../../infrastructure/offline/orcamento-repository-offline';
 import { geodesicCalculadorAreaService } from '../../infrastructure/services/geodesic-calculador-area.service';
 import { AuthService, authService } from './auth.service';
 import {
@@ -46,9 +46,9 @@ export class AreaService {
   private readonly removerAreaUseCase: RemoverAreaUseCase;
 
   constructor(
-    private readonly areaRepo: AreaRepository = supabaseAreaRepository,
-    private readonly itemOrcamentoRepo: ItemOrcamentoRepository = supabaseItemOrcamentoRepository,
-    private readonly orcamentoRepo: OrcamentoRepository = supabaseOrcamentoRepository,
+    private readonly areaRepo: AreaRepository = areaRepositoryOffline,
+    private readonly itemOrcamentoRepo: ItemOrcamentoRepository = itemOrcamentoRepositoryOffline,
+    private readonly orcamentoRepo: OrcamentoRepository = orcamentoRepositoryOffline,
     private readonly calculadorArea: CalculadorAreaService = geodesicCalculadorAreaService,
     private readonly auth: AuthService = authService
   ) {

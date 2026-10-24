@@ -1,7 +1,7 @@
 import { Cliente } from '../../domain/entities/cliente';
 import { Endereco } from '../../domain/entities/endereco';
 import { ClienteRepository } from '../../domain/repositories/cliente.repository.interface';
-import { supabaseClienteRepository } from '../../infrastructure/repositories/supabase-cliente.repository';
+import { clienteRepositoryComCopiaLocal } from '../../infrastructure/offline/cliente-repository-com-copia-local';
 import { AuthService, authService } from './auth.service';
 import { GeocodingProvider } from '../interfaces/geocoding-provider.interface';
 import { expoLocationGeocodingProvider } from '../../infrastructure/services/geocoding/expo-location-geocoding.provider';
@@ -32,7 +32,7 @@ export class ClienteService {
   private readonly salvarEnderecoClienteUseCase: SalvarEnderecoClienteUseCase;
 
   constructor(
-    repository: ClienteRepository = supabaseClienteRepository,
+    repository: ClienteRepository = clienteRepositoryComCopiaLocal,
     auth: AuthService = authService,
     geocodingProvider: GeocodingProvider = expoLocationGeocodingProvider
   ) {

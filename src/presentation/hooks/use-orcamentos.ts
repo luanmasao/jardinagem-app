@@ -1,8 +1,9 @@
-import { useState, useCallback, useMemo } from 'react';
+import { useState, useCallback, useMemo, useEffect } from 'react';
 import { useFocusEffect } from 'expo-router';
 import { OrcamentoResumo } from '../../domain/repositories/orcamento.repository.interface';
 import { StatusOrcamento } from '../../domain/enums/status-orcamento';
 import { orcamentoService } from '../../application/services/orcamento.service';
+import { sincronizacaoService } from '../../application/services/sincronizacao.service';
 
 /**
  * Hook para gerenciar o estado da listagem de orçamentos com filtro por status e busca local em memória.
@@ -43,6 +44,14 @@ export function useOrcamentos() {
       .catch(() => {});
   }, [filtroStatus]);
 
+  // Após uma sincronização, os rascunhos enviados recebem o número definitivo e deixam de estar pendentes.
+  useEffect(
+    () =>
+      sincronizacaoService.aoAlterarOrcamentos(() => {
+        loadOrcamentos();
+      }),
+    [loadOrcamentos]
+  );
 
   useFocusEffect(
     useCallback(() => {

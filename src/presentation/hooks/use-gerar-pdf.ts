@@ -1,8 +1,8 @@
 import { useState, useCallback } from 'react';
 import { Alert } from 'react-native';
 import { GerarPdfOrcamentoUseCase } from '../../application/use-cases/orcamento/gerar-pdf-orcamento.use-case';
-import { supabaseOrcamentoRepository } from '../../infrastructure/repositories/supabase-orcamento.repository';
-import { supabaseClienteRepository } from '../../infrastructure/repositories/supabase-cliente.repository';
+import { orcamentoRepositoryOffline } from '../../infrastructure/offline/orcamento-repository-offline';
+import { clienteRepositoryComCopiaLocal } from '../../infrastructure/offline/cliente-repository-com-copia-local';
 import { expoPrintPdfGenerator } from '../../infrastructure/services/pdf/expo-print-pdf.generator';
 import { androidPdfViewerService } from '../../infrastructure/services/pdf/android-pdf-viewer.service';
 import { authService } from '../../application/services/auth.service';
@@ -33,8 +33,8 @@ export function useGerarPdf() {
         }
 
         const useCase = new GerarPdfOrcamentoUseCase(
-          supabaseOrcamentoRepository,
-          supabaseClienteRepository,
+          orcamentoRepositoryOffline,
+          clienteRepositoryComCopiaLocal,
           authService,
           expoPrintPdfGenerator
         );
@@ -78,8 +78,8 @@ export function useGerarPdf() {
       if (!usuario) throw new Error('Usuário não autenticado.');
 
       const useCase = new GerarPdfOrcamentoUseCase(
-        supabaseOrcamentoRepository,
-        supabaseClienteRepository,
+        orcamentoRepositoryOffline,
+        clienteRepositoryComCopiaLocal,
         authService,
         expoPrintPdfGenerator
       );

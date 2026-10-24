@@ -2,7 +2,7 @@ import {
   ShareProvider,
   ResultadoCompartilhamento,
 } from '../../interfaces/share-provider.interface';
-import { GerarPdfOrcamentoUseCase } from './gerar-pdf-orcamento.use-case';
+import { GerarPdfOrcamentoUseCase, OrcamentoNaoSincronizadoError } from './gerar-pdf-orcamento.use-case';
 import { OrcamentoRepository } from '../../../domain/repositories/orcamento.repository.interface';
 import { AuthService } from '../../services/auth.service';
 
@@ -69,6 +69,15 @@ export class CompartilharPdfOrcamentoUseCase {
         sucesso: false,
         status: 'ERRO',
         mensagem: 'Orçamento não pertencente ao usuário autenticado.',
+      };
+    }
+
+    // RNF33 / RN82: rascunho pendente ainda tem número provisório, que não identifica o orçamento.
+    if (orcamentoComCliente.pendenteSincronizacao) {
+      return {
+        sucesso: false,
+        status: 'ERRO',
+        mensagem: new OrcamentoNaoSincronizadoError().message,
       };
     }
 

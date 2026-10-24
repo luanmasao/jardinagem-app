@@ -1,6 +1,6 @@
 import { Produto } from '../../domain/entities/produto';
 import { ProdutoRepository } from '../../domain/repositories/produto.repository.interface';
-import { supabaseProdutoRepository } from '../../infrastructure/repositories/supabase-produto.repository';
+import { produtoRepositoryComCopiaLocal } from '../../infrastructure/offline/produto-repository-com-copia-local';
 import { AuthService, authService } from './auth.service';
 import {
   ListarProdutosUseCase,
@@ -24,7 +24,7 @@ export class ProdutoService {
   private readonly alterarAtivoProdutoUseCase: AlterarAtivoProdutoUseCase;
 
   constructor(
-    repository: ProdutoRepository = supabaseProdutoRepository,
+    repository: ProdutoRepository = produtoRepositoryComCopiaLocal,
     auth: AuthService = authService
   ) {
     this.listarProdutosUseCase = new ListarProdutosUseCase(repository, auth);

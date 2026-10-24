@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { useAuth } from '../src/presentation/contexts/auth-context';
+import { useSairComAviso } from '../src/presentation/hooks/use-sair-com-aviso';
 import { colors, fonts } from '../src/presentation/theme';
 import { Button } from '../src/presentation/components/ui';
 import { AuthHero, AuthPainel } from '../src/presentation/components/auth/auth-hero';
@@ -10,7 +11,8 @@ import { AuthHero, AuthPainel } from '../src/presentation/components/auth/auth-h
  * Diferente de /concluir-perfil, que é só para quem realmente não tem perfil cadastrado.
  */
 export default function ErroPerfilScreen() {
-  const { refreshPerfil, signOut, isLoading } = useAuth();
+  const { refreshPerfil, isLoading } = useAuth();
+  const signOut = useSairComAviso();
   const [tentando, setTentando] = useState(false);
 
   const handleTentarNovamente = async () => {

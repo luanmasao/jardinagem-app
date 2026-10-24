@@ -4,7 +4,7 @@ import { useAuth } from '../../src/presentation/contexts/auth-context';
 import { useRouter } from 'expo-router';
 import { useOrcamentos } from '../../src/presentation/hooks/use-orcamentos';
 import { colors, fonts } from '../../src/presentation/theme';
-import { Button, Icon, IconName, StatusBadge } from '../../src/presentation/components/ui';
+import { Badge, Button, Icon, IconName, StatusBadge } from '../../src/presentation/components/ui';
 
 const MODULOS: { titulo: string; descricao: string; rota: string; icone: IconName }[] = [
   {
@@ -153,7 +153,11 @@ export default function HomeScreen() {
                     {orc.numero} · {formatarMoeda(orc.total)}
                   </Text>
                 </View>
-                <StatusBadge status={orc.status} />
+                {orc.pendenteSincronizacao ? (
+                  <Badge label="Não sincronizado" tone="warning" />
+                ) : (
+                  <StatusBadge status={orc.status} />
+                )}
               </TouchableOpacity>
             ))
           )}

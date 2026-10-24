@@ -12,6 +12,10 @@ entity "Orcamento" as Orcamento
 entity "ItemOrcamento" as Item
 entity "Area" as Area
 
+control "SincronizacaoService" as Sync
+database "Armazenamento local" as Local
+database "Servidor" as Servidor
+
 
 == Criação do orçamento ==
 
@@ -187,5 +191,55 @@ else Orçamento válido
     App --> Jardineiro : Confirmar envio
 
 end
+
+
+== Operação sem conexão ==
+
+note over App, Local
+Sem conexão, o catálogo e os clientes são lidos da última
+cópia local, e o salvamento do rascunho grava o orçamento
+completo (itens e áreas) no armazenamento local, marcado
+como pendente e com identificação provisória (RN82).
+end note
+
+Controller -> Local : salvar rascunho pendente
+Local --> Controller : rascunho salvo
+Controller --> App : rascunho salvo no dispositivo
+App --> Jardineiro : Informar que o rascunho está pendente
+
+
+== Sincronização de rascunhos ==
+
+alt Conexão restabelecida
+    App -> Sync : sincronizarPendentes()
+else Solicitação do usuário
+    Jardineiro -> App : Sincronizar agora
+    App -> Sync : sincronizarPendentes()
+end
+
+Sync -> Local : listar rascunhos pendentes
+Local --> Sync : rascunhos pendentes
+
+loop Para cada rascunho pendente
+
+    opt Rascunho criado sem conexão
+        Sync -> Servidor : obter próximo número
+        Servidor --> Sync : número definitivo
+    end
+
+    Sync -> Servidor : gravar orçamento, itens e áreas\n(pelos identificadores gerados no dispositivo)
+
+    alt Gravação concluída
+        Servidor --> Sync : confirmação
+        Sync -> Local : remover marca de pendente
+    else Falha
+        Servidor --> Sync : erro
+        Sync -> Local : manter pendente
+    end
+
+end
+
+Sync --> App : resultado da sincronização
+App --> Jardineiro : Exibir pendências restantes
 
 @enduml

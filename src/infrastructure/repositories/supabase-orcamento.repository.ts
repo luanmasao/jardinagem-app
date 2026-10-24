@@ -209,6 +209,7 @@ export class SupabaseOrcamentoRepository implements OrcamentoRepository {
     const numero = dados.numero ? dados.numero.trim() : await this.obterProximoNumero(dados.usuarioId);
 
     const payload = {
+      ...(dados.id ? { id: dados.id } : {}),
       usuario_id: dados.usuarioId,
       cliente_id: dados.clienteId,
       numero,

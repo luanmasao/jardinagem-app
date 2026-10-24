@@ -589,7 +589,7 @@ export function gerarOrcamentoHtml(modelo: OrcamentoPdfModel, opcoes?: OpcoesTem
   <!-- 6. Rodapé -->
   <div class="rodape-estatico">
     <div class="rodape-linha-principal">Orçamento ${escapeHtml(modelo.numero)} &bull; Emitido em ${escapeHtml(modelo.dataCriacaoFormatada)} &bull; ${validadeRodape}</div>
-    <div>Documento emitido eletronicamente pelo Sistema de Orçamentos para Jardinagem &bull; Proposta comercial sujeita às condições informadas.</div>
+    <div>Documento emitido eletronicamente pelo app Área Verde &bull; Proposta comercial sujeita às condições informadas.</div>
   </div>
 
 </body>

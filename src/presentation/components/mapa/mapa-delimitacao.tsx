@@ -10,7 +10,6 @@ import {
   Alert,
   KeyboardAvoidingView,
   ScrollView,
-  Platform,
   Keyboard,
 } from 'react-native';
 import { MapProvider } from '../../../infrastructure/maps/map-provider';
@@ -269,12 +268,10 @@ export const MapaDelimitacao: React.FC<MapaDelimitacaoProps> = ({
 
       {/* Modal para Definir Nome e Observações da Área */}
       <Modal visible={modalVisible} transparent animationType="slide">
-        {/* No Android a janela do Modal já usa SOFT_INPUT_ADJUST_RESIZE; compensar também com
+        {/* Com edge-to-edge a janela do Modal no Android não é redimensionada pelo teclado
+            (adjustResize não tem efeito), então a compensação fica a cargo do padding.
             behavior="height" fazia o painel oscilar verticalmente ao abrir o teclado. */}
-        <KeyboardAvoidingView
-          style={styles.modalOverlay}
-          behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-        >
+        <KeyboardAvoidingView style={styles.modalOverlay} behavior="padding">
           <View style={styles.modalContent}>
             <ScrollView
               contentContainerStyle={styles.modalScrollContent}
@@ -515,6 +512,8 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-end',
   },
   modalContent: {
+    // Encolhe (e o ScrollView rola) quando painel + teclado não cabem na tela.
+    flexShrink: 1,
     backgroundColor: colors.surface,
     borderTopLeftRadius: 24,
     borderTopRightRadius: 24,

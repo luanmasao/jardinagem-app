@@ -48,6 +48,10 @@ rectangle "Sistema de Orçamentos de Jardinagem" {
         usecase "Localizar endereço" as UC_LocalizarEndereco
         usecase "Posicionar mapa" as UC_PosicionarMapa
     }
+
+    package "Operação sem conexão" {
+        usecase "Sincronizar rascunhos" as UC_Sincronizar
+    }
 }
 
 ' Autenticação
@@ -89,6 +93,9 @@ Jardineiro --> UC_Compartilhar
 ' Localização
 Jardineiro --> UC_LocalizarEndereco
 Jardineiro --> UC_PosicionarMapa
+
+' Operação sem conexão
+Jardineiro --> UC_Sincronizar
 
 ' Relações entre casos de uso
 
@@ -135,6 +142,17 @@ no mapa.
 Para serviços medidos em m²,
 a soma das áreas determina
 a quantidade do item.
+end note
+
+note right of UC_Sincronizar
+Sem conexão, o catálogo e os clientes
+são consultados da última cópia local,
+e os rascunhos criados ou editados
+ficam pendentes no dispositivo.
+
+A sincronização ocorre ao restabelecer
+a conexão ou por solicitação do usuário,
+e atribui o número definitivo (RN82).
 end note
 
 @enduml

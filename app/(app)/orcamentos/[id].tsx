@@ -39,6 +39,7 @@ export default function OrcamentoDetalheScreen() {
     duplicar,
     excluir,
     removerItem,
+    pendenteSincronizacao,
   } = useOrcamentoDetalhe(id || '');
 
   useFocusEffect(
@@ -288,6 +289,16 @@ export default function OrcamentoDetalheScreen() {
         </View>
 
         <View style={styles.secoes}>
+          {pendenteSincronizacao ? (
+            <View style={styles.avisoPendente} accessibilityRole="alert">
+              <Icon name="alert" size={16} color={colors.warning} />
+              <Text style={styles.avisoPendenteTexto}>
+                Rascunho salvo só neste aparelho. Ele será enviado ao servidor na sincronização; até lá, não é
+                possível enviar, excluir nem gerar o PDF.
+              </Text>
+            </View>
+          ) : null}
+
           {/* Card de Itens */}
           <Card style={styles.cardSection}>
             <View style={styles.itensSectionHeader}>
@@ -614,6 +625,24 @@ const styles = StyleSheet.create({
   },
   secoes: {
     padding: 16,
+  },
+  avisoPendente: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    gap: 10,
+    padding: 12,
+    marginBottom: 12,
+    borderRadius: 12,
+    borderWidth: 1,
+    backgroundColor: colors.warningSoft,
+    borderColor: colors.warningBorder,
+  },
+  avisoPendenteTexto: {
+    flex: 1,
+    color: colors.warning,
+    fontSize: 13,
+    lineHeight: 18,
+    fontFamily: fonts.medium,
   },
   cardSection: {
     marginBottom: 12,

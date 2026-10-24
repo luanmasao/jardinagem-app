@@ -31,7 +31,7 @@ export const AuthHero: React.FC<AuthHeroProps> = ({ titulo, subtitulo }) => {
         <View style={styles.marcaIcone}>
           <Icon name="leaf" size={26} color={colors.primaryDark} />
         </View>
-        <Text style={styles.marcaNome}>Jardinagem App</Text>
+        <Text style={styles.marcaNome}>Área Verde</Text>
       </View>
       <Text style={styles.titulo}>{titulo}</Text>
       {subtitulo ? <Text style={styles.subtitulo}>{subtitulo}</Text> : null}

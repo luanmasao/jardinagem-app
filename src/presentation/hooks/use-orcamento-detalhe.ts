@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { Orcamento } from '../../domain/entities/orcamento';
 import { StatusOrcamento } from '../../domain/enums/status-orcamento';
 import { orcamentoService, AdicionarItemServiceInput, AtualizarItemServiceInput } from '../../application/services/orcamento.service';
+import { sincronizacaoService } from '../../application/services/sincronizacao.service';
 
 /**
  * Hook para gerenciar detalhes, itens e ciclo de vida de um orçamento.
@@ -11,6 +12,7 @@ export function useOrcamentoDetalhe(id: string) {
   const [clienteNome, setClienteNome] = useState<string | undefined>(undefined);
   const [clienteTelefone, setClienteTelefone] = useState<string | null | undefined>(undefined);
   const [clienteEmail, setClienteEmail] = useState<string | null | undefined>(undefined);
+  const [pendenteSincronizacao, setPendenteSincronizacao] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [isSaving, setIsSaving] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
@@ -26,6 +28,7 @@ export function useOrcamentoDetalhe(id: string) {
         setClienteNome(res.clienteNome);
         setClienteTelefone(res.clienteTelefone);
         setClienteEmail(res.clienteEmail);
+        setPendenteSincronizacao(!!res.pendenteSincronizacao);
       } else {
         setOrcamento(null);
         setError('Orçamento não encontrado.');
@@ -41,6 +44,15 @@ export function useOrcamentoDetalhe(id: string) {
   useEffect(() => {
     loadOrcamento();
   }, [loadOrcamento]);
+
+  // Após uma sincronização, o rascunho aberto pode ter recebido o número definitivo.
+  useEffect(
+    () =>
+      sincronizacaoService.aoAlterarOrcamentos(() => {
+        loadOrcamento();
+      }),
+    [loadOrcamento]
+  );
 
   const alterarStatus = async (novoStatus: StatusOrcamento): Promise<boolean> => {
     setIsSaving(true);
@@ -145,6 +157,7 @@ export function useOrcamentoDetalhe(id: string) {
     clienteNome,
     clienteTelefone,
     clienteEmail,
+    pendenteSincronizacao,
     itens: orcamento ? orcamento.itens : [],
     isLoading,
     isSaving,

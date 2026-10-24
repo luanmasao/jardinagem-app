@@ -3,6 +3,8 @@ import { StatusOrcamento } from '../enums/status-orcamento';
 import { TipoDesconto } from '../enums/tipo-desconto';
 
 export interface CriarOrcamentoDados {
+  /** Gerado no aparelho, para o mesmo rascunho poder ser criado offline e sincronizado depois (D-OFF-03). */
+  id?: string;
   usuarioId: string;
   clienteId: string;
   numero?: string;
@@ -38,6 +40,8 @@ export interface OrcamentoResumo {
   valorDesconto: number;
   total: number;
   totalItens?: number;
+  /** Rascunho com alterações guardadas só no aparelho. Marca técnica, não é status (RN84). */
+  pendenteSincronizacao?: boolean;
 }
 
 export interface OrcamentoComCliente {
@@ -45,6 +49,8 @@ export interface OrcamentoComCliente {
   clienteNome?: string;
   clienteTelefone?: string | null;
   clienteEmail?: string | null;
+  /** Rascunho com alterações guardadas só no aparelho. Marca técnica, não é status (RN84). */
+  pendenteSincronizacao?: boolean;
 }
 
 /**
@@ -60,5 +66,7 @@ export interface OrcamentoRepository {
   alterarStatus(id: string, novoStatus: StatusOrcamento): Promise<void>;
   excluir(id: string): Promise<void>;
   expirarMeusOrcamentos?(): Promise<number>;
+  /** Quantidade de rascunhos com alterações ainda não enviadas ao servidor (RNF40, RF87). */
+  contarPendentesSincronizacao?(): Promise<number>;
 }
 

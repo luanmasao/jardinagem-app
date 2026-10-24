@@ -7,13 +7,15 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import { useAuth } from '../../src/presentation/contexts/auth-context';
+import { useSairComAviso } from '../../src/presentation/hooks/use-sair-com-aviso';
 import { useRouter } from 'expo-router';
 import { colors, fonts } from '../../src/presentation/theme';
 import { Button, Card } from '../../src/presentation/components/ui';
 
 export default function PerfilScreen() {
   const router = useRouter();
-  const { user, perfil, isLoading, signOut, refreshPerfil } = useAuth();
+  const { user, perfil, isLoading, refreshPerfil } = useAuth();
+  const handleSair = useSairComAviso();
 
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.content}>
@@ -70,7 +72,7 @@ export default function PerfilScreen() {
         <Button
           title="Sair da Conta"
           variant="danger"
-          onPress={signOut}
+          onPress={handleSair}
           disabled={isLoading}
         />
       </View>

@@ -32,6 +32,15 @@ export class OrcamentoSemItensError extends Error {
   }
 }
 
+export class OrcamentoNaoSincronizadoError extends Error {
+  constructor() {
+    super(
+      'Este rascunho ainda não foi sincronizado com o servidor e tem um número provisório. Sincronize-o para gerar o PDF com o número definitivo.'
+    );
+    this.name = 'OrcamentoNaoSincronizadoError';
+  }
+}
+
 export class InconsistenciaFinanceiraError extends Error {
   constructor(detalhes: string) {
     super(`Inconsistência financeira detectada no orçamento: ${detalhes}`);
@@ -93,6 +102,11 @@ export class GerarPdfOrcamentoUseCase {
     // 3. Validação de autorização / propriedade
     if (orcamento.usuarioId !== usuarioId) {
       throw new UsuarioNaoAutorizadoError();
+    }
+
+    // RNF33 / RN82: rascunho pendente ainda tem número provisório, que não identifica o orçamento.
+    if (orcamentoComCliente.pendenteSincronizacao) {
+      throw new OrcamentoNaoSincronizadoError();
     }
 
     // 4. Validação de conteúdo: pelo menos 1 item
