@@ -51,3 +51,7 @@ scripts/
 
 # Fontes PlantUML dos diagramas (mantidas só localmente; as imagens ficam em apresentacao/)
 docs/uml/
+
+# Documentação final e pesquisa de mercado (mantidas só localmente)
+docs/documentacao-final/
+docs/Pesquisa de Mercado_ Aplicativo de Serviços de Jardinagem.csv
