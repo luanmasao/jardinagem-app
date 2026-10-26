@@ -1,5 +1,6 @@
 # Uniruy Wyden - Programação para Dispositivos Móveis em Android 
 
+Professor: Vagner Oliveira
 - Luan Masao
 - Aila Stefani
 
@@ -13,7 +14,7 @@ O sistema permite cadastrar clientes, serviços e produtos, criar e reutilizar o
 
 ✅ Versão 1.0 da aplicação completa
 
-🚧 Em desenvolvimento: documentação final e atualizada
+✅ Versão 1.0 da documentação completa 
 
 ## Stack 
 
